@@ -1,0 +1,3 @@
+
+class CanNotChangeProposalStatus(Exception):
+    pass

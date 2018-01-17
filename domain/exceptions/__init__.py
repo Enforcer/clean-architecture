@@ -1,0 +1,1 @@
+from .proposal import CanNotChangeProposalStatus
