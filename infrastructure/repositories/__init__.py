@@ -1,1 +1,0 @@
-from .proposals import FileProposalsRepository

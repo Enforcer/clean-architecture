@@ -1,1 +1,0 @@
-from .proposal import Proposal

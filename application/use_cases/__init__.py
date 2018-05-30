@@ -1,2 +1,0 @@
-from .accepting_proposal import AcceptingProposalUseCase
-from .submitting_proposal import SubmittingProposalUseCase
