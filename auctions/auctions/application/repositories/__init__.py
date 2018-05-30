@@ -1,0 +1,1 @@
+from auctions.application.repositories.auctions import AuctionsRepository

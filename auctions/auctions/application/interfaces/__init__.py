@@ -1,0 +1,1 @@
+from auctions.application.interfaces.email_gateway import EmailGateway

@@ -1,0 +1,6 @@
+Django==2.0.5
+funcy==1.10.2
+Inject==3.3.2
+pytest==3.6.0
+pytest-django==3.2.1
+
