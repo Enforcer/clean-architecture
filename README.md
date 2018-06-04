@@ -1,5 +1,5 @@
 # Clean architecture in Python - Auctions
-First exemplary app
+First exemplary app.
 
 # Work in progress
 * Implement the rest of `Auction` entity methods
