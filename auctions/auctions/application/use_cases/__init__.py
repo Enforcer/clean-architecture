@@ -1,1 +1,2 @@
+from auctions.application.use_cases.placing_bid import PlacingBidUseCase
 from auctions.application.use_cases.withdrawing_bids import WithdrawingBidsUseCase

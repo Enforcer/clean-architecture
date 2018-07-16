@@ -1,9 +1,10 @@
 import re
+import typing
 
 import funcy
 from django.contrib import admin
 
-from auctions.application import use_cases
+from auctions.application.use_cases import withdrawing_bids
 from auctions.models import (
     Auction,
     Bid,
@@ -13,30 +14,41 @@ from auctions.models import (
 class BidInline(admin.TabularInline):
     model = Bid
 
+    def has_add_permission(self, request):
+        return False
+
 
 class AuctionAdmin(admin.ModelAdmin):
     inlines = [BidInline]
+    readonly_fields = 'current_price',
 
     def save_related(self, request, form, formsets, *args, **kwargs):
         ids_of_deleted_bids = self._get_ids_of_deleted_bids(formsets)
 
-        use_case = use_cases.WithdrawingBidsUseCase()
-        use_case.withdraw_bids(auction_id=form.instance.pk, bids_ids=ids_of_deleted_bids)
+        use_case = withdrawing_bids.WithdrawingBidsUseCase()
+        input_dto = withdrawing_bids.WithdrawingBidsInputDto(auction_id=form.instance.pk, bids_ids=ids_of_deleted_bids)
+        # side effect is that current_price gets updated
+        use_case.execute(input_dto)
 
-        super().save_related(request, _form, formsets, *args, **kwargs)
+        for formset in formsets:
+            formset.new_objects = formset.changed_objects = formset.deleted_objects = []
 
-    def _get_ids_of_deleted_bids(self, formsets):
+    def save_model(self, request, obj, form, change):
+        if change:
+            obj.save(update_fields=['title', 'initial_price'])
+        else:
+            super().save_model(request, obj, form, change)
+
+    def _get_ids_of_deleted_bids(self, formsets) -> typing.List[int]:
         ids = set()
         for form in formsets:
-            rows_numbers_for_deletion = set()
             for key in form.data.keys():
                 match = re.match(r'bid_set-(\d+)-DELETE', key)
                 if match and form.data[key] == 'on':
                     bid_id_key = f'bid_set-{match.group(1)}-id'
                     ids.add(funcy.first(form.data[bid_id_key]))
 
-        return ids
-
+        return list(ids)
 
 
 admin.site.register(Auction, AuctionAdmin)
