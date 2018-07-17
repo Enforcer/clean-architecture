@@ -27,7 +27,7 @@ class Auction:
     def winners(self):
         if not self.bids:
             return []
-        return [self._highest_bid.user_id]
+        return [self._highest_bid.bidder_id]
 
     @property
     def _highest_bid(self) -> Bid:

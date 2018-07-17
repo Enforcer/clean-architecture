@@ -16,7 +16,7 @@ class DjangoORMAuctionsRepository(AuctionsRepository):
             title=auction_model.title,
             initial_price=auction_model.initial_price,
             bids=[
-                Bid(id=bid_model.id, user_id=bid_model.bidder_id, amount=bid_model.amount)
+                Bid(id=bid_model.id, bidder_id=bid_model.bidder_id, amount=bid_model.amount)
                 for bid_model in auction_model.bid_set.all()
             ]
         )
@@ -38,7 +38,7 @@ class DjangoORMAuctionsRepository(AuctionsRepository):
         for bid in new_bids:
             BidModel.objects.create(
                 auction_id=model.id,
-                bidder_id=bid.user_id,
+                bidder_id=bid.bidder_id,
                 amount=bid.amount
             )
         if auction.withdrawn_bids_ids:

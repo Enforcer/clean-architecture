@@ -40,7 +40,7 @@ def test_makes_an_expected_bid(
     PlacingBidUseCase().execute(input_dto)
 
     auction_mock.make_a_bid.assert_called_once_with(
-        Bid(id=None, amount=input_dto.amount, user_id=input_dto.user_id)
+        Bid(id=None, amount=input_dto.amount, bidder_id=input_dto.user_id)
     )
 
 
