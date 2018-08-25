@@ -13,6 +13,7 @@ from auctions.models import (
 
 class BidInline(admin.TabularInline):
     model = Bid
+    readonly_fields = ('amount', 'bidder')
 
     def has_add_permission(self, request):
         return False
@@ -27,7 +28,6 @@ class AuctionAdmin(admin.ModelAdmin):
 
         use_case = withdrawing_bids.WithdrawingBidsUseCase()
         input_dto = withdrawing_bids.WithdrawingBidsInputDto(auction_id=form.instance.pk, bids_ids=ids_of_deleted_bids)
-        # side effect is that current_price gets updated
         use_case.execute(input_dto)
 
         for formset in formsets:

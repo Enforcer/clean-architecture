@@ -80,3 +80,14 @@ def test_should_add_withdrawn_bids_ids_to_separate_list():
     auction.withdraw_bids([1])
 
     assert auction.withdrawn_bids_ids == [1]
+
+
+def test_should_not_be_winning_if_bid_lower_than_current_price() -> None:
+    auction = create_auction(bids=[
+        Bid(id=1, bidder_id=1, amount=Decimal('10.00'))
+    ])
+
+    lower_bid = Bid(id=None, bidder_id=2, amount=Decimal('5.00'))
+    auction.make_a_bid(lower_bid)
+
+    assert lower_bid.bidder_id not in auction.winners

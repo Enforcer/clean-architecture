@@ -34,7 +34,10 @@ class PlacingBidOutputBoundary(metaclass=abc.ABCMeta):
 class PlacingBidUseCase:
     auctions_repo: AuctionsRepository = inject.attr(AuctionsRepository)
     email_gateway: EmailGateway = inject.attr(EmailGateway)
-    presenter: PlacingBidOutputBoundary = inject.attr(PlacingBidOutputBoundary)
+
+    @inject.params(presenter=PlacingBidOutputBoundary)
+    def __init__(self, presenter: PlacingBidOutputBoundary) -> None:
+        self.presenter = presenter
 
     def execute(self, input_dto: PlacingBidInputDto) -> None:
         auction = self.auctions_repo.get(input_dto.auction_id)

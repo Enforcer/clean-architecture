@@ -16,6 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+
+from auctions import views
+
+
 urlpatterns = [
+    path('<int:auction_id>/', views.details, name='details'),
+    path('<int:auction_id>/bid', views.make_a_bid, name='make_a_bid'),
     path('admin/', admin.site.urls),
 ]
