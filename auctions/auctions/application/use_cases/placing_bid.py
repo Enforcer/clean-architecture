@@ -6,7 +6,7 @@ import inject
 
 from auctions.domain.entities import Bid
 from auctions.application.repositories import AuctionsRepository
-from auctions.application.interfaces import EmailGateway
+from auctions.application.ports import EmailGateway
 
 
 class PlacingBidInputDto(NamedTuple):
@@ -46,6 +46,9 @@ class PlacingBidUseCase:
         auction.make_a_bid(bid)
 
         self.auctions_repo.save(auction)
+
+        if input_dto.bidder_id in auction.winners:
+            self.email_gateway.notify_about_winning_auction(auction.id, input_dto.bidder_id)
 
         output_dto = PlacingBidOutputDto(
             input_dto.bidder_id in auction.winners, auction.current_price

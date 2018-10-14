@@ -2,13 +2,14 @@ from django.apps import AppConfig
 
 import inject
 
-from auctions.application.interfaces import EmailGateway
+from auctions.application.ports import EmailGateway
 from auctions.application.repositories import AuctionsRepository
+from auctions.infrastructure.adapters import DummyEmailGateway
 from auctions.infrastructure.repositories import DjangoORMAuctionsRepository
 
 
 def inject_config(binder: inject.Binder) -> None:
-    binder.bind(EmailGateway, None)  # add implementation once it's done
+    binder.bind(EmailGateway, DummyEmailGateway())
     binder.bind(AuctionsRepository, DjangoORMAuctionsRepository())
 
 

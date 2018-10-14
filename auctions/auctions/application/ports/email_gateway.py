@@ -7,5 +7,5 @@ from abc import (
 class EmailGateway(metaclass=ABCMeta):
 
     @abstractmethod
-    def notify_about_winning_auction(self, auction_id: int, winner: int) -> None:
+    def notify_about_winning_auction(self, auction_id: int, winner_id: int) -> None:
         pass

@@ -5,11 +5,11 @@ import pytest
 
 from auctions.application.use_cases import PlacingBidUseCase
 from auctions.application.use_cases.placing_bid import PlacingBidInputDto, PlacingBidOutputDto
-from auctions.domain.entities import Auction, Bid
+from auctions.domain.entities import Bid
 
 
 @pytest.fixture()
-def user_id() -> int:
+def bidder_id() -> int:
     return 1
 
 
@@ -19,8 +19,8 @@ def amount() -> Decimal:
 
 
 @pytest.fixture()
-def input_dto(exemplary_auction_id: int, user_id: int, amount: Decimal) -> PlacingBidInputDto:
-    return PlacingBidInputDto(user_id, exemplary_auction_id, amount)
+def input_dto(exemplary_auction_id: int, bidder_id: int, amount: Decimal) -> PlacingBidInputDto:
+    return PlacingBidInputDto(bidder_id, exemplary_auction_id, amount)
 
 
 def test_loads_auction_using_id(
@@ -52,6 +52,18 @@ def test_saves_auction(
     PlacingBidUseCase().execute(input_dto)
 
     auctions_repo_mock.save.assert_called_once_with(auction_mock)
+
+
+def test_notifies_winner(
+        email_gateway_mock: Mock,
+        auction_mock: Mock,
+        input_dto: PlacingBidInputDto
+) -> None:
+    type(auction_mock).winners = [input_dto.bidder_id]
+
+    PlacingBidUseCase().execute(input_dto)
+
+    email_gateway_mock.notify_about_winning_auction.assert_called_once_with(input_dto.auction_id, input_dto.bidder_id)
 
 
 def test_presents_output_dto(

@@ -2,7 +2,7 @@ from typing import List, NamedTuple
 
 import inject
 
-from auctions.application.interfaces import EmailGateway
+from auctions.application.ports import EmailGateway
 from auctions.application.repositories import AuctionsRepository
 
 
@@ -23,6 +23,6 @@ class WithdrawingBidsUseCase:
         actual_winners = set(auction.winners)
 
         new_winners = actual_winners - old_winners
-        for winner in new_winners:
-            self.email_gateway.notify_about_winning_auction(auction.id, winner)
+        for winner_id in new_winners:
+            self.email_gateway.notify_about_winning_auction(auction.id, winner_id)
         self.auctions_repo.save(auction)

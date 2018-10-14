@@ -4,7 +4,7 @@ import inject
 import pytest
 
 from auctions.application.repositories import AuctionsRepository
-from auctions.application.interfaces import EmailGateway
+from auctions.application.ports import EmailGateway
 from auctions.application.use_cases.placing_bid import PlacingBidOutputBoundary
 
 
