@@ -10,7 +10,7 @@ from auctions.application.interfaces import EmailGateway
 
 
 class PlacingBidInputDto(NamedTuple):
-    user_id: int
+    bidder_id: int
     auction_id: int
     amount: Decimal
 
@@ -42,12 +42,12 @@ class PlacingBidUseCase:
     def execute(self, input_dto: PlacingBidInputDto) -> None:
         auction = self.auctions_repo.get(input_dto.auction_id)
 
-        bid = Bid(id=None, bidder_id=input_dto.user_id, amount=input_dto.amount)
+        bid = Bid(id=None, bidder_id=input_dto.bidder_id, amount=input_dto.amount)
         auction.make_a_bid(bid)
 
         self.auctions_repo.save(auction)
 
         output_dto = PlacingBidOutputDto(
-            input_dto.user_id in auction.winners, auction.current_price
+            input_dto.bidder_id in auction.winners, auction.current_price
         )
         self.presenter.present(output_dto)

@@ -40,7 +40,7 @@ def test_makes_an_expected_bid(
     PlacingBidUseCase().execute(input_dto)
 
     auction_mock.make_a_bid.assert_called_once_with(
-        Bid(id=None, amount=input_dto.amount, bidder_id=input_dto.user_id)
+        Bid(id=None, amount=input_dto.amount, bidder_id=input_dto.bidder_id)
     )
 
 
@@ -59,7 +59,7 @@ def test_presents_output_dto(
         placing_bid_output_boundary_mock: Mock,
         auction_mock: Mock
 ) -> None:
-    type(auction_mock).winners = [input_dto.user_id]
+    type(auction_mock).winners = [input_dto.bidder_id]
     auction_mock.current_price = input_dto.amount
     PlacingBidUseCase().execute(input_dto)
 

@@ -38,7 +38,7 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
 def make_a_bid(request: HttpRequest, auction_id: int) -> HttpResponse:
     data = json.loads(request.body)
     input_dto = placing_bid.PlacingBidInputDto(
-        user_id=request.user.id,
+        bidder_id=request.user.id,
         auction_id=auction_id,
         amount=Decimal(data['amount'])
     )
