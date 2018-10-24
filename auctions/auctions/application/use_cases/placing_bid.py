@@ -1,25 +1,25 @@
 import abc
 from dataclasses import dataclass
-from decimal import Decimal
 
 import inject
 
-from auctions.domain.entities import Bid
 from auctions.application.repositories import AuctionsRepository
 from auctions.application.ports import EmailGateway
+from auctions.domain.entities import Bid
+from auctions.domain.value_objects import Money
 
 
 @dataclass
 class PlacingBidInputDto:
     bidder_id: int
     auction_id: int
-    amount: Decimal
+    amount: Money
 
 
 @dataclass
 class PlacingBidOutputDto:
     is_winner: bool
-    current_price: Decimal
+    current_price: Money
 
 
 class PlacingBidOutputBoundary(metaclass=abc.ABCMeta):

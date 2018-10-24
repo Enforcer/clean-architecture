@@ -1,4 +1,3 @@
-from decimal import Decimal
 from unittest.mock import (
     Mock,
     patch,
@@ -12,6 +11,8 @@ from auctions.domain.entities import (
     Auction,
     Bid,
 )
+from auctions.domain.factories import get_dollars
+from auctions.domain.value_objects import Money
 
 
 @pytest.fixture()
@@ -20,12 +21,12 @@ def bidder_id() -> int:
 
 
 @pytest.fixture()
-def amount() -> Decimal:
-    return Decimal('10.00')
+def amount() -> Money:
+    return get_dollars('10.00')
 
 
 @pytest.fixture()
-def input_dto(exemplary_auction_id: int, bidder_id: int, amount: Decimal) -> PlacingBidInputDto:
+def input_dto(exemplary_auction_id: int, bidder_id: int, amount: Money) -> PlacingBidInputDto:
     return PlacingBidInputDto(bidder_id, exemplary_auction_id, amount)
 
 

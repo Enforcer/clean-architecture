@@ -1,5 +1,4 @@
 import typing
-from decimal import Decimal
 from unittest.mock import (
     Mock,
     patch,
@@ -13,6 +12,7 @@ from auctions.domain.entities import (
     Auction,
     Bid,
 )
+from auctions.domain.factories import get_dollars
 
 
 @pytest.fixture()
@@ -58,9 +58,9 @@ def test_calls_withdraw_bids_on_auction(
 
 @pytest.fixture()
 def auction_with_a_winner(input_dto: WithdrawingBidsInputDto) -> Auction:
-    losing_bid = Bid(id=4, bidder_id=2, amount=Decimal('5.50'))
-    winning_bid = Bid(id=2, bidder_id=1, amount=Decimal('6.00'))
-    return Auction(id=2, title='does not matter', initial_price=Decimal('5.00'), bids=[winning_bid, losing_bid])
+    losing_bid = Bid(id=4, bidder_id=2, amount=get_dollars('5.50'))
+    winning_bid = Bid(id=2, bidder_id=1, amount=get_dollars('6.00'))
+    return Auction(id=2, title='does not matter', initial_price=get_dollars('5.00'), bids=[winning_bid, losing_bid])
 
 
 def test_calls_email_gateway_once_winners_list_changes(

@@ -3,6 +3,7 @@ from auctions.domain.entities import (
     Auction,
     Bid,
 )
+from auctions.domain.factories import get_dollars
 
 
 class DjangoORMAuctionsRepository(AuctionsRepository):
@@ -14,9 +15,9 @@ class DjangoORMAuctionsRepository(AuctionsRepository):
         return Auction(
             id=auction_model.id,
             title=auction_model.title,
-            initial_price=auction_model.initial_price,
+            initial_price=get_dollars(auction_model.initial_price),
             bids=[
-                Bid(id=bid_model.id, bidder_id=bid_model.bidder_id, amount=bid_model.amount)
+                Bid(id=bid_model.id, bidder_id=bid_model.bidder_id, amount=get_dollars(bid_model.amount))
                 for bid_model in auction_model.bid_set.all()
             ]
         )
@@ -30,8 +31,8 @@ class DjangoORMAuctionsRepository(AuctionsRepository):
         model = AuctionModel(
             id=auction.id,
             title=auction.title,
-            initial_price=auction.initial_price,
-            current_price=auction.current_price
+            initial_price=auction.initial_price.amount,
+            current_price=auction.current_price.amount
         )
         model.save()
         new_bids = [bid for bid in auction.bids if not bid.id]
@@ -39,7 +40,7 @@ class DjangoORMAuctionsRepository(AuctionsRepository):
             BidModel.objects.create(
                 auction_id=model.id,
                 bidder_id=bid.bidder_id,
-                amount=bid.amount
+                amount=bid.amount.amount
             )
         if auction.withdrawn_bids_ids:
             BidModel.objects.filter(id__in=auction.withdrawn_bids_ids).delete()

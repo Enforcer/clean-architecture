@@ -12,6 +12,7 @@ from auctions.models import (
     Auction as AuctionModel,
     Bid as BidModel,
 )
+from auctions.domain.factories import get_dollars
 
 
 UserModel = get_user_model()
@@ -19,8 +20,7 @@ UserModel = get_user_model()
 
 @pytest.fixture()
 def bidder() -> UserModel:
-    return UserModel.objects.create(
-    )
+    return UserModel.objects.create()
 
 
 @pytest.fixture()
@@ -49,8 +49,8 @@ def test_gets_existing_auction(auction_model_with_a_bid: AuctionModel, winning_b
 
     assert auction.id == auction_model_with_a_bid.id
     assert auction.title == auction_model_with_a_bid.title
-    assert auction.initial_price == auction_model_with_a_bid.initial_price
-    assert auction.current_price == winning_bid_amount
+    assert auction.initial_price == get_dollars(auction_model_with_a_bid.initial_price)
+    assert auction.current_price == get_dollars(winning_bid_amount)
 
 
 @pytest.mark.usefixtures('transactional_db')
@@ -59,10 +59,10 @@ def test_saves_auction_changes(auction_model_with_a_bid: AuctionModel) -> None:
     auction = Auction(
         id=auction_model_with_a_bid.id,
         title=auction_model_with_a_bid.title,
-        initial_price=auction_model_with_a_bid.initial_price,
+        initial_price=get_dollars(auction_model_with_a_bid.initial_price),
         bids=[
-            Bid(bid_model.id, bid_model.bidder_id, bid_model.amount),
-            Bid(None, bid_model.bidder_id, bid_model.amount)
+            Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount)),
+            Bid(None, bid_model.bidder_id, get_dollars(bid_model.amount))
         ]
     )
 
@@ -77,9 +77,9 @@ def test_removes_withdrawn_bids(auction_model_with_a_bid: AuctionModel) -> None:
     auction = Auction(
         id=auction_model_with_a_bid.id,
         title=auction_model_with_a_bid.title,
-        initial_price=auction_model_with_a_bid.initial_price,
+        initial_price=get_dollars(auction_model_with_a_bid.initial_price),
         bids=[
-            Bid(bid_model.id, bid_model.bidder_id, bid_model.amount),
+            Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount)),
         ]
     )
     auction.withdrawn_bids_ids = [bid_model.id]

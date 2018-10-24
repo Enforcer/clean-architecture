@@ -1,11 +1,12 @@
 import typing
-from decimal import Decimal
 
 from auctions.domain.entities.bid import Bid
+from auctions.domain.value_objects import Money
 
 
 class Auction:
-    def __init__(self, id: int, title: str, initial_price: Decimal, bids: typing.List[Bid]) -> None:
+    def __init__(self, id: int, title: str, initial_price: Money, bids: typing.List[Bid]) -> None:
+        assert isinstance(initial_price, Money)
         self.id = id
         self.title = title
         self.initial_price = initial_price
@@ -17,7 +18,7 @@ class Auction:
             self.bids.append(bid)
 
     @property
-    def current_price(self) -> Decimal:
+    def current_price(self) -> Money:
         if not self.bids:
             return self.initial_price
         else:

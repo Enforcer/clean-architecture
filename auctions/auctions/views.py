@@ -15,6 +15,7 @@ from auctions.application import (
     repositories,
 )
 from auctions.application.use_cases import placing_bid
+from auctions.domain.factories import get_dollars
 
 
 def details(request: HttpRequest, auction_id: int) -> HttpResponse:
@@ -29,7 +30,7 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
         # However, we are in Django.
         self._data = {
             'is_winner': output_dto.is_winner,
-            'current_price': round(output_dto.current_price, 2)
+            'current_price': str(output_dto.current_price)
         }
 
     def get_http_response(self) -> HttpResponse:
@@ -50,7 +51,7 @@ def make_a_bid(request: HttpRequest, auction_id: int) -> HttpResponse:
     input_dto = dacite.from_dict(placing_bid.PlacingBidInputDto, {
         'bidder_id': request.user.id,
         'auction_id': auction_id,
-        'amount': Decimal(data['amount'])
+        'amount': get_dollars(data['amount'])
     })
     presenter = PlacingBidPresenter()
     uc = placing_bid.PlacingBidUseCase(presenter)

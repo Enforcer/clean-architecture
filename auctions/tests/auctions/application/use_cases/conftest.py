@@ -8,6 +8,7 @@ from auctions.application.repositories import AuctionsRepository
 from auctions.application.ports import EmailGateway
 from auctions.application.use_cases.placing_bid import PlacingBidOutputBoundary
 from auctions.domain.entities import Auction
+from auctions.domain.factories import get_dollars
 
 
 @pytest.fixture()
@@ -22,7 +23,7 @@ def exemplary_bids_ids() -> int:
 
 @pytest.fixture()
 def auction(exemplary_auction_id: int) -> Auction:
-    return Auction(id=exemplary_auction_id, title='irrelevant', initial_price=Decimal('2.00'), bids=[])
+    return Auction(id=exemplary_auction_id, title='irrelevant', initial_price=get_dollars('2.00'), bids=[])
 
 
 @pytest.fixture()

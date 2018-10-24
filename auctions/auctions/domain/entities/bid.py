@@ -1,9 +1,11 @@
 from typing import Optional
-from decimal import Decimal
+
+from auctions.domain.value_objects import Money
 
 
 class Bid:
-    def __init__(self, id: Optional[int], bidder_id: int, amount: Decimal) -> None:
+    def __init__(self, id: Optional[int], bidder_id: int, amount: Money) -> None:
+        assert isinstance(amount, Money)
         self.id = id
         self.bidder_id = bidder_id
         self.amount = amount
