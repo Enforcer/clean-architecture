@@ -1,6 +1,7 @@
 import json
 from decimal import Decimal
 
+import dacite
 import inject
 from django.contrib.auth.decorators import login_required
 from django.http import (
@@ -24,6 +25,8 @@ def details(request: HttpRequest, auction_id: int) -> HttpResponse:
 
 class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
     def present(self, output_dto: placing_bid.PlacingBidOutputDto) -> None:
+        # in a textbook example of the Clean Architecture this method would cause HttpResponse to be sent to a client.
+        # However, we are in Django.
         self._data = {
             'is_winner': output_dto.is_winner,
             'current_price': round(output_dto.current_price, 2)
@@ -44,11 +47,11 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
 @login_required
 def make_a_bid(request: HttpRequest, auction_id: int) -> HttpResponse:
     data = json.loads(request.body)
-    input_dto = placing_bid.PlacingBidInputDto(
-        bidder_id=request.user.id,
-        auction_id=auction_id,
-        amount=Decimal(data['amount'])
-    )
+    input_dto = dacite.from_dict(placing_bid.PlacingBidInputDto, {
+        'bidder_id': request.user.id,
+        'auction_id': auction_id,
+        'amount': Decimal(data['amount'])
+    })
     presenter = PlacingBidPresenter()
     uc = placing_bid.PlacingBidUseCase(presenter)
     uc.execute(input_dto)

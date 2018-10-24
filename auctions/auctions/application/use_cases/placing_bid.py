@@ -1,6 +1,6 @@
 import abc
+from dataclasses import dataclass
 from decimal import Decimal
-from typing import NamedTuple
 
 import inject
 
@@ -9,13 +9,15 @@ from auctions.application.repositories import AuctionsRepository
 from auctions.application.ports import EmailGateway
 
 
-class PlacingBidInputDto(NamedTuple):
+@dataclass
+class PlacingBidInputDto:
     bidder_id: int
     auction_id: int
     amount: Decimal
 
 
-class PlacingBidOutputDto(NamedTuple):
+@dataclass
+class PlacingBidOutputDto:
     is_winner: bool
     current_price: Decimal
 
