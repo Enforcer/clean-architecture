@@ -4,14 +4,17 @@ from decimal import (
     DecimalException,
 )
 from functools import total_ordering
-from typing import Type
+from typing import (
+    Any,
+    Type,
+)
 
 from auctions.domain.value_objects.currency import Currency
 
 
 @total_ordering
 class Money:
-    def __init__(self, currency: Type[Currency], amount: str) -> None:
+    def __init__(self, currency: Type[Currency], amount: Any) -> None:
         if not inspect.isclass(currency) or not issubclass(currency, Currency):
             raise ValueError(f'{currency} is not a subclass of Currency!')
         try:
