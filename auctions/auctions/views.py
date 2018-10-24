@@ -29,8 +29,15 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
             'current_price': round(output_dto.current_price, 2)
         }
 
-    def get_presented_data(self) -> dict:
-        return self._data
+    def get_http_response(self) -> HttpResponse:
+        if self._data['is_winner']:
+            return HttpResponse(
+                f'Congratulations! You are a winner! :) Current price is {self._data["current_price"]}'
+            )
+        else:
+            return HttpResponse(
+                f'Unfortunately, you are not winning. :( Current price is {self._data["current_price"]}'
+            )
 
 
 @csrf_exempt
@@ -46,8 +53,4 @@ def make_a_bid(request: HttpRequest, auction_id: int) -> HttpResponse:
     uc = placing_bid.PlacingBidUseCase(presenter)
     uc.execute(input_dto)
 
-    data = presenter.get_presented_data()
-    if data['is_winner']:
-        return HttpResponse(f'Congratulations! You are a winner! :) Current price is {data["current_price"]}')
-    else:
-        return HttpResponse(f'Unfortunately, you are not winning. :( Current price is {data["current_price"]}')
+    return presenter.get_http_response()

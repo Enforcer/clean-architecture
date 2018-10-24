@@ -26,10 +26,6 @@ class PlacingBidOutputBoundary(metaclass=abc.ABCMeta):
     def present(self, output_dto: PlacingBidOutputDto) -> None:
         pass
 
-    @abc.abstractmethod
-    def get_presented_data(self) -> dict:
-        pass
-
 
 class PlacingBidUseCase:
     auctions_repo: AuctionsRepository = inject.attr(AuctionsRepository)
