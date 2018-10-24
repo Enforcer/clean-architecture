@@ -1,5 +1,4 @@
 import json
-from decimal import Decimal
 
 import dacite
 import inject

@@ -1,6 +1,7 @@
 import re
 import typing
 
+import dacite
 import funcy
 from django.contrib import admin
 
@@ -27,17 +28,17 @@ class AuctionAdmin(admin.ModelAdmin):
         ids_of_deleted_bids = self._get_ids_of_deleted_bids(formsets)
 
         use_case = withdrawing_bids.WithdrawingBidsUseCase()
-        input_dto = withdrawing_bids.WithdrawingBidsInputDto(auction_id=form.instance.pk, bids_ids=ids_of_deleted_bids)
+        input_dto = dacite.from_dict(
+            withdrawing_bids.WithdrawingBidsInputDto,
+            {'auction_id': form.instance.pk, 'bids_ids': ids_of_deleted_bids}
+        )
         use_case.execute(input_dto)
 
         for formset in formsets:
             formset.new_objects = formset.changed_objects = formset.deleted_objects = []
 
     def save_model(self, request, obj, form, change):
-        if change:
-            obj.save(update_fields=['title', 'initial_price'])
-        else:
-            super().save_model(request, obj, form, change)
+        obj.save(update_fields=['title', 'initial_price'])
 
     def _get_ids_of_deleted_bids(self, formsets) -> typing.List[int]:
         ids = set()
@@ -46,7 +47,7 @@ class AuctionAdmin(admin.ModelAdmin):
                 match = re.match(r'bid_set-(\d+)-DELETE', key)
                 if match and form.data[key] == 'on':
                     bid_id_key = f'bid_set-{match.group(1)}-id'
-                    ids.add(funcy.first(form.data[bid_id_key]))
+                    ids.add(int(funcy.first(form.data[bid_id_key])))
 
         return list(ids)
 

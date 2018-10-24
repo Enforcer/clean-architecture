@@ -1,12 +1,14 @@
 from typing import List, NamedTuple
 
 import inject
+from dataclasses import dataclass
 
 from auctions.application.ports import EmailGateway
 from auctions.application.repositories import AuctionsRepository
 
 
-class WithdrawingBidsInputDto(NamedTuple):
+@dataclass
+class WithdrawingBidsInputDto:
     auction_id: int
     bids_ids: List[int]
 
