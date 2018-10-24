@@ -1,3 +1,4 @@
+from decimal import Decimal
 from unittest.mock import Mock, PropertyMock
 
 import inject
@@ -6,6 +7,7 @@ import pytest
 from auctions.application.repositories import AuctionsRepository
 from auctions.application.ports import EmailGateway
 from auctions.application.use_cases.placing_bid import PlacingBidOutputBoundary
+from auctions.domain.entities import Auction
 
 
 @pytest.fixture()
@@ -19,15 +21,13 @@ def exemplary_bids_ids() -> int:
 
 
 @pytest.fixture()
-def auction_mock(exemplary_auction_id: int) -> Mock:
-    mock = Mock(id=exemplary_auction_id)
-    type(mock).winners = PropertyMock([])
-    return mock
+def auction(exemplary_auction_id: int) -> Auction:
+    return Auction(id=exemplary_auction_id, title='irrelevant', initial_price=Decimal('2.00'), bids=[])
 
 
 @pytest.fixture()
-def auctions_repo_mock(auction_mock: Mock) -> Mock:
-    return Mock(spec_set=AuctionsRepository, get=Mock(return_value=auction_mock))
+def auctions_repo_mock(auction: Auction) -> Mock:
+    return Mock(spec_set=AuctionsRepository, get=Mock(return_value=auction))
 
 
 @pytest.fixture()

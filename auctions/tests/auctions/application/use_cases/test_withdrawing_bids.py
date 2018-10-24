@@ -1,14 +1,18 @@
 import typing
+from decimal import Decimal
 from unittest.mock import (
     Mock,
-    PropertyMock,
+    patch,
 )
 
 import pytest
 
 from auctions.application.use_cases import WithdrawingBidsUseCase
 from auctions.application.use_cases.withdrawing_bids import WithdrawingBidsInputDto
-from auctions.domain.entities import Auction
+from auctions.domain.entities import (
+    Auction,
+    Bid,
+)
 
 
 @pytest.fixture()
@@ -33,33 +37,43 @@ def test_loads_auction_using_id(
 
 def test_saves_auction_afterwards(
         auctions_repo_mock: Mock,
-        auction_mock: Mock,
+        auction,
         input_dto: WithdrawingBidsInputDto,
 ) -> None:
     WithdrawingBidsUseCase().execute(input_dto)
 
-    auctions_repo_mock.save.assert_called_once_with(auction_mock)
+    auctions_repo_mock.save.assert_called_once_with(auction)
 
 
 def test_calls_withdraw_bids_on_auction(
         exemplary_bids_ids: typing.List[int],
-        auction_mock: Mock,
+        auction: Auction,
         input_dto: WithdrawingBidsInputDto
 ) -> None:
-    WithdrawingBidsUseCase().execute(input_dto)
+    with patch.object(Auction, 'withdraw_bids', wraps=auction.withdraw_bids) as withdraw_bids_mock:
+        WithdrawingBidsUseCase().execute(input_dto)
 
-    auction_mock.withdraw_bids.assert_called_once_with(exemplary_bids_ids)
+    withdraw_bids_mock.assert_called_once_with(exemplary_bids_ids)
+
+
+@pytest.fixture()
+def auction_with_a_winner(input_dto: WithdrawingBidsInputDto) -> Auction:
+    losing_bid = Bid(id=4, bidder_id=2, amount=Decimal('5.50'))
+    winning_bid = Bid(id=2, bidder_id=1, amount=Decimal('6.00'))
+    return Auction(id=2, title='does not matter', initial_price=Decimal('5.00'), bids=[winning_bid, losing_bid])
 
 
 def test_calls_email_gateway_once_winners_list_changes(
-        exemplary_auction_id: int,
-        exemplary_bids_ids: typing.List[int],
-        auction_mock: Mock,
+        auction_with_a_winner: Auction,
         email_gateway_mock: Mock,
-        input_dto: WithdrawingBidsInputDto
+        input_dto: WithdrawingBidsInputDto,
+        auctions_repo_mock: Mock,
 ) -> None:
-    exemplary_new_winner_id = 1
-    type(auction_mock).winners = PropertyMock(side_effect=[[], [exemplary_new_winner_id]])
+    auctions_repo_mock.get.return_value = auction_with_a_winner
+    expected_bidder_id = [bid.bidder_id for bid in auction_with_a_winner.bids if bid.id not in input_dto.bids_ids].pop()
+
     WithdrawingBidsUseCase().execute(input_dto)
 
-    email_gateway_mock.notify_about_winning_auction.assert_called_once_with(exemplary_auction_id, exemplary_new_winner_id)
+    email_gateway_mock.notify_about_winning_auction.assert_called_once_with(
+        auction_with_a_winner.id, expected_bidder_id
+    )
