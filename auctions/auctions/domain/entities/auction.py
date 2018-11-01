@@ -5,11 +5,11 @@ from auctions.domain.value_objects import Money
 
 
 class Auction:
-    def __init__(self, id: int, title: str, initial_price: Money, bids: typing.List[Bid]) -> None:
-        assert isinstance(initial_price, Money)
+    def __init__(self, id: int, title: str, starting_price: Money, bids: typing.List[Bid]) -> None:
+        assert isinstance(starting_price, Money)
         self.id = id
         self.title = title
-        self.initial_price = initial_price
+        self.starting_price = starting_price
         self.bids = sorted(bids, key=lambda bid: bid.amount)
         self.withdrawn_bids_ids: typing.List[int] = []
 
@@ -20,7 +20,7 @@ class Auction:
     @property
     def current_price(self) -> Money:
         if not self.bids:
-            return self.initial_price
+            return self.starting_price
         else:
             return self._highest_bid.amount
 

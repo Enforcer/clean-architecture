@@ -32,7 +32,7 @@ def winning_bid_amount() -> Decimal:
 def auction_model_with_a_bid(winning_bid_amount: Decimal, bidder: UserModel) -> AuctionModel:
     auction = AuctionModel.objects.create(
         title='Cool socks',
-        initial_price=winning_bid_amount / 2,
+        starting_price=winning_bid_amount / 2,
         current_price=winning_bid_amount
     )
     BidModel.objects.create(
@@ -49,7 +49,7 @@ def test_gets_existing_auction(auction_model_with_a_bid: AuctionModel, winning_b
 
     assert auction.id == auction_model_with_a_bid.id
     assert auction.title == auction_model_with_a_bid.title
-    assert auction.initial_price == get_dollars(auction_model_with_a_bid.initial_price)
+    assert auction.starting_price == get_dollars(auction_model_with_a_bid.starting_price)
     assert auction.current_price == get_dollars(winning_bid_amount)
 
 
@@ -59,7 +59,7 @@ def test_saves_auction_changes(auction_model_with_a_bid: AuctionModel) -> None:
     auction = Auction(
         id=auction_model_with_a_bid.id,
         title=auction_model_with_a_bid.title,
-        initial_price=get_dollars(auction_model_with_a_bid.initial_price),
+        starting_price=get_dollars(auction_model_with_a_bid.starting_price),
         bids=[
             Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount)),
             Bid(None, bid_model.bidder_id, get_dollars(bid_model.amount))
@@ -77,7 +77,7 @@ def test_removes_withdrawn_bids(auction_model_with_a_bid: AuctionModel) -> None:
     auction = Auction(
         id=auction_model_with_a_bid.id,
         title=auction_model_with_a_bid.title,
-        initial_price=get_dollars(auction_model_with_a_bid.initial_price),
+        starting_price=get_dollars(auction_model_with_a_bid.starting_price),
         bids=[
             Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount)),
         ]

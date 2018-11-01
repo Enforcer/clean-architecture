@@ -34,7 +34,7 @@ def authenticated_client(client: Client) -> Client:
 def auction_without_bids() -> Auction:
     return Auction.objects.create(
         title='Cool socks',
-        initial_price=Decimal('1.00'),
+        starting_price=Decimal('1.00'),
         current_price=Decimal('1.00'),
     )
 

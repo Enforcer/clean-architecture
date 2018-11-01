@@ -11,13 +11,13 @@ def create_auction(bids: typing.List[Bid] = None) -> Auction:
     if not bids:
         bids = []
 
-    return Auction(id=1, title='', initial_price=get_dollars('10'), bids=bids)
+    return Auction(id=1, title='', starting_price=get_dollars('10'), bids=bids)
 
 
-def test_should_use_initial_price_as_current_price_for_empty_bids_list():
+def test_should_use_starting_price_as_current_price_for_empty_bids_list():
     auction = create_auction()
 
-    assert auction.current_price == auction.initial_price
+    assert auction.current_price == auction.starting_price
 
 
 def test_should_return_highest_bid_for_current_price():
@@ -45,7 +45,7 @@ def test_should_return_highest_bids_user_id_for_winners_list():
     assert auction.winners == [1]
 
 
-def test_should_win_auction_if_is_the_only_bidder_above_initial_price():
+def test_should_win_auction_if_is_the_only_bidder_above_starting_price():
     auction = create_auction()
 
     auction.place_bid(Bid(id=None, bidder_id=1, amount=get_dollars('11')))
@@ -53,7 +53,7 @@ def test_should_win_auction_if_is_the_only_bidder_above_initial_price():
     assert auction.winners == [1]
 
 
-def test_should_not_be_winning_auction_if_bids_below_initial_price():
+def test_should_not_be_winning_auction_if_bids_below_starting_price():
     auction = create_auction()
 
     auction.place_bid(Bid(id=None, bidder_id=1, amount=get_dollars('5')))
@@ -69,7 +69,7 @@ def test_should_withdraw_the_only_bid():
     auction.withdraw_bids([1])
 
     assert auction.winners == []
-    assert auction.current_price == auction.initial_price
+    assert auction.current_price == auction.starting_price
 
 
 def test_should_add_withdrawn_bids_ids_to_separate_list():

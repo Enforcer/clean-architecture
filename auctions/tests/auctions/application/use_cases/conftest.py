@@ -23,7 +23,7 @@ def exemplary_bids_ids() -> int:
 
 @pytest.fixture()
 def auction(exemplary_auction_id: int) -> Auction:
-    return Auction(id=exemplary_auction_id, title='irrelevant', initial_price=get_dollars('2.00'), bids=[])
+    return Auction(id=exemplary_auction_id, title='irrelevant', starting_price=get_dollars('2.00'), bids=[])
 
 
 @pytest.fixture()

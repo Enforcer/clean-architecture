@@ -15,7 +15,7 @@ class DjangoORMAuctionsRepository(AuctionsRepository):
         return Auction(
             id=auction_model.id,
             title=auction_model.title,
-            initial_price=get_dollars(auction_model.initial_price),
+            starting_price=get_dollars(auction_model.starting_price),
             bids=[
                 Bid(id=bid_model.id, bidder_id=bid_model.bidder_id, amount=get_dollars(bid_model.amount))
                 for bid_model in auction_model.bid_set.all()
@@ -31,7 +31,7 @@ class DjangoORMAuctionsRepository(AuctionsRepository):
         model = AuctionModel(
             id=auction.id,
             title=auction.title,
-            initial_price=auction.initial_price.amount,
+            starting_price=auction.starting_price.amount,
             current_price=auction.current_price.amount
         )
         model.save()

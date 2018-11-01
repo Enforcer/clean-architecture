@@ -60,7 +60,7 @@ def test_calls_withdraw_bids_on_auction(
 def auction_with_a_winner(input_dto: WithdrawingBidsInputDto) -> Auction:
     losing_bid = Bid(id=4, bidder_id=2, amount=get_dollars('5.50'))
     winning_bid = Bid(id=2, bidder_id=1, amount=get_dollars('6.00'))
-    return Auction(id=2, title='does not matter', initial_price=get_dollars('5.00'), bids=[winning_bid, losing_bid])
+    return Auction(id=2, title='does not matter', starting_price=get_dollars('5.00'), bids=[winning_bid, losing_bid])
 
 
 def test_calls_email_gateway_once_winners_list_changes(

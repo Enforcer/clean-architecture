@@ -38,7 +38,7 @@ class AuctionAdmin(admin.ModelAdmin):
             formset.new_objects = formset.changed_objects = formset.deleted_objects = []
 
     def save_model(self, request, obj, form, change):
-        obj.save(update_fields=['title', 'initial_price'])
+        obj.save(update_fields=['title', 'starting_price'])
 
     def _get_ids_of_deleted_bids(self, formsets) -> typing.List[int]:
         ids = set()
