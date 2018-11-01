@@ -44,7 +44,7 @@ def test_makes_an_expected_bid(
         input_dto: PlacingBidInputDto,
         auction: Auction
 ) -> None:
-    with patch.object(Auction, 'make_a_bid', wraps=auction.make_a_bid) as make_a_bid_mock:
+    with patch.object(Auction, 'place_bid', wraps=auction.place_bid) as make_a_bid_mock:
         PlacingBidUseCase().execute(input_dto)
 
     make_a_bid_mock.assert_called_once_with(
@@ -79,5 +79,5 @@ def test_presents_output_dto(
 ) -> None:
     PlacingBidUseCase().execute(input_dto)
 
-    desired_output_dto = PlacingBidOutputDto(is_winner=True, current_price=input_dto.amount)
-    placing_bid_output_boundary_mock.present.assert_called_once_with(desired_output_dto)
+    expected_output_dto = PlacingBidOutputDto(is_winner=True, current_price=input_dto.amount)
+    placing_bid_output_boundary_mock.present.assert_called_once_with(expected_output_dto)

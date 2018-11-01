@@ -48,7 +48,7 @@ def test_should_return_highest_bids_user_id_for_winners_list():
 def test_should_win_auction_if_is_the_only_bidder_above_initial_price():
     auction = create_auction()
 
-    auction.make_a_bid(Bid(id=None, bidder_id=1, amount=get_dollars('11')))
+    auction.place_bid(Bid(id=None, bidder_id=1, amount=get_dollars('11')))
 
     assert auction.winners == [1]
 
@@ -56,7 +56,7 @@ def test_should_win_auction_if_is_the_only_bidder_above_initial_price():
 def test_should_not_be_winning_auction_if_bids_below_initial_price():
     auction = create_auction()
 
-    auction.make_a_bid(Bid(id=None, bidder_id=1, amount=get_dollars('5')))
+    auction.place_bid(Bid(id=None, bidder_id=1, amount=get_dollars('5')))
 
     assert auction.winners == []
 
@@ -88,6 +88,6 @@ def test_should_not_be_winning_if_bid_lower_than_current_price() -> None:
     ])
 
     lower_bid = Bid(id=None, bidder_id=2, amount=get_dollars('5.00'))
-    auction.make_a_bid(lower_bid)
+    auction.place_bid(lower_bid)
 
     assert lower_bid.bidder_id not in auction.winners

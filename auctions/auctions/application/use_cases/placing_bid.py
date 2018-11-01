@@ -41,7 +41,7 @@ class PlacingBidUseCase:
         auction = self.auctions_repo.get(input_dto.auction_id)
 
         bid = Bid(id=None, bidder_id=input_dto.bidder_id, amount=input_dto.amount)
-        auction.make_a_bid(bid)
+        auction.place_bid(bid)
 
         self.auctions_repo.save(auction)
 

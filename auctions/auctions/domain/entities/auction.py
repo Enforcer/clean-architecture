@@ -13,7 +13,7 @@ class Auction:
         self.bids = sorted(bids, key=lambda bid: bid.amount)
         self.withdrawn_bids_ids: typing.List[int] = []
 
-    def make_a_bid(self, bid: Bid):
+    def place_bid(self, bid: Bid):
         if bid.amount > self.current_price:
             self.bids.append(bid)
 
