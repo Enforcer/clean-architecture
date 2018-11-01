@@ -1,11 +1,15 @@
 import typing
 
 from auctions.domain.entities.bid import Bid
+from auctions.domain.types import (
+    AuctionId,
+    BidderId,
+)
 from auctions.domain.value_objects import Money
 
 
 class Auction:
-    def __init__(self, id: int, title: str, starting_price: Money, bids: typing.List[Bid]) -> None:
+    def __init__(self, id: AuctionId, title: str, starting_price: Money, bids: typing.List[Bid]) -> None:
         assert isinstance(starting_price, Money)
         self.id = id
         self.title = title
@@ -13,9 +17,9 @@ class Auction:
         self.bids = sorted(bids, key=lambda bid: bid.amount)
         self.withdrawn_bids_ids: typing.List[int] = []
 
-    def place_bid(self, bid: Bid):
-        if bid.amount > self.current_price:
-            self.bids.append(bid)
+    def place_bid(self, bidder_id: BidderId, amount: Money) -> None:
+        if amount > self.current_price:
+            self.bids.append(Bid(id=None, bidder_id=bidder_id, amount=amount))
 
     @property
     def current_price(self) -> Money:

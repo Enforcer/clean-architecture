@@ -5,7 +5,6 @@ import inject
 
 from auctions.application.repositories import AuctionsRepository
 from auctions.application.ports import EmailGateway
-from auctions.domain.entities import Bid
 from auctions.domain.value_objects import Money
 
 
@@ -40,8 +39,7 @@ class PlacingBidUseCase:
     def execute(self, input_dto: PlacingBidInputDto) -> None:
         auction = self.auctions_repo.get(input_dto.auction_id)
 
-        bid = Bid(id=None, bidder_id=input_dto.bidder_id, amount=input_dto.amount)
-        auction.place_bid(bid)
+        auction.place_bid(bidder_id=input_dto.bidder_id, amount=input_dto.amount)
 
         self.auctions_repo.save(auction)
 

@@ -1,0 +1,3 @@
+
+BidderId = int
+AuctionId = int
