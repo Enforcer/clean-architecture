@@ -6,7 +6,7 @@ from unittest.mock import (
 
 import pytest
 
-from auctions.application.use_cases import WithdrawingBidsUseCase
+from auctions.application.use_cases import WithdrawingBids
 from auctions.application.use_cases.withdrawing_bids import WithdrawingBidsInputDto
 from auctions.domain.entities import (
     Auction,
@@ -30,7 +30,7 @@ def test_loads_auction_using_id(
         input_dto: WithdrawingBidsInputDto,
         auctions_repo_mock: Mock
 ) -> None:
-    WithdrawingBidsUseCase().execute(input_dto)
+    WithdrawingBids().execute(input_dto)
 
     auctions_repo_mock.get.assert_called_once_with(exemplary_auction_id)
 
@@ -40,7 +40,7 @@ def test_saves_auction_afterwards(
         auction,
         input_dto: WithdrawingBidsInputDto,
 ) -> None:
-    WithdrawingBidsUseCase().execute(input_dto)
+    WithdrawingBids().execute(input_dto)
 
     auctions_repo_mock.save.assert_called_once_with(auction)
 
@@ -51,7 +51,7 @@ def test_calls_withdraw_bids_on_auction(
         input_dto: WithdrawingBidsInputDto
 ) -> None:
     with patch.object(Auction, 'withdraw_bids', wraps=auction.withdraw_bids) as withdraw_bids_mock:
-        WithdrawingBidsUseCase().execute(input_dto)
+        WithdrawingBids().execute(input_dto)
 
     withdraw_bids_mock.assert_called_once_with(exemplary_bids_ids)
 
@@ -72,7 +72,7 @@ def test_calls_email_gateway_once_winners_list_changes(
     auctions_repo_mock.get.return_value = auction_with_a_winner
     expected_bidder_id = [bid.bidder_id for bid in auction_with_a_winner.bids if bid.id not in input_dto.bids_ids].pop()
 
-    WithdrawingBidsUseCase().execute(input_dto)
+    WithdrawingBids().execute(input_dto)
 
     email_gateway_mock.notify_about_winning_auction.assert_called_once_with(
         auction_with_a_winner.id, expected_bidder_id

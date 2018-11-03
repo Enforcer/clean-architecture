@@ -53,7 +53,7 @@ def make_a_bid(request: HttpRequest, auction_id: int) -> HttpResponse:
         'amount': get_dollars(data['amount'])
     })
     presenter = PlacingBidPresenter()
-    uc = placing_bid.PlacingBidUseCase(presenter)
+    uc = placing_bid.PlacingBid(presenter)
     uc.execute(input_dto)
 
     return presenter.get_http_response()

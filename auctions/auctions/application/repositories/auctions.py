@@ -4,11 +4,13 @@ from abc import (
 )
 
 from auctions.domain.entities import Auction
+from auctions.domain.types import AuctionId
 
 
 class AuctionsRepository(metaclass=ABCMeta):
+
     @abstractmethod
-    def get(self, auction_id) -> Auction:
+    def get(self, auction_id: AuctionId) -> Auction:
         pass
 
     @abstractmethod

@@ -2,7 +2,7 @@ dacite==0.0.18
 dataclasses==0.6
 Django==2.0.5
 funcy==1.10.2
-Inject==3.3.2
+Inject==3.4.0
 pytest==3.6.0
 pytest-django==3.2.1
 

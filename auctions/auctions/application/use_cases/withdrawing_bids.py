@@ -13,7 +13,7 @@ class WithdrawingBidsInputDto:
     bids_ids: List[int]
 
 
-class WithdrawingBidsUseCase:
+class WithdrawingBids:
     auctions_repo: AuctionsRepository = inject.attr(AuctionsRepository)
     email_gateway: EmailGateway = inject.attr(EmailGateway)
 

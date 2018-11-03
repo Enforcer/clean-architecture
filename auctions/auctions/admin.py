@@ -27,7 +27,7 @@ class AuctionAdmin(admin.ModelAdmin):
     def save_related(self, request, form, formsets, *args, **kwargs):
         ids_of_deleted_bids = self._get_ids_of_deleted_bids(formsets)
 
-        use_case = withdrawing_bids.WithdrawingBidsUseCase()
+        use_case = withdrawing_bids.WithdrawingBids()
         input_dto = dacite.from_dict(
             withdrawing_bids.WithdrawingBidsInputDto,
             {'auction_id': form.instance.pk, 'bids_ids': ids_of_deleted_bids}
