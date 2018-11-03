@@ -1,0 +1,3 @@
+dataclasses==0.6
+Inject==3.4.0
+pytest==3.6.0
