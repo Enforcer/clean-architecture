@@ -1,1 +1,7 @@
 .cache/
+.pytest_cache/
+.mypy_cache/
+.vscode/
+ve36/
+db.sqlite3
+*.egg-info/

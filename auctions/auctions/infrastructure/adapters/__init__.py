@@ -1,1 +1,0 @@
-from auctions.infrastructure.adapters.dummy_email_gateway import DummyEmailGateway
