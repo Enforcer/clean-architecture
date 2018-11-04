@@ -2,7 +2,7 @@ import pytest
 from django.test import Client
 from django.urls import reverse
 
-from web.models import Auction
+from auctions_infrastructure.models import Auction
 
 
 @pytest.mark.usefixtures('transactional_db')

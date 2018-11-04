@@ -1,4 +1,4 @@
-from web.infrastructure.repositories.auctions import (
+from auctions_infrastructure.repositories.auctions import (
     DjangoORMAuctionsRepository,
     InMemoryAuctionsRepository,
 )

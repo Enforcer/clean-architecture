@@ -6,7 +6,7 @@ import funcy
 from django.contrib import admin
 
 from auctions.application.use_cases import withdrawing_bids
-from web.models import (
+from auctions_infrastructure.models import (
     Auction,
     Bid,
 )

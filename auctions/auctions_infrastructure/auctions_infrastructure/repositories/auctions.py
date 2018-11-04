@@ -24,7 +24,7 @@ class InMemoryAuctionsRepository(AuctionsRepository):
 class DjangoORMAuctionsRepository(AuctionsRepository):
 
     def get(self, auction_id: int) -> Auction:
-        from web.models import Auction as AuctionModel
+        from auctions_infrastructure.models import Auction as AuctionModel
 
         auction_model = AuctionModel.objects.prefetch_related('bid_set').get(id=auction_id)
         return Auction(
@@ -38,7 +38,7 @@ class DjangoORMAuctionsRepository(AuctionsRepository):
         )
 
     def save(self, auction: Auction) -> None:
-        from web.models import (
+        from auctions_infrastructure.models import (
             Auction as AuctionModel,
             Bid as BidModel
         )

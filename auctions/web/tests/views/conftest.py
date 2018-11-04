@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client
 
 from web.apps import inject_config
-from web.models import (
+from auctions_infrastructure.models import (
     Auction,
     Bid,
 )
@@ -27,7 +27,6 @@ def authenticated_client(client: Client) -> Client:
     UserModel.objects.create_user(username=username, password=password)
     client.login(username=username, password=password)
     return client
-
 
 
 @pytest.fixture()

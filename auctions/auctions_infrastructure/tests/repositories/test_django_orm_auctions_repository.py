@@ -8,8 +8,8 @@ from auctions.domain.entities import (
     Bid,
 )
 from auctions.domain.factories import get_dollars
-from web.infrastructure.repositories import DjangoORMAuctionsRepository
-from web.models import (
+from auctions_infrastructure.repositories import DjangoORMAuctionsRepository
+from auctions_infrastructure.models import (
     Auction as AuctionModel,
     Bid as BidModel,
 )

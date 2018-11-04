@@ -5,4 +5,3 @@ Inject==3.4.0
 pytest==3.6.0
 pytest-django==3.2.1
 auctions
-auctions_infrastructure

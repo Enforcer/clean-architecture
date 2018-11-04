@@ -3,7 +3,7 @@ from auctions.domain.entities import (
     Bid,
 )
 from auctions.domain.factories import get_dollars
-from web.infrastructure.repositories import InMemoryAuctionsRepository
+from auctions_infrastructure.repositories import InMemoryAuctionsRepository
 
 
 def test_should_get_back_saved_auction():
