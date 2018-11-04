@@ -1,5 +1,8 @@
 import copy
-from typing import Dict
+from typing import (
+    Dict,
+    List,
+)
 
 from auctions.application.repositories import AuctionsRepository
 from auctions.domain.entities import (
@@ -11,14 +14,28 @@ from auctions.domain.factories import get_dollars
 
 
 class InMemoryAuctionsRepository(AuctionsRepository):
-    def __init__(self) -> None:
+    def __init__(self, objects: List[Auction] = None) -> None:
+        if not objects:
+            objects = []
+
         self._storage: Dict[AuctionId, Auction] = {}
+        for object in objects:
+            self.save(object)
 
     def get(self, auction_id: AuctionId) -> Auction:
-        return copy.deepcopy(self._storage[auction_id])
+        copied = copy.deepcopy(self._storage[auction_id])
+        return Auction(
+            id=copied.id,
+            title=copied.title,
+            starting_price=copied.starting_price,
+            bids=copied.bids
+        )
 
     def save(self, auction: Auction) -> None:
-        self._storage[auction.id] = copy.deepcopy(auction)
+        copied = copy.deepcopy(auction)
+        copied.bids = [bid for bid in copied.bids if bid.id not in copied.withdrawn_bids_ids]
+        copied.withdrawn_bids_ids = []
+        self._storage[auction.id] = copied
 
 
 class DjangoORMAuctionsRepository(AuctionsRepository):

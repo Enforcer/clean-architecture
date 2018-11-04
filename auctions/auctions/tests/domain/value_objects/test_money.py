@@ -79,3 +79,13 @@ def test_supports_different_comparison_operators(
         one: Money, another: Money, cmp_operator: Callable, expected_result: bool
 ) -> None:
     assert cmp_operator(one, another) == expected_result
+
+
+@pytest.mark.parametrize('one, another, math_operator, expected_result', [
+    (Money(USD, '1'), Money(USD, '2'), operator.add, Money(USD, '3')),
+    (Money(USD, '1'), Money(USD, '0.49'), operator.sub, Money(USD, '0.51')),
+])
+def test_supports_basic_math_operators_if_the_same_currency(
+        one: Money, another: Money, math_operator: Callable, expected_result: Money
+) -> None:
+    assert math_operator(one, another) == expected_result

@@ -55,6 +55,16 @@ class Money:
         else:
             return self.amount < other.amount
 
+    def __add__(self, other: 'Money') -> 'Money':
+        if not isinstance(other, Money) or not self.currency == other.currency:
+            raise TypeError
+        return Money(self.currency, self.amount + other.amount)
+
+    def __sub__(self, other: 'Money') -> 'Money':
+        if not isinstance(other, Money) or not self.currency == other.currency:
+            raise TypeError
+        return Money(self.currency, self.amount - other.amount)
+
     def __repr__(self) -> str:
         return f'Money({self._currency.__name__}, {repr(self._amount)})'
 
