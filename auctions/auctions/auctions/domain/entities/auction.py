@@ -3,6 +3,7 @@ from typing import List
 from auctions.domain.entities.bid import Bid
 from auctions.domain.types import (
     AuctionId,
+    BidId,
     BidderId,
 )
 from auctions.domain.value_objects import Money
@@ -15,7 +16,7 @@ class Auction:
         self.title = title
         self.starting_price = starting_price
         self.bids = sorted(bids, key=lambda bid: bid.amount)
-        self.withdrawn_bids_ids: List[int] = []
+        self._withdrawn_bids_ids: List[BidId] = []
 
     def place_bid(self, bidder_id: BidderId, amount: Money) -> None:
         if amount > self.current_price:
@@ -40,7 +41,11 @@ class Auction:
 
     def withdraw_bids(self, bids_ids: List[int]):
         self.bids = [bid for bid in self.bids if bid.id not in bids_ids]
-        self.withdrawn_bids_ids.extend(bids_ids)
+        self._withdrawn_bids_ids.extend(bids_ids)
+
+    @property
+    def withdrawn_bids_ids(self) -> List[BidId]:
+        return self._withdrawn_bids_ids[:]
 
     def __str__(self):
         return f'<Auction #{self.id} title="{self.title}" current_price={self.current_price}>'

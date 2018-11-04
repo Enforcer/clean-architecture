@@ -60,7 +60,7 @@ def test_removes_withdrawn_bids(auction_with_a_bid: Auction) -> None:
         starting_price=auction_with_a_bid.starting_price,
         bids=[the_only_bid]
     )
-    auction.withdrawn_bids_ids = [the_only_bid.id]
+    auction.withdraw_bids([the_only_bid.id])
 
     repo = InMemoryAuctionsRepository([auction_with_a_bid])
     repo.save(auction)

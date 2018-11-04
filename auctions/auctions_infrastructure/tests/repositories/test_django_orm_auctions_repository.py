@@ -82,7 +82,7 @@ def test_removes_withdrawn_bids(auction_model_with_a_bid: AuctionModel) -> None:
             Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount)),
         ]
     )
-    auction.withdrawn_bids_ids = [bid_model.id]
+    auction.withdraw_bids([bid_model.id])
 
     DjangoORMAuctionsRepository().save(auction)
 

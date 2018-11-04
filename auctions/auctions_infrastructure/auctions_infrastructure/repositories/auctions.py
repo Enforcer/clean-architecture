@@ -34,7 +34,6 @@ class InMemoryAuctionsRepository(AuctionsRepository):
     def save(self, auction: Auction) -> None:
         copied = copy.deepcopy(auction)
         copied.bids = [bid for bid in copied.bids if bid.id not in copied.withdrawn_bids_ids]
-        copied.withdrawn_bids_ids = []
         self._storage[auction.id] = copied
 
 
