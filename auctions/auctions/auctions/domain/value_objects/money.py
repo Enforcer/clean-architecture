@@ -28,7 +28,7 @@ class Money:
             elif -decimal_tuple.exponent > currency.decimal_precision:
                 raise ValueError(
                     f'given amount has invalid precision! It should have '
-                    'no more than {currency.decimal_precision} decimal places!'
+                    f'no more than {currency.decimal_precision} decimal places!'
                 )
 
             self._currency = currency
