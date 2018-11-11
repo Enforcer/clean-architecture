@@ -59,6 +59,7 @@ def test_saves_auction(
     auctions_repo_mock.save.assert_called_once_with(auction)
 
 
+@pytest.mark.skip('Not for now')
 def test_notifies_winner(
         email_gateway_mock: Mock,
         auction: Auction,

@@ -1,4 +1,8 @@
-from unittest.mock import Mock, PropertyMock
+from datetime import (
+    datetime,
+    timedelta,
+)
+from unittest.mock import Mock
 
 import inject
 import pytest
@@ -22,7 +26,10 @@ def exemplary_bids_ids() -> int:
 
 @pytest.fixture()
 def auction(exemplary_auction_id: int) -> Auction:
-    return Auction(id=exemplary_auction_id, title='irrelevant', starting_price=get_dollars('2.00'), bids=[])
+    ends_at = datetime.now() + timedelta(days=1)
+    return Auction(
+        id=exemplary_auction_id, title='irrelevant', starting_price=get_dollars('2.00'), bids=[], ends_at=ends_at
+    )
 
 
 @pytest.fixture()

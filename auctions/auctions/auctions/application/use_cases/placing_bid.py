@@ -5,13 +5,17 @@ import inject
 
 from auctions.application.repositories import AuctionsRepository
 from auctions.application.ports import EmailGateway
+from auctions.domain.types import (
+    AuctionId,
+    BidderId,
+)
 from auctions.domain.value_objects import Money
 
 
 @dataclass
 class PlacingBidInputDto:
-    bidder_id: int
-    auction_id: int
+    bidder_id: BidderId
+    auction_id: AuctionId
     amount: Money
 
 
@@ -41,8 +45,8 @@ class PlacingBid:
         auction.place_bid(bidder_id=input_dto.bidder_id, amount=input_dto.amount)
         self.auctions_repo.save(auction)
 
-        if input_dto.bidder_id in auction.winners:
-            self.email_gateway.notify_about_winning_auction(auction.id, input_dto.bidder_id)
+        # if input_dto.bidder_id in auction.winners:
+        #     self.email_gateway.notify_about_winning_auction(auction.id, input_dto.bidder_id)
 
         output_dto = PlacingBidOutputDto(
             input_dto.bidder_id in auction.winners, auction.current_price

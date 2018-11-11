@@ -1,4 +1,5 @@
 from typing import List
+from datetime import datetime
 
 from auctions.domain.entities.bid import Bid
 from auctions.domain.types import (
@@ -10,7 +11,14 @@ from auctions.domain.value_objects import Money
 
 
 class Auction:
-    def __init__(self, id: AuctionId, title: str, starting_price: Money, bids: List[Bid]) -> None:
+    def __init__(
+            self,
+            id: AuctionId,
+            title: str,
+            starting_price: Money,
+            bids: List[Bid],
+            ends_at: datetime,
+    ) -> None:
         assert isinstance(starting_price, Money)
         self.id = id
         self.title = title
