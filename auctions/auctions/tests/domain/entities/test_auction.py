@@ -1,4 +1,12 @@
+from datetime import (
+    datetime,
+    timedelta,
+)
+
+import pytest
+
 from auctions.domain.entities import Bid
+from auctions.domain.exceptions import BidOnEndedAuctionError
 from auctions.domain.factories import get_dollars
 from ...factories import create_auction
 
@@ -80,3 +88,11 @@ def test_should_not_be_winning_if_bid_lower_than_current_price() -> None:
     auction.place_bid(bidder_id=lower_bid_bidder_id, amount=get_dollars('5.00'))
 
     assert lower_bid_bidder_id not in auction.winners
+
+
+def test_should_not_allow_placing_bids_for_ended_auction() -> None:
+    yesterday = datetime.now() - timedelta(days=1)
+    auction = create_auction(ends_at=yesterday)
+
+    with pytest.raises(BidOnEndedAuctionError):
+        auction.place_bid(bidder_id=1, amount=auction.current_price + get_dollars('1.00'))

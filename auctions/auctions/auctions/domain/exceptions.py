@@ -1,0 +1,3 @@
+
+class BidOnEndedAuctionError(Exception):
+    pass
