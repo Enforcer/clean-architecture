@@ -19,22 +19,22 @@ def bidder_id() -> int:
 
 @pytest.fixture()
 def amount() -> Money:
-    return get_dollars('10.00')
+    return get_dollars('12.00')
 
 
 @pytest.fixture()
-def input_dto(exemplary_auction_id: int, bidder_id: int, amount: Money) -> PlacingBidInputDto:
-    return PlacingBidInputDto(bidder_id, exemplary_auction_id, amount)
+def input_dto(auction: Auction, bidder_id: int, amount: Money) -> PlacingBidInputDto:
+    return PlacingBidInputDto(bidder_id, auction.id, amount)
 
 
 def test_loads_auction_using_id(
-        exemplary_auction_id: int,
+        auction: Auction,
         auctions_repo_mock: Mock,
         input_dto: PlacingBidInputDto
 ) -> None:
     PlacingBid().execute(input_dto)
 
-    auctions_repo_mock.get.assert_called_once_with(exemplary_auction_id)
+    auctions_repo_mock.get.assert_called_once_with(auction.id)
 
 
 def test_makes_an_expected_bid(

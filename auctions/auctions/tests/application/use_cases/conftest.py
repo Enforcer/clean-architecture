@@ -1,7 +1,3 @@
-from datetime import (
-    datetime,
-    timedelta,
-)
 from unittest.mock import Mock
 
 import inject
@@ -11,12 +7,7 @@ from auctions.application.repositories import AuctionsRepository
 from auctions.application.ports import EmailGateway
 from auctions.application.use_cases.placing_bid import PlacingBidOutputBoundary
 from auctions.domain.entities import Auction
-from auctions.domain.factories import get_dollars
-
-
-@pytest.fixture()
-def exemplary_auction_id() -> int:
-    return 1
+from ...factories import create_auction
 
 
 @pytest.fixture()
@@ -25,11 +16,8 @@ def exemplary_bids_ids() -> int:
 
 
 @pytest.fixture()
-def auction(exemplary_auction_id: int) -> Auction:
-    ends_at = datetime.now() + timedelta(days=1)
-    return Auction(
-        id=exemplary_auction_id, title='irrelevant', starting_price=get_dollars('2.00'), bids=[], ends_at=ends_at
-    )
+def auction() -> Auction:
+    return create_auction()
 
 
 @pytest.fixture()

@@ -1,7 +1,3 @@
-from datetime import (
-    datetime,
-    timedelta,
-)
 from typing import List
 from unittest.mock import (
     Mock,
@@ -17,6 +13,7 @@ from auctions.domain.entities import (
     Bid,
 )
 from auctions.domain.factories import get_dollars
+from ...factories import create_auction
 
 
 @pytest.fixture()
@@ -25,18 +22,18 @@ def exemplary_bids_ids() -> List[int]:
 
 
 @pytest.fixture()
-def input_dto(exemplary_auction_id: int, exemplary_bids_ids: List[int]) -> WithdrawingBidsInputDto:
-    return WithdrawingBidsInputDto(exemplary_auction_id, exemplary_bids_ids)
+def input_dto(auction: Auction, exemplary_bids_ids: List[int]) -> WithdrawingBidsInputDto:
+    return WithdrawingBidsInputDto(auction.id, exemplary_bids_ids)
 
 
 def test_loads_auction_using_id(
-        exemplary_auction_id: int,
+        auction: Auction,
         input_dto: WithdrawingBidsInputDto,
         auctions_repo_mock: Mock
 ) -> None:
     WithdrawingBids().execute(input_dto)
 
-    auctions_repo_mock.get.assert_called_once_with(exemplary_auction_id)
+    auctions_repo_mock.get.assert_called_once_with(auction.id)
 
 
 def test_saves_auction_afterwards(
@@ -62,13 +59,10 @@ def test_calls_withdraw_bids_on_auction(
 
 @pytest.fixture()
 def auction_with_a_winner(input_dto: WithdrawingBidsInputDto) -> Auction:
-    losing_bid = Bid(id=4, bidder_id=2, amount=get_dollars('5.50'))
-    winning_bid = Bid(id=2, bidder_id=1, amount=get_dollars('6.00'))
+    losing_bid = Bid(id=4, bidder_id=2, amount=get_dollars('10.50'))
+    winning_bid = Bid(id=2, bidder_id=1, amount=get_dollars('11.00'))
     bids = [winning_bid, losing_bid]
-    ends_at = datetime.now() + timedelta(days=1)
-    return Auction(
-        id=2, title='does not matter', starting_price=get_dollars('5.00'), bids=bids, ends_at=ends_at
-    )
+    return create_auction(auction_id=2, bids=bids)
 
 
 def test_calls_email_gateway_once_winners_list_changes(

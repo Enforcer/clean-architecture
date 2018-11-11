@@ -1,22 +1,6 @@
-from datetime import (
-    datetime,
-    timedelta,
-)
-from typing import List
-
-from auctions.domain.entities import (
-    Auction,
-    Bid,
-)
+from auctions.domain.entities import Bid
 from auctions.domain.factories import get_dollars
-
-
-def create_auction(bids: List[Bid] = None) -> Auction:
-    if not bids:
-        bids = []
-
-    ends_at = datetime.now() + timedelta(days=1)
-    return Auction(id=1, title='', starting_price=get_dollars('10'), bids=bids, ends_at=ends_at)
+from ...factories import create_auction
 
 
 def test_should_use_starting_price_as_current_price_for_empty_bids_list():
