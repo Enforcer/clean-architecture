@@ -18,3 +18,16 @@ class Bid(models.Model):
 
     def __str__(self):
         return f'{self.bidder} with {self.amount}'
+
+
+class BidderCardDetails(models.Model):
+    bidder = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    card_token = models.CharField(max_length=255)
+
+
+class PaymentHistoryEntry(models.Model):
+    bidder = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    auction = models.ForeignKey(Auction, on_delete=models.PROTECT)
+    amount = models.DecimalField(decimal_places=2, max_digits=10)
+    currency = models.CharField(max_length=3)
+    charge_uuid = models.UUIDField()

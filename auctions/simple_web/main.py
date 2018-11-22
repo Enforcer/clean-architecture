@@ -1,3 +1,8 @@
+from datetime import (
+    datetime,
+    timedelta,
+)
+
 import inject
 
 from auctions.application.repositories import AuctionsRepository
@@ -8,8 +13,9 @@ from auctions_infrastructure.repositories.auctions import InMemoryAuctionsReposi
 
 def setup_dependency_injection():
     def di_config(binder: inject.Binder) -> None:
+        tomorrow = datetime.now() + timedelta(days=1)
         binder.bind(AuctionsRepository, InMemoryAuctionsRepository([
-            Auction(id=1, title='Exemplary auction', starting_price=get_dollars('12.99'), bids=[])
+            Auction(id=1, title='Exemplary auction', starting_price=get_dollars('12.99'), bids=[], ends_at=tomorrow)
         ]))
 
     inject.configure(di_config)
