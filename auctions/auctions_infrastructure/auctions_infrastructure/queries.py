@@ -3,22 +3,11 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import List
 
-from django.db import models
-
 from auctions.domain.types import AuctionId
 from auctions_infrastructure.models import (
     Auction,
     Bid,
 )
-
-
-class AuctionsReadFacade:
-
-    def auctions(self) -> models.Manager:
-        return Auction.objects
-
-    def bids(self) -> models.Manager:
-        return Bid.objects
 
 
 class GetAuctionDetails:

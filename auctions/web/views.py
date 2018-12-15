@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from auctions.application.use_cases import placing_bid
 from auctions.domain.factories import get_dollars
-from auctions_infrastructure.read_model_facade import AuctionsReadFacade, GetAuctionDetails
+from auctions_infrastructure.queries import GetAuctionDetails
 
 
 def details(request: HttpRequest, auction_id: int) -> HttpResponse:
