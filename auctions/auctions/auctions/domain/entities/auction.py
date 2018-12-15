@@ -8,7 +8,7 @@ from auctions.domain.types import (
     BidderId,
 )
 from auctions.domain.value_objects import Money
-from auctions.domain.exceptions import BidOnEndedAuctionError
+from auctions.domain.exceptions import BidOnEndedAuction
 
 
 class Auction:
@@ -29,8 +29,8 @@ class Auction:
         self._withdrawn_bids_ids: List[BidId] = []
 
     def place_bid(self, bidder_id: BidderId, amount: Money) -> None:
-        if datetime.now() > self.ends_at:
-            raise BidOnEndedAuctionError
+        if datetime.now(tz=self.ends_at.tzinfo) > self.ends_at:
+            raise BidOnEndedAuction
 
         if amount > self.current_price:
             self.bids.append(Bid(id=None, bidder_id=bidder_id, amount=amount))

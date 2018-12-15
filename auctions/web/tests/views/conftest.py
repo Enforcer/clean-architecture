@@ -4,6 +4,7 @@ import inject
 import pytest
 from django.contrib.auth import get_user_model
 from django.test import Client
+from django.utils import timezone
 
 from web.apps import inject_config
 from auctions_infrastructure.models import (
@@ -35,6 +36,7 @@ def auction_without_bids() -> Auction:
         title='Cool socks',
         starting_price=Decimal('1.00'),
         current_price=Decimal('1.00'),
+        ends_at=timezone.now() + timezone.timedelta(days=5)
     )
 
 

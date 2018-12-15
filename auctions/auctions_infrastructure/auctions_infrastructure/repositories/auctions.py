@@ -28,7 +28,8 @@ class InMemoryAuctionsRepository(AuctionsRepository):
             id=copied.id,
             title=copied.title,
             starting_price=copied.starting_price,
-            bids=copied.bids
+            bids=copied.bids,
+            ends_at=copied.ends_at,
         )
 
     def save(self, auction: Auction) -> None:
@@ -50,7 +51,8 @@ class DjangoORMAuctionsRepository(AuctionsRepository):
             bids=[
                 Bid(id=bid_model.id, bidder_id=bid_model.bidder_id, amount=get_dollars(bid_model.amount))
                 for bid_model in auction_model.bid_set.all()
-            ]
+            ],
+            ends_at=auction_model.ends_at,
         )
 
     def save(self, auction: Auction) -> None:
@@ -63,7 +65,8 @@ class DjangoORMAuctionsRepository(AuctionsRepository):
             id=auction.id,
             title=auction.title,
             starting_price=auction.starting_price.amount,
-            current_price=auction.current_price.amount
+            current_price=auction.current_price.amount,
+            ends_at=auction.ends_at,
         )
         model.save()
         new_bids = [bid for bid in auction.bids if not bid.id]

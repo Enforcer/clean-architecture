@@ -1,3 +1,3 @@
 
-class BidOnEndedAuctionError(Exception):
+class BidOnEndedAuction(Exception):
     pass
