@@ -1,7 +1,11 @@
 from typing import List
 from datetime import datetime
 
+import inject
+from foundation import EventBus
+
 from auctions.domain.entities.bid import Bid
+from auctions.domain.events import BidderHasBeenOverbid
 from auctions.domain.types import (
     AuctionId,
     BidId,
@@ -12,6 +16,8 @@ from auctions.domain.exceptions import BidOnEndedAuction
 
 
 class Auction:
+    event_bus = inject.attr(EventBus)
+
     def __init__(
             self,
             id: AuctionId,
@@ -32,8 +38,11 @@ class Auction:
         if datetime.now(tz=self.ends_at.tzinfo) > self.ends_at:
             raise BidOnEndedAuction
 
+        old_winner = self.winners[0] if self.bids else None
         if amount > self.current_price:
             self.bids.append(Bid(id=None, bidder_id=bidder_id, amount=amount))
+            if old_winner:
+                self.event_bus.emit(BidderHasBeenOverbid(self.id, old_winner, amount))
 
     @property
     def current_price(self) -> Money:
