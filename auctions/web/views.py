@@ -1,24 +1,43 @@
 import json
+from dataclasses import asdict
 
 import dacite
-import inject
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import (
+    Http404,
     HttpRequest,
     HttpResponse,
 )
-from django.utils.html import escape
+from django.template import (
+    Context,
+    Template,
+)
 from django.views.decorators.csrf import csrf_exempt
 
-from auctions.application import repositories
 from auctions.application.use_cases import placing_bid
 from auctions.domain.factories import get_dollars
+from auctions_infrastructure.read_model_facade import AuctionsReadFacade, GetAuctionDetails
 
 
 def details(request: HttpRequest, auction_id: int) -> HttpResponse:
-    repo: repositories.AuctionsRepository = inject.instance(repositories.AuctionsRepository)
-    auction = repo.get(auction_id)
-    return HttpResponse(escape("Brilliant auction! %s." % auction))
+    try:
+        dto = GetAuctionDetails().query(auction_id)
+    except ObjectDoesNotExist:
+        raise Http404(f'Auction #{auction_id} does not exist!')
+
+    ctx = Context(asdict(dto))
+    tpl = Template(
+        '''{% load app_filters %}'''
+        '''Auction: {{ auction.title }}<br>'''
+        '''Price changed from {{ auction.starting_price|dollars }}'''
+        '''to {{ auction.current_price|dollars }}<br>'''
+        '''Top bids:<br>'''
+        '''{% for bid in bids %}'''
+        '''{{ bid.amount|dollars }} by {{ bid.bidder.username|anonymize }}<br>'''
+        '''{% endfor %}'''
+    )
+    return HttpResponse(tpl.render(ctx))
 
 
 class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
