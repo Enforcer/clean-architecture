@@ -11,6 +11,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
 ]
 
+USE_TZ = True
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
