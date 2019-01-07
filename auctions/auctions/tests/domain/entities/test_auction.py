@@ -5,7 +5,7 @@ from datetime import (
 from unittest import mock
 
 import pytest
-from foundation import EventBus
+from pybuses import EventBus
 
 from auctions.domain.entities import Bid
 from auctions.domain.events import BidderHasBeenOverbid
@@ -110,4 +110,4 @@ def test_should_emit_event_upon_overbid() -> None:
     auction.place_bid(bidder_id=2, amount=new_bid_amount)
 
     expected_event = BidderHasBeenOverbid(auction.id, bid_that_will_lose.bidder_id, new_bid_amount)
-    auction.event_bus.emit.assert_called_once_with(expected_event)
+    auction.event_bus.post.assert_called_once_with(expected_event)

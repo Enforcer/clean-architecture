@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 
-from foundation import Event
-
 from auctions.domain.value_objects import Money
 from auctions.domain.types import (
     AuctionId,
@@ -10,7 +8,7 @@ from auctions.domain.types import (
 
 
 @dataclass
-class BidderHasBeenOverbid(Event):
+class BidderHasBeenOverbid:
     auction_id: AuctionId
     bidder_id: BidderId
     new_price: Money

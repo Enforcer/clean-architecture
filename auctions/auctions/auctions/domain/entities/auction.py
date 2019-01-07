@@ -2,7 +2,7 @@ from typing import List
 from datetime import datetime
 
 import inject
-from foundation import EventBus
+from pybuses import EventBus
 
 from auctions.domain.entities.bid import Bid
 from auctions.domain.events import BidderHasBeenOverbid
@@ -42,7 +42,7 @@ class Auction:
         if amount > self.current_price:
             self.bids.append(Bid(id=None, bidder_id=bidder_id, amount=amount))
             if old_winner:
-                self.event_bus.emit(BidderHasBeenOverbid(self.id, old_winner, amount))
+                self.event_bus.post(BidderHasBeenOverbid(self.id, old_winner, amount))
 
     @property
     def current_price(self) -> Money:
