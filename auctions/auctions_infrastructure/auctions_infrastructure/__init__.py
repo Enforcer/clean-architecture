@@ -12,6 +12,13 @@ def setup():
     return engine
 
 
+bidders = Table(
+    'bidders',
+    metadata,
+    Column('id', Integer, primary_key=True),
+)
+
+
 auctions = Table(
     'auctions',
     metadata,
@@ -28,5 +35,6 @@ bids = Table(
     metadata,
     Column('id', Integer, primary_key=True),
     Column('amount', Numeric, nullable=False),
-    Column('auction_id', None, ForeignKey('auctions.id')),
+    Column('bidder_id', None, ForeignKey('bidders.id'), nullable=False),
+    Column('auction_id', None, ForeignKey('auctions.id'), nullable=False),
 )

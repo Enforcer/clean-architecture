@@ -18,7 +18,13 @@ from auctions.domain.entities import (
     Bid,
 )
 from auctions.domain.factories import get_dollars
-from auctions_infrastructure import auctions, bids, metadata, setup
+from auctions_infrastructure import (
+    auctions,
+    bidders,
+    bids,
+    metadata,
+    setup,
+)
 from auctions_infrastructure.repositories import SqlAlchemyAuctionsRepo
 
 
@@ -44,7 +50,17 @@ def winning_bid_amount() -> Decimal:
 
 
 @pytest.fixture()
-def auction_model_with_a_bid(connection: Connection, winning_bid_amount: Decimal, ends_at: datetime) -> RowProxy:
+def bidder_id(connection: Connection) -> int:
+    return connection.execute(bidders.insert()).inserted_primary_key[0]
+
+
+another_bidder_id = bidder_id
+
+
+@pytest.fixture()
+def auction_model_with_a_bid(
+        connection: Connection, winning_bid_amount: Decimal, bidder_id: int, ends_at: datetime
+) -> RowProxy:
     connection.execute(auctions.insert().values({
         'id': 1,
         'title': 'Cool socks',
@@ -52,7 +68,7 @@ def auction_model_with_a_bid(connection: Connection, winning_bid_amount: Decimal
         'current_price': winning_bid_amount,
         'ends_at': ends_at,
     }))
-    connection.execute(bids.insert().values({'amount': winning_bid_amount, 'auction_id': 1}))
+    connection.execute(bids.insert().values({'amount': winning_bid_amount, 'auction_id': 1, 'bidder_id': bidder_id}))
     return connection.execute(auctions.select(whereclause=auctions.c.id == 1)).first()
 
 
@@ -74,18 +90,21 @@ def test_gets_existing_auction(
 
 
 def test_saves_auction_changes(
-        connection: Connection, bid_model: RowProxy, auction_model_with_a_bid: RowProxy, ends_at: datetime
+        connection: Connection,
+        another_bidder_id: int,
+        bid_model: RowProxy,
+        auction_model_with_a_bid: RowProxy,
+        ends_at: datetime,
 ) -> None:
-    new_bid_price = get_dollars(bid_model['amount'] * 2)
+    new_bid_price = get_dollars(bid_model.amount * 2)
     auction = Auction(
         id=auction_model_with_a_bid.id,
         title=auction_model_with_a_bid.title,
         starting_price=get_dollars(auction_model_with_a_bid.starting_price),
         ends_at=ends_at,
         bids=[
-            # TODO - bidder id
-            Bid(bid_model['id'], None, get_dollars(bid_model['amount'])),
-            Bid(None, None, new_bid_price)
+            Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount)),
+            Bid(None, another_bidder_id, new_bid_price)
         ]
     )
 
@@ -106,8 +125,7 @@ def test_removes_withdrawn_bids(
         starting_price=get_dollars(auction_model_with_a_bid.starting_price),
         ends_at=ends_at,
         bids=[
-            # TODO bidder_id
-            Bid(bid_model.id, None, get_dollars(bid_model.amount)),
+            Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount)),
         ]
     )
     auction.withdraw_bids([bid_model.id])

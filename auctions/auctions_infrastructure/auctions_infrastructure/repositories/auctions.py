@@ -53,8 +53,7 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
             raise Exception('Not found')
 
         bid_rows = self._conn.execute(bids.select().where(bids.c.auction_id == auction_id)).fetchall()
-        # TODO: bidder_id!!!
-        auction_bids = [Bid(bid_row.id, None, get_dollars(bid_row.amount)) for bid_row in bid_rows]
+        auction_bids = [Bid(bid_row.id, bid_row.bidder_id, get_dollars(bid_row.amount)) for bid_row in bid_rows]
         return Auction(
             row.id, row.title, get_dollars(row.starting_price), auction_bids, row.ends_at.replace(tzinfo=pytz.UTC)
         )
@@ -78,7 +77,7 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
             if bid.id:
                 continue
             result = self._conn.execute(bids.insert(values={
-                'auction_id': auction.id, 'amount': bid.amount.amount
+                'auction_id': auction.id, 'amount': bid.amount.amount, 'bidder_id': bid.bidder_id
             }))
             bid.id, = result.inserted_primary_key
 
