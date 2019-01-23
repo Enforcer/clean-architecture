@@ -18,7 +18,7 @@ class Money:
         if not inspect.isclass(currency) or not issubclass(currency, Currency):
             raise ValueError(f'{currency} is not a subclass of Currency!')
         try:
-            decimal_amount = Decimal(amount)
+            decimal_amount = Decimal(amount).normalize()
         except DecimalException:
             raise ValueError(f'"{amount}" is not a valid amount!')
         else:

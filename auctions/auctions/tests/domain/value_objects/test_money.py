@@ -1,5 +1,9 @@
 import operator
-from typing import Callable
+from decimal import Decimal
+from typing import (
+    Any,
+    Callable,
+)
 
 import pytest
 
@@ -89,3 +93,11 @@ def test_supports_basic_math_operators_if_the_same_currency(
         one: Money, another: Money, math_operator: Callable, expected_result: Money
 ) -> None:
     assert math_operator(one, another) == expected_result
+
+
+@pytest.mark.parametrize('arg, expected_result', [
+    ('5.0000', Money(USD, '5')),
+    (Decimal('5.990000000'), Money(USD, '5.99')),
+])
+def test_normalizes_whenever_it_can(arg: Any, expected_result: Money) -> None:
+    assert Money(USD, arg) == expected_result
