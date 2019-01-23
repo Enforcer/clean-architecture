@@ -70,3 +70,6 @@ class Money:
 
     def __str__(self) -> str:
         return f'{self._amount} {self._currency.symbol}'
+
+    def __hash__(self) -> int:
+        return hash((self.amount, self.currency))

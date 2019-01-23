@@ -8,7 +8,7 @@ from auctions.domain.types import (
 from auctions.domain.value_objects import Money
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Bid:
     id: Optional[BidId]
     bidder_id: BidderId

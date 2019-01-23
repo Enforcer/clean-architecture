@@ -78,15 +78,16 @@ def bid_model(connection: Connection, auction_model_with_a_bid: RowProxy) -> Row
 
 
 def test_gets_existing_auction(
-        connection: Connection, auction_model_with_a_bid: RowProxy, winning_bid_amount: Decimal, ends_at: datetime
+        connection: Connection, auction_model_with_a_bid: RowProxy, bid_model: RowProxy, ends_at: datetime
 ) -> None:
     auction = SqlAlchemyAuctionsRepo(connection).get(auction_model_with_a_bid.id)
 
     assert auction.id == auction_model_with_a_bid.id
     assert auction.title == auction_model_with_a_bid.title
     assert auction.starting_price == get_dollars(auction_model_with_a_bid.starting_price)
-    assert auction.current_price == get_dollars(winning_bid_amount)
+    assert auction.current_price == get_dollars(bid_model.amount)
     assert auction.ends_at == ends_at
+    assert set(auction.bids) == {Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount))}
 
 
 def test_saves_auction_changes(
