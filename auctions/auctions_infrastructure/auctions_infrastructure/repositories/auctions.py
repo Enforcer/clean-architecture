@@ -4,6 +4,9 @@ from typing import (
     List,
 )
 
+import pytz
+from sqlalchemy.engine import Connection
+
 from auctions.application.repositories import AuctionsRepository
 from auctions.domain.entities import (
     Auction,
@@ -11,6 +14,7 @@ from auctions.domain.entities import (
 )
 from auctions.domain.types import AuctionId
 from auctions.domain.factories import get_dollars
+from auctions_infrastructure import auctions, bids
 
 
 class InMemoryAuctionsRepository(AuctionsRepository):
@@ -36,6 +40,50 @@ class InMemoryAuctionsRepository(AuctionsRepository):
         copied = copy.deepcopy(auction)
         copied.bids = [bid for bid in copied.bids if bid.id not in copied.withdrawn_bids_ids]
         self._storage[auction.id] = copied
+
+
+class SqlAlchemyAuctionsRepo(AuctionsRepository):
+
+    def __init__(self, connection: Connection) -> None:
+        self._conn = connection
+
+    def get(self, auction_id: AuctionId) -> Auction:
+        row = self._conn.execute(auctions.select().where(auctions.c.id == auction_id)).first()
+        if not row:
+            raise Exception('Not found')
+
+        bid_rows = self._conn.execute(bids.select().where(bids.c.auction_id == auction_id)).fetchall()
+        # TODO: bidder_id!!!
+        auction_bids = [Bid(bid_row.id, None, get_dollars(bid_row.amount)) for bid_row in bid_rows]
+        return Auction(
+            row.id, row.title, get_dollars(row.starting_price), auction_bids, row.ends_at.replace(tzinfo=pytz.UTC)
+        )
+
+    def save(self, auction: Auction) -> None:
+        raw_auction = {
+            'title': auction.title,
+            'starting_price': auction.starting_price.amount,
+            'current_price': auction.current_price.amount,
+            'ends_at': auction.ends_at,
+        }
+        update_result = self._conn.execute(
+            auctions.update(
+                values=raw_auction,
+                whereclause=auctions.c.id == auction.id
+            )
+        )
+        assert update_result.rowcount == 1  # no support for creating
+
+        for bid in auction.bids:
+            if bid.id:
+                continue
+            result = self._conn.execute(bids.insert(values={
+                'auction_id': auction.id, 'amount': bid.amount.amount
+            }))
+            bid.id, = result.inserted_primary_key
+
+        if auction.withdrawn_bids_ids:
+            self._conn.execute(bids.delete(whereclause=bids.c.id.in_(auction.withdrawn_bids_ids)))
 
 
 class DjangoORMAuctionsRepository(AuctionsRepository):

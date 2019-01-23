@@ -1,5 +1,7 @@
 Django==2.0.5
 pytest==3.6.0
 pytest-django==3.2.1
+pytz==2018.4
 requests==2.20.1
+sqlalchemy==1.2.16
 auctions
