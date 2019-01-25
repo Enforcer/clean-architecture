@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Type
 
+import inject
 from flask import (
     Flask,
     abort,
@@ -20,6 +21,7 @@ from .main import setup
 
 
 from auctions.application.use_cases import placing_bid
+from auctions.application.repositories import AuctionsRepository
 from auctions.domain.entities import Auction
 from auctions.domain.factories import get_dollars
 from auctions.domain.types import AuctionId
@@ -108,8 +110,6 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
 
 @app.route('/')
 def auctions_list() -> app.response_class:
-    import inject
-    from auctions.application.repositories import AuctionsRepository
     inst = inject.instance(AuctionsRepository)
 
     return make_response(jsonify([inst.get_active()]))
@@ -117,8 +117,6 @@ def auctions_list() -> app.response_class:
 
 @app.route('/<int:auction_id>')
 def single_auction(auction_id: int) -> app.response_class:
-    import inject
-    from auctions.application.repositories import AuctionsRepository
     inst = inject.instance(AuctionsRepository)
 
     auction = inst.get(auction_id)
