@@ -1,8 +1,0 @@
-dacite==0.0.18
-Django==2.0.5
-funcy==1.10.2
-Inject==3.4.0
-pytest==3.6.0
-pytest-django==3.2.1
-auctions
-auctions_infrastructure
