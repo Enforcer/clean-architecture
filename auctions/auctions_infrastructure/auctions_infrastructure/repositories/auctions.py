@@ -4,6 +4,7 @@ from typing import (
     List,
 )
 
+import inject
 import pytz
 from sqlalchemy.engine import Connection
 
@@ -44,7 +45,8 @@ class InMemoryAuctionsRepository(AuctionsRepository):
 
 class SqlAlchemyAuctionsRepo(AuctionsRepository):
 
-    def __init__(self, connection: Connection) -> None:
+    @inject.autoparams('connection')
+    def __init__(self, connection: Connection = None) -> None:
         self._conn = connection
 
     def get(self, auction_id: AuctionId) -> Auction:

@@ -7,7 +7,7 @@ metadata = MetaData()
 
 
 def setup():
-    engine = create_engine('sqlite:///:memory:')
+    engine = create_engine('sqlite:///:memory:', echo=True)
     metadata.create_all(engine)
     return engine
 

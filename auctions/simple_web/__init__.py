@@ -1,3 +1,4 @@
+import functools
 from typing import Type
 
 from flask import (
@@ -6,6 +7,7 @@ from flask import (
     jsonify,
     make_response,
     request,
+    json,
 )
 from marshmallow import (
     fields,
@@ -18,12 +20,48 @@ from .main import setup
 
 
 from auctions.application.use_cases import placing_bid
-from auctions.domain.types import AuctionId
+from auctions.domain.entities import Auction
 from auctions.domain.factories import get_dollars
+from auctions.domain.types import AuctionId
+from auctions.domain.value_objects import Money
+
+
+def method_dispatch(func):
+    dispatcher = functools.singledispatch(func)
+
+    def wrapper(*args, **kw):
+        return dispatcher.dispatch(args[1].__class__)(*args, **kw)
+
+    wrapper.register = dispatcher.register
+    functools.update_wrapper(wrapper, func)
+    return wrapper
+
+
+class JSONEncoder(json.JSONEncoder):
+    @method_dispatch
+    def default(self, obj: object) -> object:
+        raise TypeError(f'Cannot serialize {type(obj)}')
+
+    @default.register(Auction)
+    def _(self, obj: Auction) -> object:
+        return {
+            'id': obj.id,
+            'title': obj.title,
+            'current_price': obj.current_price,
+            'starting_price': obj.starting_price,
+        }
+
+    @default.register(Money)
+    def _(self, obj: Money) -> object:
+        return {
+            'amount': str(obj.amount),
+            'currency': obj.currency.iso_code,
+        }
 
 
 app = Flask(__name__)
-setup()
+app.json_encoder = JSONEncoder
+setup(app)
 
 
 @app.before_request
@@ -71,6 +109,27 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
             else f'Your bid is too low. Current price is {output_dto.current_price}'
         )
         self.response = make_response(jsonify({'message': message}))
+
+
+@app.route('/')
+def auctions_list() -> app.response_class:
+    import inject
+    from auctions.application.repositories import AuctionsRepository
+    inst = inject.instance(AuctionsRepository)
+
+    return make_response(jsonify({'auctions': [
+        auction for auction in inst._storage.values()
+    ]}))
+
+
+@app.route('/<int:auction_id>')
+def single_auction(auction_id: int) -> app.response_class:
+    import inject
+    from auctions.application.repositories import AuctionsRepository
+    inst = inject.instance(AuctionsRepository)
+
+    auction = inst.get(auction_id)
+    return make_response(jsonify(auction))
 
 
 @app.route('/<int:auction_id>/bid', methods=['POST'])
