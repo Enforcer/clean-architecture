@@ -24,17 +24,7 @@ from auctions.domain.entities import Auction
 from auctions.domain.factories import get_dollars
 from auctions.domain.types import AuctionId
 from auctions.domain.value_objects import Money
-
-
-def method_dispatch(func):
-    dispatcher = functools.singledispatch(func)
-
-    def wrapper(*args, **kw):
-        return dispatcher.dispatch(args[1].__class__)(*args, **kw)
-
-    wrapper.register = dispatcher.register
-    functools.update_wrapper(wrapper, func)
-    return wrapper
+from foundation.method_dispatch import method_dispatch
 
 
 class JSONEncoder(json.JSONEncoder):

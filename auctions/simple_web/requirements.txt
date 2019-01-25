@@ -1,5 +1,6 @@
 auctions
 auctions_infrastructure
+foundation
 Flask==1.0.2
 marshmallow==3.0.0b20
 Inject==3.4.0
