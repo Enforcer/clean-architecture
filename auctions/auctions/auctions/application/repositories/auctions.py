@@ -1,5 +1,4 @@
 import abc
-from typing import List
 
 from auctions.domain.entities import Auction
 from auctions.domain.types import AuctionId

@@ -6,7 +6,6 @@ from typing import (
 
 import inject
 import pytz
-from sqlalchemy import sql
 from sqlalchemy.engine import (
     Connection,
     RowProxy,

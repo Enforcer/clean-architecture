@@ -1,8 +1,4 @@
 import threading
-from datetime import (
-    datetime,
-    timedelta,
-)
 
 import inject
 from flask import (
@@ -15,19 +11,16 @@ from sqlalchemy.engine import (
     Engine,
 )
 
-from auctions.application.repositories import AuctionsRepository
 from auctions.application import queries as auction_queries
 from auctions.application.ports import PaymentProvider
-from auctions.domain.entities import Auction
+from auctions.application.repositories import AuctionsRepository
 from auctions.domain.events import BidderHasBeenOverbid
-from auctions.domain.factories import get_dollars
-from auctions_infrastructure import setup as auctions_infrastructure_setup
-from auctions_infrastructure import queries as auctions_inf_queries
-from auctions_infrastructure.repositories.auctions import (
-    InMemoryAuctionsRepository,
-    SqlAlchemyAuctionsRepo,
+from auctions_infrastructure import (
+    queries as auctions_inf_queries,
+    setup as auctions_infrastructure_setup,
 )
-# from auctions_infrastructure.adapters import CaPaymentsPaymentProvider
+from auctions_infrastructure.adapters import CaPaymentsPaymentProvider
+from auctions_infrastructure.repositories.auctions import SqlAlchemyAuctionsRepo
 
 
 def setup(app: Flask) -> None:
@@ -73,10 +66,10 @@ def setup_dependency_injection(connection_provider: 'ThreadlocalConnectionProvid
         binder.bind_to_provider(auction_queries.GetSingleAuction, auctions_inf_queries.SqlGetSingleAuction)
 
         binder.bind(EventBus, EventBus())
-        # binder.bind(
-        #     PaymentProvider,
-        #     CaPaymentsPaymentProvider(settings['payments.login'], settings['payments.password'])
-        # )
+        binder.bind(
+            PaymentProvider,
+            CaPaymentsPaymentProvider(settings['payments.login'], settings['payments.password'])
+        )
 
     inject.configure(di_config)
 
@@ -106,13 +99,11 @@ class ThreadlocalConnectionProvider:
             pass
 
 
-# send_email = object
-# send_email.delay = lambda *args, **kwargs: None
-
-
 def setup_event_subscriptions():
     event_bus = inject.instance(EventBus)
 
-    # event_bus.subscribe(
-    #     BidderHasBeenOverbid, lambda event: send_email.delay(event.auction_id, event.bidder_id, event.money.amount)
-    # )
+    event_bus.subscribe(handle_overbid)
+
+
+def handle_overbid(_event: BidderHasBeenOverbid) -> None:
+    pass  # TODO!

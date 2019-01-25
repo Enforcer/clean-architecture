@@ -22,7 +22,6 @@ from .main import setup
 
 from auctions.application.use_cases import placing_bid
 from auctions.application import queries as auction_queries
-from auctions.domain.entities import Auction
 from auctions.domain.factories import get_dollars
 from auctions.domain.types import AuctionId
 from auctions.domain.value_objects import Money
@@ -34,7 +33,7 @@ class JSONEncoder(json.JSONEncoder):
     def default(self, obj: object) -> object:
         raise TypeError(f'Cannot serialize {type(obj)}')
 
-    @default.register(auction_queries.AuctionDto)
+    @default.register(auction_queries.AuctionDto)  # noqa: F811
     def _(self, obj: auction_queries.AuctionDto) -> object:
         return {
             'id': obj.id,
@@ -44,14 +43,14 @@ class JSONEncoder(json.JSONEncoder):
             'ends_at': obj.ends_at,
         }
 
-    @default.register(Money)
+    @default.register(Money)  # noqa: F811
     def _(self, obj: Money) -> object:
         return {
             'amount': str(obj.amount),
             'currency': obj.currency.iso_code,
         }
 
-    @default.register(datetime)
+    @default.register(datetime)  # noqa: F811
     def _(self, obj: datetime) -> str:
         return obj.isoformat()
 

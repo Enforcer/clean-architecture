@@ -1,4 +1,3 @@
-from dataclasses import fields
 from typing import List
 
 from sqlalchemy import func

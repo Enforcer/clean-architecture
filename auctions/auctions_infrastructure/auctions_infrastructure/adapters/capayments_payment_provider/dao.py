@@ -11,4 +11,3 @@ def get_bidders_card_token(bidder_id: BidderId) -> str:
 
 def record_successful_payment(auction_id: AuctionId, bidder_id: BidderId, charge: Money, charge_uuid: str) -> None:
     raise NotImplemented
-

@@ -1,4 +1,4 @@
-from typing import List, NamedTuple
+from typing import List
 
 import inject
 from dataclasses import dataclass
