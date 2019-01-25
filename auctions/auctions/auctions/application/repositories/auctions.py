@@ -12,9 +12,5 @@ class AuctionsRepository(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_active(self) -> List[Auction]:
-        pass
-
-    @abc.abstractmethod
     def save(self, auction: Auction) -> None:
         pass

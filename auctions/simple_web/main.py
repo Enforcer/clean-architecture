@@ -16,11 +16,13 @@ from sqlalchemy.engine import (
 )
 
 from auctions.application.repositories import AuctionsRepository
+from auctions.application import queries as auction_queries
 from auctions.application.ports import PaymentProvider
 from auctions.domain.entities import Auction
 from auctions.domain.events import BidderHasBeenOverbid
 from auctions.domain.factories import get_dollars
 from auctions_infrastructure import setup as auctions_infrastructure_setup
+from auctions_infrastructure import queries as auctions_inf_queries
 from auctions_infrastructure.repositories.auctions import (
     InMemoryAuctionsRepository,
     SqlAlchemyAuctionsRepo,
@@ -66,6 +68,9 @@ def setup_dependency_injection(connection_provider: 'ThreadlocalConnectionProvid
     def di_config(binder: inject.Binder) -> None:
         binder.bind_to_provider(Connection, connection_provider)
         binder.bind_to_provider(AuctionsRepository, SqlAlchemyAuctionsRepo)
+
+        binder.bind_to_provider(auction_queries.GetActiveAuctions, auctions_inf_queries.SqlGetActiveAuctions)
+        binder.bind_to_provider(auction_queries.GetSingleAuction, auctions_inf_queries.SqlGetSingleAuction)
 
         binder.bind(EventBus, EventBus())
         # binder.bind(

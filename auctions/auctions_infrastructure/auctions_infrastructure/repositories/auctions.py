@@ -41,9 +41,6 @@ class InMemoryAuctionsRepository(AuctionsRepository):
             ends_at=copied.ends_at,
         )
 
-    def get_active(self) -> List[Auction]:
-        return []
-
     def save(self, auction: Auction) -> None:
         copied = copy.deepcopy(auction)
         copied.bids = [bid for bid in copied.bids if bid.id not in copied.withdrawn_bids_ids]
@@ -63,16 +60,6 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
 
         bid_rows = self._conn.execute(bids.select().where(bids.c.auction_id == auction_id)).fetchall()
         return self._row_to_entity(row, bid_rows)
-
-    def get_active(self) -> List[Auction]:
-        active_auctions = self._conn.execute(auctions.select().where(auctions.c.ends_at > sql.func.now())).fetchall()
-        return [
-            self._row_to_entity(
-                auction,
-                self._conn.execute(bids.select().where(bids.c.auction_id == auction.id)).fetchall()
-            )
-            for auction in active_auctions
-        ]
 
     def _row_to_entity(self, auction_proxy: RowProxy, bids_proxies: List[RowProxy]) -> Auction:
         auction_bids = [Bid(bid.id, bid.bidder_id, get_dollars(bid.amount)) for bid in bids_proxies]

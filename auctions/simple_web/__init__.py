@@ -21,7 +21,7 @@ from .main import setup
 
 
 from auctions.application.use_cases import placing_bid
-from auctions.application.repositories import AuctionsRepository
+from auctions.application import queries as auction_queries
 from auctions.domain.entities import Auction
 from auctions.domain.factories import get_dollars
 from auctions.domain.types import AuctionId
@@ -34,8 +34,8 @@ class JSONEncoder(json.JSONEncoder):
     def default(self, obj: object) -> object:
         raise TypeError(f'Cannot serialize {type(obj)}')
 
-    @default.register(Auction)
-    def _(self, obj: Auction) -> object:
+    @default.register(auction_queries.AuctionDto)
+    def _(self, obj: auction_queries.AuctionDto) -> object:
         return {
             'id': obj.id,
             'title': obj.title,
@@ -109,18 +109,15 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
 
 
 @app.route('/')
-def auctions_list() -> app.response_class:
-    inst = inject.instance(AuctionsRepository)
-
-    return make_response(jsonify([inst.get_active()]))
+@inject.autoparams('query')
+def auctions_list(query: auction_queries.GetActiveAuctions) -> app.response_class:
+    return make_response(jsonify([query.query()]))
 
 
 @app.route('/<int:auction_id>')
-def single_auction(auction_id: int) -> app.response_class:
-    inst = inject.instance(AuctionsRepository)
-
-    auction = inst.get(auction_id)
-    return make_response(jsonify(auction))
+@inject.autoparams('query')
+def single_auction(auction_id: int, query: auction_queries.GetSingleAuction) -> app.response_class:
+    return make_response(jsonify(query.query(auction_id)))
 
 
 @app.route('/<int:auction_id>/bid', methods=['POST'])

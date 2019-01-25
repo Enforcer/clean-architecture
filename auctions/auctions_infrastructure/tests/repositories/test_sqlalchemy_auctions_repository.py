@@ -102,16 +102,6 @@ def test_gets_existing_auction(
     assert set(auction.bids) == {Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount))}
 
 
-@pytest.mark.usefixtures('expired_auction')
-def test_gets_active_auctions(
-        connection: Connection, auction_model_with_a_bid: RowProxy
-) -> None:
-    auctions = SqlAlchemyAuctionsRepo(connection).get_active()
-    ids_of_found_auctions = [auction.id for auction in auctions]
-
-    assert ids_of_found_auctions == [auction_model_with_a_bid.id]
-
-
 def test_saves_auction_changes(
         connection: Connection,
         another_bidder_id: int,
