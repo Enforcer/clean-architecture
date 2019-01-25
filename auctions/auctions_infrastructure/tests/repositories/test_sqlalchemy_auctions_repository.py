@@ -58,6 +58,18 @@ another_bidder_id = bidder_id
 
 
 @pytest.fixture()
+def expired_auction(connection: Connection, past_date: datetime) -> RowProxy:
+    connection.execute(auctions.insert().values({
+        'id': 0,
+        'title': 'Nothing interesting',
+        'starting_price': Decimal('1.99'),
+        'current_price': Decimal('1.99'),
+        'ends_at': past_date,
+    }))
+    return connection.execute(auctions.select(whereclause=auctions.c.id == 0)).first()
+
+
+@pytest.fixture()
 def auction_model_with_a_bid(
         connection: Connection, winning_bid_amount: Decimal, bidder_id: int, ends_at: datetime
 ) -> RowProxy:
@@ -88,6 +100,16 @@ def test_gets_existing_auction(
     assert auction.current_price == get_dollars(bid_model.amount)
     assert auction.ends_at == ends_at
     assert set(auction.bids) == {Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount))}
+
+
+@pytest.mark.usefixtures('expired_auction')
+def test_gets_active_auctions(
+        connection: Connection, auction_model_with_a_bid: RowProxy
+) -> None:
+    auctions = SqlAlchemyAuctionsRepo(connection).get_active()
+    ids_of_found_auctions = [auction.id for auction in auctions]
+
+    assert ids_of_found_auctions == [auction_model_with_a_bid.id]
 
 
 def test_saves_auction_changes(

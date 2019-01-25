@@ -1,4 +1,4 @@
-import functools
+from datetime import datetime
 from typing import Type
 
 from flask import (
@@ -39,6 +39,7 @@ class JSONEncoder(json.JSONEncoder):
             'title': obj.title,
             'current_price': obj.current_price,
             'starting_price': obj.starting_price,
+            'ends_at': obj.ends_at,
         }
 
     @default.register(Money)
@@ -47,6 +48,10 @@ class JSONEncoder(json.JSONEncoder):
             'amount': str(obj.amount),
             'currency': obj.currency.iso_code,
         }
+
+    @default.register(datetime)
+    def _(self, obj: datetime) -> str:
+        return obj.isoformat()
 
 
 app = Flask(__name__)
@@ -107,9 +112,7 @@ def auctions_list() -> app.response_class:
     from auctions.application.repositories import AuctionsRepository
     inst = inject.instance(AuctionsRepository)
 
-    return make_response(jsonify({'auctions': [
-        auction for auction in inst._storage.values()
-    ]}))
+    return make_response(jsonify([inst.get_active()]))
 
 
 @app.route('/<int:auction_id>')
