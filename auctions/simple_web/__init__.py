@@ -128,7 +128,7 @@ def place_bid(auction_id: AuctionId) -> app.response_class:
     ).execute(
         get_input_dto(PlacingBidSchema, context={
             'auction_id': auction_id,
-            'bidder_id': 1,  # hardcoded for now, should be taken from request authentication
+            'bidder_id': 2,  # hardcoded for now, should be taken from request authentication
         })
     )
 

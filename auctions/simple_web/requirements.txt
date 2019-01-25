@@ -1,5 +1,6 @@
 auctions
 auctions_infrastructure
+customer_relationship
 foundation
 Flask==1.0.2
 marshmallow==3.0.0b20

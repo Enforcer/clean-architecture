@@ -14,13 +14,13 @@ from sqlalchemy.engine import (
 from auctions.application import queries as auction_queries
 from auctions.application.ports import PaymentProvider
 from auctions.application.repositories import AuctionsRepository
-from auctions.domain.events import BidderHasBeenOverbid
 from auctions_infrastructure import (
     queries as auctions_inf_queries,
     setup as auctions_infrastructure_setup,
 )
 from auctions_infrastructure.adapters import CaPaymentsPaymentProvider
 from auctions_infrastructure.repositories.auctions import SqlAlchemyAuctionsRepo
+from customer_relationship import send_email_about_overbid
 
 
 def setup(app: Flask) -> None:
@@ -51,6 +51,10 @@ def setup_db(app: Flask) -> 'ThreadlocalConnectionProvider':
     conn.execute('''
         INSERT INTO auctions (id, title, starting_price, current_price, ends_at)
         VALUES(1, "Super aukcja", "0.99", "0.99", '2019-12-12 10:00:00')
+    ''')
+    conn.execute('''
+        INSERT INTO bids (auction_id, amount, bidder_id)
+        VALUES(1, '1.00', 1)
     ''')
     conn.close()
 
@@ -102,8 +106,4 @@ class ThreadlocalConnectionProvider:
 def setup_event_subscriptions():
     event_bus = inject.instance(EventBus)
 
-    event_bus.subscribe(handle_overbid)
-
-
-def handle_overbid(_event: BidderHasBeenOverbid) -> None:
-    pass  # TODO!
+    event_bus.subscribe(send_email_about_overbid)
