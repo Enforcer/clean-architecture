@@ -110,7 +110,7 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
 @app.route('/')
 @inject.autoparams('query')
 def auctions_list(query: auction_queries.GetActiveAuctions) -> app.response_class:
-    return make_response(jsonify([query.query()]))
+    return make_response(jsonify(query.query()))
 
 
 @app.route('/<int:auction_id>')
@@ -119,7 +119,7 @@ def single_auction(auction_id: int, query: auction_queries.GetSingleAuction) -> 
     return make_response(jsonify(query.query(auction_id)))
 
 
-@app.route('/<int:auction_id>/bid', methods=['POST'])
+@app.route('/<int:auction_id>/bids', methods=['POST'])
 def place_bid(auction_id: AuctionId) -> app.response_class:
     presenter = PlacingBidPresenter()
 
