@@ -6,3 +6,4 @@ Flask==1.0.2
 marshmallow==3.0.0b20
 Inject==3.4.0
 pybuses==1.1.0
+python-dotenv==0.10.1

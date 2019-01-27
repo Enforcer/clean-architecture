@@ -1,5 +1,7 @@
+import os
 import threading
 
+import dotenv
 import inject
 from flask import (
     Flask,
@@ -27,13 +29,14 @@ from customer_relationship import (
 
 
 def setup(app: Flask) -> None:
+    dotenv.load_dotenv('../.env_file')
     settings = {
-        'payments.login': '',
-        'payments.password': '',
-        'email.host': 'localhost',
-        'email.port': '2525',
-        'email.username': 'user',
-        'email.password': 'login',
+        'payments.login': os.environ['PAYMENTS_LOGIN'],
+        'payments.password': os.environ['PAYMENTS_PASSWORD'],
+        'email.host': os.environ['EMAIL_HOST'],
+        'email.port': os.environ['EMAIL_PORT'],
+        'email.username': os.environ['EMAIL_USERNAME'],
+        'email.password': os.environ['EMAIL_PASSWORD'],
     }
     connection_provider = setup_db(app)
     event_bus = EventBus()
