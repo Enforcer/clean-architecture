@@ -20,13 +20,25 @@ from auctions_infrastructure import (
 )
 from auctions_infrastructure.adapters import CaPaymentsPaymentProvider
 from auctions_infrastructure.repositories.auctions import SqlAlchemyAuctionsRepo
-from customer_relationship import send_email_about_overbid
+from customer_relationship import (
+    CustomerRelationshipConfig,
+    CustomerRelationshipFacade,
+)
 
 
 def setup(app: Flask) -> None:
+    settings = {
+        'payments.login': '',
+        'payments.password': '',
+        'email.host': 'localhost',
+        'email.port': '2525',
+        'email.username': 'user',
+        'email.password': 'login',
+    }
     connection_provider = setup_db(app)
-    setup_dependency_injection(connection_provider, {'payments.login': '', 'payments.password': ''})
-    setup_event_subscriptions()
+    event_bus = EventBus()
+
+    setup_dependency_injection(settings, connection_provider, event_bus)
 
 
 def setup_db(app: Flask) -> 'ThreadlocalConnectionProvider':
@@ -61,7 +73,19 @@ def setup_db(app: Flask) -> 'ThreadlocalConnectionProvider':
     return connection_provider
 
 
-def setup_dependency_injection(connection_provider: 'ThreadlocalConnectionProvider', settings: dict) -> None:
+def setup_dependency_injection(
+        settings: dict,
+        connection_provider: 'ThreadlocalConnectionProvider',
+        event_bus: EventBus,
+) -> None:
+    cr_config = CustomerRelationshipConfig(
+        email_host=settings['email.host'],
+        email_port=int(settings['email.port']),
+        email_username=settings['email.username'],
+        email_password=settings['email.password'],
+    )
+    CustomerRelationshipFacade(cr_config, event_bus)
+
     def di_config(binder: inject.Binder) -> None:
         binder.bind_to_provider(Connection, connection_provider)
         binder.bind_to_provider(AuctionsRepository, SqlAlchemyAuctionsRepo)
@@ -69,7 +93,7 @@ def setup_dependency_injection(connection_provider: 'ThreadlocalConnectionProvid
         binder.bind_to_provider(auction_queries.GetActiveAuctions, auctions_inf_queries.SqlGetActiveAuctions)
         binder.bind_to_provider(auction_queries.GetSingleAuction, auctions_inf_queries.SqlGetSingleAuction)
 
-        binder.bind(EventBus, EventBus())
+        binder.bind(EventBus, event_bus)
         binder.bind(
             PaymentProvider,
             CaPaymentsPaymentProvider(settings['payments.login'], settings['payments.password'])
@@ -101,9 +125,3 @@ class ThreadlocalConnectionProvider:
             del self._storage.connection
         except AttributeError:
             pass
-
-
-def setup_event_subscriptions():
-    event_bus = inject.instance(EventBus)
-
-    event_bus.subscribe(send_email_about_overbid)
