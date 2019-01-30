@@ -1,11 +1,14 @@
+import inject
 import pytest
 from flask import testing
 
-from .. import app
+from ..app import create_app
 
 
 @pytest.fixture()
 def client() -> testing.FlaskClient:
+    inject.clear()
+    app = create_app()
     return app.test_client()
 
 
