@@ -17,7 +17,7 @@ from customer_relationship import CustomerRelationshipConfig, CustomerRelationsh
 
 
 def setup(app: Flask) -> None:
-    dotenv.load_dotenv("../.env_file")
+    dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), os.pardir, ".env_file"))
     settings = {
         "payments.login": os.environ["PAYMENTS_LOGIN"],
         "payments.password": os.environ["PAYMENTS_PASSWORD"],
