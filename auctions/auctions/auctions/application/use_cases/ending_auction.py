@@ -13,8 +13,7 @@ class EndingAuctionInputDto:
 
 
 class EndingAuction:
-
-    @inject.autoparams('auctions_repo', 'payment_provider')
+    @inject.autoparams("auctions_repo", "payment_provider")
     def __init__(self, auctions_repo: AuctionsRepository, payment_provider: PaymentProvider) -> None:
         self.auctions_repo = auctions_repo
         self.payment_provider = payment_provider

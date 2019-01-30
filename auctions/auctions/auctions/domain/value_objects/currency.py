@@ -1,4 +1,3 @@
-
 class Currency:
     decimal_precision = 2
     iso_code = None
@@ -6,5 +5,5 @@ class Currency:
 
 
 class USD(Currency):
-    iso_code = 'USD'
-    symbol = '$'
+    iso_code = "USD"
+    symbol = "$"

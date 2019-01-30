@@ -3,11 +3,7 @@ from typing import List
 from sqlalchemy import func
 from sqlalchemy.engine import RowProxy
 
-from auctions.application.queries import (
-    AuctionDto,
-    GetActiveAuctions,
-    GetSingleAuction,
-)
+from auctions.application.queries import AuctionDto, GetActiveAuctions, GetSingleAuction
 from auctions.domain.factories import get_dollars
 from auctions_infrastructure import auctions
 from auctions_infrastructure.queries.base import SqlQuery

@@ -13,11 +13,10 @@ class CustomerRelationshipConfig:
 
 
 class CustomerRelationshipFacade:
-
     def __init__(self, config: CustomerRelationshipConfig, event_bus: EventBus) -> None:
         self._config = config
 
         event_bus.subscribe(self.send_email_about_overbid)
 
     def send_email_about_overbid(self, event: BidderHasBeenOverbid) -> None:
-        print('dummy handler', event, self._config)
+        print("dummy handler", event, self._config)

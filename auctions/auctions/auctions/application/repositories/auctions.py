@@ -5,7 +5,6 @@ from auctions.domain.types import AuctionId
 
 
 class AuctionsRepository(abc.ABC):
-
     @abc.abstractmethod
     def get(self, auction_id: AuctionId) -> Auction:
         pass

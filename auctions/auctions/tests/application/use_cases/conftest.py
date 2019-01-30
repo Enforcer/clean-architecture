@@ -37,9 +37,7 @@ def placing_bid_output_boundary_mock() -> Mock:
 
 @pytest.fixture(autouse=True)
 def dependency_injection_config(
-    auctions_repo_mock: Mock,
-    email_gateway_mock: Mock,
-    placing_bid_output_boundary_mock: Mock
+    auctions_repo_mock: Mock, email_gateway_mock: Mock, placing_bid_output_boundary_mock: Mock
 ) -> None:
     def configure(binder: inject.Binder) -> None:
         binder.bind(AuctionsRepository, auctions_repo_mock)

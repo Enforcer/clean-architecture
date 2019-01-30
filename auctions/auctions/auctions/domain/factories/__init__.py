@@ -1,5 +1,3 @@
-__all__ = [
-    'get_dollars',
-]
+__all__ = ["get_dollars"]
 
 from auctions.domain.factories.dollars import get_dollars

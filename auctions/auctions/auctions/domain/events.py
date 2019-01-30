@@ -1,10 +1,7 @@
 from dataclasses import dataclass
 
 from auctions.domain.value_objects import Money
-from auctions.domain.types import (
-    AuctionId,
-    BidderId,
-)
+from auctions.domain.types import AuctionId, BidderId
 
 
 @dataclass

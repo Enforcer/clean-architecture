@@ -3,40 +3,28 @@ import threading
 
 import dotenv
 import inject
-from flask import (
-    Flask,
-    request,
-)
+from flask import Flask, request
 from pybuses import EventBus
-from sqlalchemy.engine import (
-    Connection,
-    Engine,
-)
+from sqlalchemy.engine import Connection, Engine
 
 from auctions.application import queries as auction_queries
 from auctions.application.ports import PaymentProvider
 from auctions.application.repositories import AuctionsRepository
-from auctions_infrastructure import (
-    queries as auctions_inf_queries,
-    setup as auctions_infrastructure_setup,
-)
+from auctions_infrastructure import queries as auctions_inf_queries, setup as auctions_infrastructure_setup
 from auctions_infrastructure.adapters import CaPaymentsPaymentProvider
 from auctions_infrastructure.repositories.auctions import SqlAlchemyAuctionsRepo
-from customer_relationship import (
-    CustomerRelationshipConfig,
-    CustomerRelationshipFacade,
-)
+from customer_relationship import CustomerRelationshipConfig, CustomerRelationshipFacade
 
 
 def setup(app: Flask) -> None:
-    dotenv.load_dotenv('../.env_file')
+    dotenv.load_dotenv("../.env_file")
     settings = {
-        'payments.login': os.environ['PAYMENTS_LOGIN'],
-        'payments.password': os.environ['PAYMENTS_PASSWORD'],
-        'email.host': os.environ['EMAIL_HOST'],
-        'email.port': os.environ['EMAIL_PORT'],
-        'email.username': os.environ['EMAIL_USERNAME'],
-        'email.password': os.environ['EMAIL_PASSWORD'],
+        "payments.login": os.environ["PAYMENTS_LOGIN"],
+        "payments.password": os.environ["PAYMENTS_PASSWORD"],
+        "email.host": os.environ["EMAIL_HOST"],
+        "email.port": os.environ["EMAIL_PORT"],
+        "email.username": os.environ["EMAIL_USERNAME"],
+        "email.password": os.environ["EMAIL_PASSWORD"],
     }
     connection_provider = setup_db(app)
     event_bus = EventBus()
@@ -44,7 +32,7 @@ def setup(app: Flask) -> None:
     setup_dependency_injection(settings, connection_provider, event_bus)
 
 
-def setup_db(app: Flask) -> 'ThreadlocalConnectionProvider':
+def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
     engine = auctions_infrastructure_setup()
     connection_provider = ThreadlocalConnectionProvider(engine)
 
@@ -55,7 +43,7 @@ def setup_db(app: Flask) -> 'ThreadlocalConnectionProvider':
     @app.after_request
     def transaction_commit(response: app.response_class) -> app.response_class:
         try:
-            if hasattr(request, 'tx') and response.status_code < 400:
+            if hasattr(request, "tx") and response.status_code < 400:
                 request.tx.commit()
         finally:
             connection_provider.close_if_present()
@@ -63,29 +51,31 @@ def setup_db(app: Flask) -> 'ThreadlocalConnectionProvider':
         return response
 
     conn = engine.connect()
-    conn.execute('''
+    conn.execute(
+        """
         INSERT INTO auctions (id, title, starting_price, current_price, ends_at)
         VALUES(1, "Super aukcja", "0.99", "0.99", '2019-12-12 10:00:00')
-    ''')
-    conn.execute('''
+    """
+    )
+    conn.execute(
+        """
         INSERT INTO bids (auction_id, amount, bidder_id)
         VALUES(1, '1.00', 1)
-    ''')
+    """
+    )
     conn.close()
 
     return connection_provider
 
 
 def setup_dependency_injection(
-        settings: dict,
-        connection_provider: 'ThreadlocalConnectionProvider',
-        event_bus: EventBus,
+    settings: dict, connection_provider: "ThreadlocalConnectionProvider", event_bus: EventBus
 ) -> None:
     cr_config = CustomerRelationshipConfig(
-        email_host=settings['email.host'],
-        email_port=int(settings['email.port']),
-        email_username=settings['email.username'],
-        email_password=settings['email.password'],
+        email_host=settings["email.host"],
+        email_port=int(settings["email.port"]),
+        email_username=settings["email.username"],
+        email_password=settings["email.password"],
     )
     CustomerRelationshipFacade(cr_config, event_bus)
 
@@ -98,15 +88,13 @@ def setup_dependency_injection(
 
         binder.bind(EventBus, event_bus)
         binder.bind(
-            PaymentProvider,
-            CaPaymentsPaymentProvider(settings['payments.login'], settings['payments.password'])
+            PaymentProvider, CaPaymentsPaymentProvider(settings["payments.login"], settings["payments.password"])
         )
 
     inject.configure(di_config)
 
 
 class ThreadlocalConnectionProvider:
-
     def __init__(self, engine: Engine) -> None:
         self._engine = engine
         self._storage = threading.local()
@@ -120,7 +108,7 @@ class ThreadlocalConnectionProvider:
             return connection
 
     def is_present(self) -> bool:
-        return hasattr(self._storage, 'connection')
+        return hasattr(self._storage, "connection")
 
     def close_if_present(self) -> None:
         try:

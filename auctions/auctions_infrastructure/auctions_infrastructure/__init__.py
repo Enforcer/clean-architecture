@@ -7,34 +7,30 @@ metadata = MetaData()
 
 
 def setup():
-    engine = create_engine('sqlite:///:memory:', echo=True)
+    engine = create_engine("sqlite:///:memory:", echo=True)
     metadata.create_all(engine)
     return engine
 
 
-bidders = Table(
-    'bidders',
-    metadata,
-    Column('id', Integer, primary_key=True),
-)
+bidders = Table("bidders", metadata, Column("id", Integer, primary_key=True))
 
 
 auctions = Table(
-    'auctions',
+    "auctions",
     metadata,
-    Column('id', Integer, primary_key=True),
-    Column('title', String(255), nullable=False),
-    Column('starting_price', Numeric, nullable=False),
-    Column('current_price', Numeric, nullable=False),
-    Column('ends_at', DateTime, nullable=False),
+    Column("id", Integer, primary_key=True),
+    Column("title", String(255), nullable=False),
+    Column("starting_price", Numeric, nullable=False),
+    Column("current_price", Numeric, nullable=False),
+    Column("ends_at", DateTime, nullable=False),
 )
 
 
 bids = Table(
-    'bids',
+    "bids",
     metadata,
-    Column('id', Integer, primary_key=True),
-    Column('amount', Numeric, nullable=False),
-    Column('bidder_id', None, ForeignKey('bidders.id'), nullable=False),
-    Column('auction_id', None, ForeignKey('auctions.id'), nullable=False),
+    Column("id", Integer, primary_key=True),
+    Column("amount", Numeric, nullable=False),
+    Column("bidder_id", None, ForeignKey("bidders.id"), nullable=False),
+    Column("auction_id", None, ForeignKey("auctions.id"), nullable=False),
 )

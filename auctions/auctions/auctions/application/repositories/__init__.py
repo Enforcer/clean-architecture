@@ -1,5 +1,3 @@
-__all__ = [
-    'AuctionsRepository',
-]
+__all__ = ["AuctionsRepository"]
 
 from auctions.application.repositories.auctions import AuctionsRepository

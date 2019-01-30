@@ -5,10 +5,7 @@ import inject
 
 from auctions.application.repositories import AuctionsRepository
 from auctions.application.ports import EmailGateway
-from auctions.domain.types import (
-    AuctionId,
-    BidderId,
-)
+from auctions.domain.types import AuctionId, BidderId
 from auctions.domain.value_objects import Money
 
 
@@ -26,7 +23,6 @@ class PlacingBidOutputDto:
 
 
 class PlacingBidOutputBoundary(metaclass=abc.ABCMeta):
-
     @abc.abstractmethod
     def present(self, output_dto: PlacingBidOutputDto) -> None:
         pass
@@ -35,7 +31,7 @@ class PlacingBidOutputBoundary(metaclass=abc.ABCMeta):
 class PlacingBid:
     email_gateway: EmailGateway = inject.attr(EmailGateway)
 
-    @inject.autoparams('output_boundary', 'auctions_repo')
+    @inject.autoparams("output_boundary", "auctions_repo")
     def __init__(self, output_boundary: PlacingBidOutputBoundary, auctions_repo: AuctionsRepository) -> None:
         self.output_boundary = output_boundary
         self.auctions_repo = auctions_repo
@@ -45,7 +41,5 @@ class PlacingBid:
         auction.place_bid(bidder_id=input_dto.bidder_id, amount=input_dto.amount)
         self.auctions_repo.save(auction)
 
-        output_dto = PlacingBidOutputDto(
-            input_dto.bidder_id in auction.winners, auction.current_price
-        )
+        output_dto = PlacingBidOutputDto(input_dto.bidder_id in auction.winners, auction.current_price)
         self.output_boundary.present(output_dto)

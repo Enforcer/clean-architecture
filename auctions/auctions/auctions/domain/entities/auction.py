@@ -6,11 +6,7 @@ from pybuses import EventBus
 
 from auctions.domain.entities.bid import Bid
 from auctions.domain.events import BidderHasBeenOverbid
-from auctions.domain.types import (
-    AuctionId,
-    BidId,
-    BidderId,
-)
+from auctions.domain.types import AuctionId, BidId, BidderId
 from auctions.domain.value_objects import Money
 from auctions.domain.exceptions import BidOnEndedAuction
 
@@ -18,14 +14,7 @@ from auctions.domain.exceptions import BidOnEndedAuction
 class Auction:
     event_bus = inject.attr(EventBus)
 
-    def __init__(
-            self,
-            id: AuctionId,
-            title: str,
-            starting_price: Money,
-            bids: List[Bid],
-            ends_at: datetime,
-    ) -> None:
+    def __init__(self, id: AuctionId, title: str, starting_price: Money, bids: List[Bid], ends_at: datetime) -> None:
         assert isinstance(starting_price, Money)
         self.id = id
         self.title = title
@@ -72,5 +61,5 @@ class Auction:
     def __str__(self):
         return f'<Auction #{self.id} title="{self.title}" current_price={self.current_price}>'
 
-    def __eq__(self, other: 'Auction') -> bool:
+    def __eq__(self, other: "Auction") -> bool:
         return isinstance(other, Auction) and vars(self) == vars(other)

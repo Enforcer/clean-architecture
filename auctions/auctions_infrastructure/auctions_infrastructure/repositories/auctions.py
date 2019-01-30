@@ -1,21 +1,12 @@
 import copy
-from typing import (
-    Dict,
-    List,
-)
+from typing import Dict, List
 
 import inject
 import pytz
-from sqlalchemy.engine import (
-    Connection,
-    RowProxy,
-)
+from sqlalchemy.engine import Connection, RowProxy
 
 from auctions.application.repositories import AuctionsRepository
-from auctions.domain.entities import (
-    Auction,
-    Bid,
-)
+from auctions.domain.entities import Auction, Bid
 from auctions.domain.types import AuctionId
 from auctions.domain.factories import get_dollars
 from auctions_infrastructure import auctions, bids
@@ -47,15 +38,14 @@ class InMemoryAuctionsRepository(AuctionsRepository):
 
 
 class SqlAlchemyAuctionsRepo(AuctionsRepository):
-
-    @inject.autoparams('connection')
+    @inject.autoparams("connection")
     def __init__(self, connection: Connection = None) -> None:
         self._conn = connection
 
     def get(self, auction_id: AuctionId) -> Auction:
         row = self._conn.execute(auctions.select().where(auctions.c.id == auction_id)).first()
         if not row:
-            raise Exception('Not found')
+            raise Exception("Not found")
 
         bid_rows = self._conn.execute(bids.select().where(bids.c.auction_id == auction_id)).fetchall()
         return self._row_to_entity(row, bid_rows)
@@ -72,25 +62,20 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
 
     def save(self, auction: Auction) -> None:
         raw_auction = {
-            'title': auction.title,
-            'starting_price': auction.starting_price.amount,
-            'current_price': auction.current_price.amount,
-            'ends_at': auction.ends_at,
+            "title": auction.title,
+            "starting_price": auction.starting_price.amount,
+            "current_price": auction.current_price.amount,
+            "ends_at": auction.ends_at,
         }
-        update_result = self._conn.execute(
-            auctions.update(
-                values=raw_auction,
-                whereclause=auctions.c.id == auction.id
-            )
-        )
+        update_result = self._conn.execute(auctions.update(values=raw_auction, whereclause=auctions.c.id == auction.id))
         assert update_result.rowcount == 1  # no support for creating
 
         for bid in auction.bids:
             if bid.id:
                 continue
-            result = self._conn.execute(bids.insert(values={
-                'auction_id': auction.id, 'amount': bid.amount.amount, 'bidder_id': bid.bidder_id
-            }))
+            result = self._conn.execute(
+                bids.insert(values={"auction_id": auction.id, "amount": bid.amount.amount, "bidder_id": bid.bidder_id})
+            )
             bid.id, = result.inserted_primary_key
 
         if auction.withdrawn_bids_ids:
