@@ -38,7 +38,7 @@ def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
 
     @app.before_request
     def transaction_start() -> None:
-        request.tx = connection_provider().begin()
+        request.tx = connection_provider.open().begin()
 
     @app.after_request
     def transaction_commit(response: app.response_class) -> app.response_class:
@@ -103,12 +103,16 @@ class ThreadlocalConnectionProvider:
         try:
             return self._storage.connection
         except AttributeError:
-            connection = self._engine.connect()
-            self._storage.connection = connection
-            return connection
+            raise Exception("No connection available")
 
     def is_present(self) -> bool:
         return hasattr(self._storage, "connection")
+
+    def open(self) -> Connection:
+        assert not hasattr(self._storage, "connection")
+        connection = self._engine.connect()
+        self._storage.connection = connection
+        return connection
 
     def close_if_present(self) -> None:
         try:
