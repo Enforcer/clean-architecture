@@ -25,6 +25,8 @@ def setup(app: Flask) -> None:
         "email.port": os.environ["EMAIL_PORT"],
         "email.username": os.environ["EMAIL_USERNAME"],
         "email.password": os.environ["EMAIL_PASSWORD"],
+        "email.from.name": os.environ["EMAIL_FROM_NAME"],
+        "email.from.address": os.environ["EMAIL_FROM_ADDRESS"],
     }
     connection_provider = setup_db(app)
     event_bus = EventBus()
@@ -76,6 +78,7 @@ def setup_dependency_injection(
         email_port=int(settings["email.port"]),
         email_username=settings["email.username"],
         email_password=settings["email.password"],
+        email_from=(settings["email.from.name"], settings["email.from.address"]),
     )
     CustomerRelationshipFacade(cr_config, event_bus)
 

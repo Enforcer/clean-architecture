@@ -1,22 +1,14 @@
-from dataclasses import dataclass
 from pybuses import EventBus
 
 from auctions.domain.events import BidderHasBeenOverbid
-from customer_relationship.email_sender import EmailSender
 from customer_relationship import messages
-
-
-@dataclass(repr=False)
-class CustomerRelationshipConfig:
-    email_host: str
-    email_port: int
-    email_username: str
-    email_password: str
+from customer_relationship.email_sender import EmailSender
+from customer_relationship.config import CustomerRelationshipConfig
 
 
 class CustomerRelationshipFacade:
     def __init__(self, config: CustomerRelationshipConfig, event_bus: EventBus) -> None:
-        self._sender = EmailSender(config.email_host, config.email_port, config.email_username, config.email_password)
+        self._sender = EmailSender(config)
 
         event_bus.subscribe(self.send_email_about_overbid)
 

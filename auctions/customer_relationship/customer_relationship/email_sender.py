@@ -4,25 +4,21 @@ from email.mime.text import MIMEText
 
 
 from customer_relationship.messages import Message
+from customer_relationship.config import CustomerRelationshipConfig
 
 
 class EmailSender:
-    FROM = ("Auctions", "auctions@cleanarchitecture.io")  # TODO: shouldn't this be part of config, eh?
-
-    def __init__(self, host: str, port: int, username: str, password: str) -> None:
-        self._host = host
-        self._port = port
-        self._username = username
-        self._password = password
+    def __init__(self, config: CustomerRelationshipConfig) -> None:
+        self._config = config
 
     def send(self, recipient: str, message: Message) -> None:
-        with smtplib.SMTP(self._host, self._port) as server:
-            server.login(self._username, self._password)
+        with smtplib.SMTP(self._config.email_host, self._config.email_port) as server:
+            server.login(self._config.email_username, self._config.email_password)
             msg = MIMEMultipart("alternative")
             msg["Subject"] = message.title
-            msg["From"] = self.FROM
+            msg["From"] = self._config.email_from
             msg["To"] = recipient
             msg.attach(MIMEText(message.text, "plain"))
             msg.attach(MIMEText(message.html, "html"))
 
-            server.sendmail(self.FROM, recipient, msg.as_string())
+            server.sendmail(self._config.email_from, recipient, msg.as_string())

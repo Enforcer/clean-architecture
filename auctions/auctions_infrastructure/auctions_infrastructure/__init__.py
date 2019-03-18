@@ -12,7 +12,7 @@ def setup():
     return engine
 
 
-bidders = Table("bidders", metadata, Column("id", Integer, primary_key=True))
+bidders = Table("bidders", metadata, Column("id", Integer, primary_key=True), Column("email", String(255), unique=True))
 
 
 auctions = Table(
