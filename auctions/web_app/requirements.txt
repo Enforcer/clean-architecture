@@ -3,6 +3,7 @@ auctions_infrastructure
 customer_relationship
 foundation
 Flask==1.0.2
+Flask-Security==3.0.0
 marshmallow==3.0.0b20
 Inject==3.4.0
 pybuses==1.1.0
