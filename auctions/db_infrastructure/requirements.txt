@@ -1,0 +1,2 @@
+sqlalchemy==1.2.16
+pytest-sqlalchemy==0.2.1

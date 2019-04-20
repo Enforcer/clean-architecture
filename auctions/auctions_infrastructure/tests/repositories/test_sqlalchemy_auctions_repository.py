@@ -1,6 +1,6 @@
-from typing import Generator
 from datetime import datetime
 from decimal import Decimal
+from typing import Generator
 
 import pytest
 from sqlalchemy import func, select
@@ -8,24 +8,20 @@ from sqlalchemy.engine import Connection, Engine, RowProxy
 
 from auctions.domain.entities import Auction, Bid
 from auctions.domain.factories import get_dollars
-from auctions_infrastructure import auctions, bidders, bids, metadata, setup
+from auctions_infrastructure import auctions, bidders, bids
 from auctions_infrastructure.repositories import SqlAlchemyAuctionsRepo
+
+from db_infrastructure import Base
 
 
 @pytest.fixture(scope="session")
-def engine() -> Generator[Engine, None, None]:
-    eng = setup()
-    yield eng
-    metadata.drop_all(eng)
+def sqlalchemy_connect_url() -> str:
+    return "sqlite:///:memory:"
 
 
-@pytest.fixture()
-def connection(engine: Engine) -> Generator[Connection, None, None]:
-    conn = engine.connect()
-    tx = conn.begin()
-    yield conn
-    tx.rollback()
-    conn.close()
+@pytest.fixture(scope="session", autouse=True)
+def setup_teardown_tables(engine: Engine) -> Generator:
+    Base.metadata.create_all(engine)
 
 
 @pytest.fixture()
@@ -81,6 +77,7 @@ def bid_model(connection: Connection, auction_model_with_a_bid: RowProxy) -> Row
     return connection.execute(bids.select().where(bids.c.auction_id == auction_model_with_a_bid.id)).first()
 
 
+@pytest.mark.usefixtures("transaction")
 def test_gets_existing_auction(
     connection: Connection, auction_model_with_a_bid: RowProxy, bid_model: RowProxy, ends_at: datetime
 ) -> None:
@@ -94,6 +91,7 @@ def test_gets_existing_auction(
     assert set(auction.bids) == {Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount))}
 
 
+@pytest.mark.usefixtures("transaction")
 def test_saves_auction_changes(
     connection: Connection,
     another_bidder_id: int,
@@ -124,6 +122,7 @@ def test_saves_auction_changes(
     )
 
 
+@pytest.mark.usefixtures("transaction")
 def test_removes_withdrawn_bids(
     connection: Connection, bid_model: RowProxy, auction_model_with_a_bid: dict, ends_at: datetime
 ) -> None:

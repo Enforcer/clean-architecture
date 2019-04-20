@@ -1,15 +1,9 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Numeric, ForeignKey, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Table, Column, Integer, String, Numeric, ForeignKey, DateTime
+
+from db_infrastructure import Base
 
 
-Base = declarative_base()
-metadata = MetaData()
-
-
-def setup():
-    engine = create_engine("sqlite:///:memory:", echo=True)
-    metadata.create_all(engine)
-    return engine
+metadata = Base.metadata
 
 
 bidders = Table("bidders", metadata, Column("id", Integer, primary_key=True), Column("email", String(255), unique=True))

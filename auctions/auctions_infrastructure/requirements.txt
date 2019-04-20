@@ -3,3 +3,5 @@ pytz==2018.4
 requests==2.20.1
 sqlalchemy==1.2.16
 auctions
+foundation
+db_infrastructure

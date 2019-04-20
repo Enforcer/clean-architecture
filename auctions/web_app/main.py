@@ -5,15 +5,19 @@ import dotenv
 import inject
 from flask import Flask, request
 from pybuses import EventBus
-from sqlalchemy.engine import Connection, Engine
+from sqlalchemy.engine import Connection, Engine, create_engine
 
 from auctions.application import queries as auction_queries
 from auctions.application.ports import PaymentProvider
 from auctions.application.repositories import AuctionsRepository
-from auctions_infrastructure import queries as auctions_inf_queries, setup as auctions_infrastructure_setup
+from auctions_infrastructure import queries as auctions_inf_queries
 from auctions_infrastructure.adapters import CaPaymentsPaymentProvider
 from auctions_infrastructure.repositories.auctions import SqlAlchemyAuctionsRepo
 from customer_relationship import CustomerRelationshipConfig, CustomerRelationshipFacade
+from db_infrastructure import Base
+
+
+# TODO: import all models to ensure they are detected
 
 
 def setup(app: Flask) -> None:
@@ -35,7 +39,7 @@ def setup(app: Flask) -> None:
 
 
 def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
-    engine = auctions_infrastructure_setup()
+    engine = create_engine("sqlite:///:memory:", echo=True)
     connection_provider = ThreadlocalConnectionProvider(engine)
 
     @app.before_request
@@ -51,6 +55,9 @@ def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
             connection_provider.close_if_present()
 
         return response
+
+    # TODO: use migrations
+    Base.metadata.create_all(engine)
 
     conn = engine.connect()
     conn.execute(
