@@ -4,7 +4,6 @@ from dataclasses import dataclass
 import inject
 
 from auctions.application.repositories import AuctionsRepository
-from auctions.application.ports import EmailGateway
 from auctions.domain.types import AuctionId, BidderId
 from auctions.domain.value_objects import Money
 
@@ -29,8 +28,6 @@ class PlacingBidOutputBoundary(metaclass=abc.ABCMeta):
 
 
 class PlacingBid:
-    email_gateway: EmailGateway = inject.attr(EmailGateway)
-
     @inject.autoparams("output_boundary", "auctions_repo")
     def __init__(self, output_boundary: PlacingBidOutputBoundary, auctions_repo: AuctionsRepository) -> None:
         self.output_boundary = output_boundary

@@ -47,19 +47,3 @@ def auction_with_a_winner(input_dto: WithdrawingBidsInputDto) -> Auction:
     winning_bid = Bid(id=2, bidder_id=1, amount=get_dollars("11.00"))
     bids = [winning_bid, losing_bid]
     return create_auction(auction_id=2, bids=bids)
-
-
-def test_calls_email_gateway_once_winners_list_changes(
-    auction_with_a_winner: Auction,
-    email_gateway_mock: Mock,
-    input_dto: WithdrawingBidsInputDto,
-    auctions_repo_mock: Mock,
-) -> None:
-    auctions_repo_mock.get.return_value = auction_with_a_winner
-    expected_bidder_id = [bid.bidder_id for bid in auction_with_a_winner.bids if bid.id not in input_dto.bids_ids].pop()
-
-    WithdrawingBids().execute(input_dto)
-
-    email_gateway_mock.notify_about_winning_auction.assert_called_once_with(
-        auction_with_a_winner.id, expected_bidder_id
-    )

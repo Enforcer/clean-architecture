@@ -43,13 +43,6 @@ def test_saves_auction(auctions_repo_mock: Mock, auction: Auction, input_dto: Pl
     auctions_repo_mock.save.assert_called_once_with(auction)
 
 
-@pytest.mark.skip("Not for now")
-def test_notifies_winner(email_gateway_mock: Mock, auction: Auction, input_dto: PlacingBidInputDto) -> None:
-    PlacingBid().execute(input_dto)
-
-    email_gateway_mock.notify_about_winning_auction.assert_called_once_with(input_dto.auction_id, input_dto.bidder_id)
-
-
 def test_presents_output_dto(
     input_dto: PlacingBidInputDto, placing_bid_output_boundary_mock: Mock, auction: Auction
 ) -> None:
