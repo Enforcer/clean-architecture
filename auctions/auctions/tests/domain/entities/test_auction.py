@@ -2,10 +2,9 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 import pytest
-from pybuses import EventBus
 
 from auctions.domain.entities import Bid
-from auctions.domain.events import BidderHasBeenOverbid
+from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
 from auctions.domain.exceptions import BidOnEndedAuction
 from auctions.domain.factories import get_dollars
 from ...factories import create_auction
@@ -96,10 +95,32 @@ def test_should_not_allow_placing_bids_for_ended_auction() -> None:
 def test_should_emit_event_upon_overbid() -> None:
     bid_that_will_lose = Bid(id=1, bidder_id=1, amount=get_dollars("15.00"))
     auction = create_auction(bids=[bid_that_will_lose])
-    auction.event_bus = mock.Mock(spec_set=EventBus)
 
     new_bid_amount = get_dollars("20.00")
     auction.place_bid(bidder_id=2, amount=new_bid_amount)
 
     expected_event = BidderHasBeenOverbid(auction.id, bid_that_will_lose.bidder_id, new_bid_amount)
-    auction.event_bus.post.assert_called_once_with(expected_event)
+    auction.event_bus.post.assert_called_with(expected_event)
+
+
+def test_should_emit_winning_event_if_the_first_offer() -> None:
+    auction = create_auction()
+    winning_amount = auction.current_price + get_dollars("1.00")
+
+    auction.place_bid(bidder_id=1, amount=winning_amount)
+
+    expected_event = WinningBidPlaced(auction.id, 1, winning_amount)
+    auction.event_bus.post.assert_called_with(expected_event)
+
+
+def test_should_emit_winning_if_overbids() -> None:
+    auction = create_auction(bids=[Bid(id=1, bidder_id=1, amount=get_dollars("15.00"))])
+    winning_amount = auction.current_price + get_dollars("1.00")
+
+    auction.place_bid(bidder_id=2, amount=winning_amount)
+
+    expected_winning_event = WinningBidPlaced(auction.id, 2, winning_amount)
+    expected_overbid_event = BidderHasBeenOverbid(auction.id, 1, winning_amount)
+    auction.event_bus.post.assert_has_calls(
+        [mock.call(expected_winning_event), mock.call(expected_overbid_event)], any_order=True
+    )

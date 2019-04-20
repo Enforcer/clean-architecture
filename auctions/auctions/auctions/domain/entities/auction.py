@@ -5,7 +5,7 @@ import inject
 from pybuses import EventBus
 
 from auctions.domain.entities.bid import Bid
-from auctions.domain.events import BidderHasBeenOverbid
+from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
 from auctions.domain.types import AuctionId, BidId, BidderId
 from auctions.domain.value_objects import Money
 from auctions.domain.exceptions import BidOnEndedAuction
@@ -30,6 +30,7 @@ class Auction:
         old_winner = self.winners[0] if self.bids else None
         if amount > self.current_price:
             self.bids.append(Bid(id=None, bidder_id=bidder_id, amount=amount))
+            self.event_bus.post(WinningBidPlaced(self.id, bidder_id, amount))
             if old_winner:
                 self.event_bus.post(BidderHasBeenOverbid(self.id, old_winner, amount))
 

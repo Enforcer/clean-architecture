@@ -9,3 +9,10 @@ class BidderHasBeenOverbid:
     auction_id: AuctionId
     bidder_id: BidderId
     new_price: Money
+
+
+@dataclass
+class WinningBidPlaced:
+    auction_id: AuctionId
+    bidder_id: BidderId
+    bid_amount: Money

@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
+from unittest import mock
+
+from pybuses import EventBus
 
 from auctions.domain.entities import Auction, Bid
 from auctions.domain.types import AuctionId
@@ -15,4 +18,6 @@ def create_auction(
     if not ends_at:
         ends_at = datetime.now() + timedelta(days=1)
 
-    return Auction(id=auction_id, title="", starting_price=get_dollars("10.00"), bids=bids, ends_at=ends_at)
+    auction = Auction(id=auction_id, title="", starting_price=get_dollars("10.00"), bids=bids, ends_at=ends_at)
+    auction.event_bus = mock.Mock(spec_set=EventBus)
+    return auction
