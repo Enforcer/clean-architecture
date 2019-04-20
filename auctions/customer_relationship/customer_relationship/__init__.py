@@ -10,7 +10,7 @@ class CustomerRelationshipFacade:
     def __init__(self, config: CustomerRelationshipConfig, event_bus: EventBus) -> None:
         self._sender = EmailSender(config)
 
-        event_bus.subscribe(self.send_email_about_overbid)
+        # event_bus.subscribe(self.send_email_about_overbid)
 
     def send_email_about_overbid(self, event: BidderHasBeenOverbid) -> None:
         message = messages.Overbid(
