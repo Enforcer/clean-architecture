@@ -35,3 +35,20 @@ class Overbid(Message):
     @property
     def html(self) -> str:
         return "Bazinga"
+
+
+class Winning(Message):
+    def __init__(self, auction_title: str, amount: Money) -> None:
+        pass
+
+    @property
+    def title(self) -> "str":
+        return "You are winning :)"
+
+    @property
+    def text(self) -> str:
+        return ""
+
+    @property
+    def html(self) -> str:
+        return "Bazinga"
