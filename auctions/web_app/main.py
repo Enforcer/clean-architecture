@@ -6,6 +6,7 @@ import inject
 from flask import Flask, request
 from pybuses import EventBus
 from sqlalchemy.engine import Connection, Engine, create_engine
+from sqlalchemy.orm import Session
 
 from auctions.application import queries as auction_queries
 from auctions.application.ports import PaymentProvider
@@ -14,10 +15,11 @@ from auctions_infrastructure import queries as auctions_inf_queries
 from auctions_infrastructure.adapters import CaPaymentsPaymentProvider
 from auctions_infrastructure.repositories.auctions import SqlAlchemyAuctionsRepo
 from customer_relationship import CustomerRelationshipConfig, CustomerRelationshipFacade
-from db_infrastructure import Base
+from db_infrastructure import metadata
 
-
-# TODO: import all models to ensure they are detected
+# Models has to be in one place to be discoverable for metadata.create_all
+from web_app.security import User, Role, RolesUsers  # noqa
+from auctions_infrastructure import auctions, bids, bidders  # noqa
 
 
 def setup(app: Flask) -> None:
@@ -39,7 +41,7 @@ def setup(app: Flask) -> None:
 
 
 def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
-    engine = create_engine("sqlite:///:memory:", echo=True)
+    engine = create_engine(app.config["DB_DSN"], echo=True)
     connection_provider = ThreadlocalConnectionProvider(engine)
 
     @app.before_request
@@ -56,23 +58,8 @@ def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
 
         return response
 
-    # TODO: use migrations
-    Base.metadata.create_all(engine)
-
-    conn = engine.connect()
-    conn.execute(
-        """
-        INSERT INTO auctions (id, title, starting_price, current_price, ends_at)
-        VALUES(1, "Super aukcja", "0.99", "0.99", '2019-12-12 10:00:00')
-    """
-    )
-    conn.execute(
-        """
-        INSERT INTO bids (auction_id, amount, bidder_id)
-        VALUES(1, '1.00', 1)
-    """
-    )
-    conn.close()
+    # TODO: Use migrations for that
+    metadata.create_all(engine)
 
     return connection_provider
 
@@ -91,6 +78,7 @@ def setup_dependency_injection(
 
     def di_config(binder: inject.Binder) -> None:
         binder.bind_to_provider(Connection, connection_provider)
+        binder.bind_to_provider(Session, connection_provider.provide_session)
         binder.bind_to_provider(AuctionsRepository, SqlAlchemyAuctionsRepo)
 
         binder.bind_to_provider(auction_queries.GetActiveAuctions, auctions_inf_queries.SqlGetActiveAuctions)
@@ -115,18 +103,27 @@ class ThreadlocalConnectionProvider:
         except AttributeError:
             raise Exception("No connection available")
 
-    def is_present(self) -> bool:
+    def provide_session(self) -> Session:
+        if not self.connected:
+            raise Exception("No connection available")
+
+        return self._storage.session
+
+    @property
+    def connected(self) -> bool:
         return hasattr(self._storage, "connection")
 
     def open(self) -> Connection:
         assert not hasattr(self._storage, "connection")
         connection = self._engine.connect()
         self._storage.connection = connection
+        self._storage.session = Session(bind=connection)
         return connection
 
     def close_if_present(self) -> None:
         try:
             self._storage.connection.close()
             del self._storage.connection
+            del self._storage.session
         except AttributeError:
             pass

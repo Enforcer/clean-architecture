@@ -4,6 +4,7 @@ from flask import Flask, json, abort, request
 
 from .main import setup
 from .blueprints.auctions import auctions_blueprint
+from .security import setup as security_setup
 from auctions.application import queries as auction_queries
 from auctions.domain.value_objects import Money
 from foundation.method_dispatch import method_dispatch
@@ -45,6 +46,16 @@ def create_app() -> Flask:
 
     app.register_blueprint(auctions_blueprint)
 
+    # TODO: move this config
+    app.config["SECRET_KEY"] = "super-secret"
+    app.config["DEBUG"] = True
+    app.config["SECURITY_SEND_REGISTER_EMAIL"] = False
+    app.config["SECURITY_REGISTERABLE"] = True
+    app.config["SECURITY_PASSWORD_SALT"] = "99f885320c0f867cde17876a7849904c41a2b8120a9a9e76d1789e458e543af9"
+    app.config["WTF_CSRF_ENABLED"] = False
+    app.config["DB_DSN"] = "sqlite:///foo.db"
+
     setup(app)
+    security_setup(app)
 
     return app
