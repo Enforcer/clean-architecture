@@ -1,9 +1,6 @@
 from typing import List
 from datetime import datetime
 
-import inject
-from pybuses import EventBus
-
 from auctions.domain.entities.bid import Bid
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
 from auctions.domain.types import AuctionId, BidId, BidderId
@@ -12,8 +9,6 @@ from auctions.domain.exceptions import BidOnEndedAuction
 
 
 class Auction:
-    event_bus = inject.attr(EventBus)
-
     def __init__(self, id: AuctionId, title: str, starting_price: Money, bids: List[Bid], ends_at: datetime) -> None:
         assert isinstance(starting_price, Money)
         self.id = id
@@ -22,6 +17,14 @@ class Auction:
         self.bids = sorted(bids, key=lambda bid: bid.amount)
         self.ends_at = ends_at
         self._withdrawn_bids_ids: List[BidId] = []
+        self._pending_domain_events = []
+
+    def _record_event(self, event: object) -> None:
+        self._pending_domain_events.append(event)
+
+    @property
+    def domain_events(self) -> list:
+        return self._pending_domain_events[:]
 
     def place_bid(self, bidder_id: BidderId, amount: Money) -> None:
         if datetime.now(tz=self.ends_at.tzinfo) > self.ends_at:
@@ -30,9 +33,9 @@ class Auction:
         old_winner = self.winners[0] if self.bids else None
         if amount > self.current_price:
             self.bids.append(Bid(id=None, bidder_id=bidder_id, amount=amount))
-            self.event_bus.post(WinningBidPlaced(self.id, bidder_id, amount))
+            self._record_event(WinningBidPlaced(self.id, bidder_id, amount))
             if old_winner:
-                self.event_bus.post(BidderHasBeenOverbid(self.id, old_winner, amount))
+                self._record_event(BidderHasBeenOverbid(self.id, old_winner, amount))
 
     @property
     def current_price(self) -> Money:

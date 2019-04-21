@@ -3,6 +3,7 @@ from typing import Dict, List
 
 import inject
 import pytz
+from pybuses import EventBus
 from sqlalchemy.engine import Connection, RowProxy
 
 from auctions.application.repositories import AuctionsRepository
@@ -13,13 +14,16 @@ from auctions_infrastructure import auctions, bids
 
 
 class InMemoryAuctionsRepository(AuctionsRepository):
-    def __init__(self, objects: List[Auction] = None) -> None:
+    @inject.autoparams("event_bus")
+    def __init__(self, objects: List[Auction] = None, event_bus: EventBus = None) -> None:
         if not objects:
             objects = []
 
         self._storage: Dict[AuctionId, Auction] = {}
         for object in objects:
             self.save(object)
+
+        self._event_bus = event_bus
 
     def get(self, auction_id: AuctionId) -> Auction:
         copied = copy.deepcopy(self._storage[auction_id])
@@ -35,12 +39,15 @@ class InMemoryAuctionsRepository(AuctionsRepository):
         copied = copy.deepcopy(auction)
         copied.bids = [bid for bid in copied.bids if bid.id not in copied.withdrawn_bids_ids]
         self._storage[auction.id] = copied
+        for event in auction.domain_events:
+            self._event_bus.post(event)
 
 
 class SqlAlchemyAuctionsRepo(AuctionsRepository):
-    @inject.autoparams("connection")
-    def __init__(self, connection: Connection = None) -> None:
+    @inject.autoparams("connection", "event_bus")
+    def __init__(self, connection: Connection = None, event_bus: EventBus = None) -> None:
         self._conn = connection
+        self._event_bus = event_bus
 
     def get(self, auction_id: AuctionId) -> Auction:
         row = self._conn.execute(auctions.select().where(auctions.c.id == auction_id)).first()
@@ -80,3 +87,6 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
 
         if auction.withdrawn_bids_ids:
             self._conn.execute(bids.delete(whereclause=bids.c.id.in_(auction.withdrawn_bids_ids)))
+
+        for event in auction.domain_events:
+            self._event_bus.post(event)

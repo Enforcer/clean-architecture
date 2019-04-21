@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Generator
+from unittest.mock import Mock
 
 import pytest
 from sqlalchemy import func, select
@@ -79,9 +80,13 @@ def bid_model(connection: Connection, auction_model_with_a_bid: RowProxy) -> Row
 
 @pytest.mark.usefixtures("transaction")
 def test_gets_existing_auction(
-    connection: Connection, auction_model_with_a_bid: RowProxy, bid_model: RowProxy, ends_at: datetime
+    connection: Connection,
+    auction_model_with_a_bid: RowProxy,
+    bid_model: RowProxy,
+    ends_at: datetime,
+    event_bus_mock: Mock,
 ) -> None:
-    auction = SqlAlchemyAuctionsRepo(connection).get(auction_model_with_a_bid.id)
+    auction = SqlAlchemyAuctionsRepo(connection, event_bus_mock).get(auction_model_with_a_bid.id)
 
     assert auction.id == auction_model_with_a_bid.id
     assert auction.title == auction_model_with_a_bid.title
@@ -98,6 +103,7 @@ def test_saves_auction_changes(
     bid_model: RowProxy,
     auction_model_with_a_bid: RowProxy,
     ends_at: datetime,
+    event_bus_mock: Mock,
 ) -> None:
     new_bid_price = get_dollars(bid_model.amount * 2)
     auction = Auction(
@@ -111,7 +117,7 @@ def test_saves_auction_changes(
         ],
     )
 
-    SqlAlchemyAuctionsRepo(connection).save(auction)
+    SqlAlchemyAuctionsRepo(connection, event_bus_mock).save(auction)
 
     assert connection.execute(select([func.count()]).select_from(bids)).scalar() == 2
     assert (
@@ -124,7 +130,7 @@ def test_saves_auction_changes(
 
 @pytest.mark.usefixtures("transaction")
 def test_removes_withdrawn_bids(
-    connection: Connection, bid_model: RowProxy, auction_model_with_a_bid: dict, ends_at: datetime
+    connection: Connection, bid_model: RowProxy, auction_model_with_a_bid: dict, ends_at: datetime, event_bus_mock: Mock
 ) -> None:
     auction = Auction(
         id=auction_model_with_a_bid.id,
@@ -135,6 +141,19 @@ def test_removes_withdrawn_bids(
     )
     auction.withdraw_bids([bid_model.id])
 
-    SqlAlchemyAuctionsRepo(connection).save(auction)
+    SqlAlchemyAuctionsRepo(connection, event_bus_mock).save(auction)
 
     assert connection.execute(select([func.count()]).select_from(bids)).scalar() == 0
+
+
+@pytest.mark.usefixtures("transaction")
+def test_posts_pending_domain_events(
+    connection: Connection, another_bidder_id: int, auction_model_with_a_bid: RowProxy, event_bus_mock: Mock
+) -> None:
+    repo = SqlAlchemyAuctionsRepo(connection, event_bus_mock)
+    auction = repo.get(auction_model_with_a_bid.id)
+    auction.place_bid(another_bidder_id, auction.current_price + get_dollars("1.00"))
+
+    repo.save(auction)
+
+    event_bus_mock.post.assert_called()

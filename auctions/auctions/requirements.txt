@@ -1,5 +1,4 @@
 dataclasses==0.6
 Inject==3.4.0
 pytest==3.6.0
-pybuses==1.1.0
 foundation
