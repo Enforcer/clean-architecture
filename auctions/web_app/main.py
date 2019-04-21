@@ -3,7 +3,7 @@ import threading
 
 import dotenv
 import inject
-from flask import Flask, request
+from flask import Flask, request, Response
 from pybuses import EventBus
 from sqlalchemy.engine import Connection, Engine, create_engine
 from sqlalchemy.orm import Session
@@ -49,7 +49,7 @@ def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
         request.tx = connection_provider.open().begin()
 
     @app.after_request
-    def transaction_commit(response: app.response_class) -> app.response_class:
+    def transaction_commit(response: Response) -> Response:
         try:
             if hasattr(request, "tx") and response.status_code < 400:
                 request.tx.commit()

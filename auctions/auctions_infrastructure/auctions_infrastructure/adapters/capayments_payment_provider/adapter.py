@@ -32,4 +32,4 @@ class CaPaymentsPaymentProvider(PaymentProvider):
         if not response.ok:
             raise PaymentFailedError
         else:
-            return response_cls(**response.json())
+            return response_cls(**response.json())  # type: ignore

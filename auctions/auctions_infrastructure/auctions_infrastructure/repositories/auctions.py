@@ -16,6 +16,7 @@ from auctions_infrastructure import auctions, bids
 class InMemoryAuctionsRepository(AuctionsRepository):
     @inject.autoparams("event_bus")
     def __init__(self, objects: List[Auction] = None, event_bus: EventBus = None) -> None:
+        assert isinstance(event_bus, EventBus)
         if not objects:
             objects = []
 
@@ -46,6 +47,8 @@ class InMemoryAuctionsRepository(AuctionsRepository):
 class SqlAlchemyAuctionsRepo(AuctionsRepository):
     @inject.autoparams("connection", "event_bus")
     def __init__(self, connection: Connection = None, event_bus: EventBus = None) -> None:
+        assert isinstance(connection, Connection)
+        assert isinstance(event_bus, EventBus)
         self._conn = connection
         self._event_bus = event_bus
 

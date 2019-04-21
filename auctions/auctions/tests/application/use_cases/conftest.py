@@ -1,3 +1,4 @@
+from typing import List
 from unittest.mock import Mock
 
 import inject
@@ -10,7 +11,7 @@ from ...factories import create_auction
 
 
 @pytest.fixture()
-def exemplary_bids_ids() -> int:
+def exemplary_bids_ids() -> List[int]:
     return [1, 2, 3]
 
 

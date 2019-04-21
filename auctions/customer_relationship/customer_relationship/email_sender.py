@@ -16,9 +16,9 @@ class EmailSender:
             server.login(self._config.email_username, self._config.email_password)
             msg = MIMEMultipart("alternative")
             msg["Subject"] = message.title
-            msg["From"] = self._config.email_from
+            msg["From"] = self._config.formatted_from
             msg["To"] = recipient
             msg.attach(MIMEText(message.text, "plain"))
             msg.attach(MIMEText(message.html, "html"))
 
-            server.sendmail(self._config.email_from, recipient, msg.as_string())
+            server.sendmail(self._config.formatted_from, recipient, msg.as_string())

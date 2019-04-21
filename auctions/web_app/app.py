@@ -16,7 +16,7 @@ class JSONEncoder(json.JSONEncoder):
         raise TypeError(f"Cannot serialize {type(obj)}")
 
     @default.register(auction_queries.AuctionDto)  # noqa: F811
-    def _(self, obj: auction_queries.AuctionDto) -> object:
+    def serialize_auction_dto(self, obj: auction_queries.AuctionDto) -> object:
         return {
             "id": obj.id,
             "title": obj.title,
@@ -26,11 +26,11 @@ class JSONEncoder(json.JSONEncoder):
         }
 
     @default.register(Money)  # noqa: F811
-    def _(self, obj: Money) -> object:
+    def serialize_money(self, obj: Money) -> object:
         return {"amount": str(obj.amount), "currency": obj.currency.iso_code}
 
     @default.register(datetime)  # noqa: F811
-    def _(self, obj: datetime) -> str:
+    def serialize_datetime(self, obj: datetime) -> str:
         return obj.isoformat()
 
 

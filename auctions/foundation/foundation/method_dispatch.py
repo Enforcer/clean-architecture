@@ -8,6 +8,6 @@ def method_dispatch(func: Callable) -> Callable:
     def wrapper(*args, **kw):
         return dispatcher.dispatch(args[1].__class__)(*args, **kw)
 
-    wrapper.register = dispatcher.register
+    wrapper.register = dispatcher.register  # type: ignore
     functools.update_wrapper(wrapper, func)
     return wrapper

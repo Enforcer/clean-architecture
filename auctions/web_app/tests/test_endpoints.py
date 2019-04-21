@@ -35,7 +35,7 @@ def remove_user(connection: Connection) -> Generator:
 
 
 @pytest.fixture()
-def create_remove_user(connection: Connection) -> Generator[int, None, None]:
+def create_remove_user(connection: Connection) -> Generator[str, None, None]:
     result_proxy = connection.execute(
         User.__table__.insert(
             # passwords are hashed automagically by Flask-security
@@ -82,7 +82,7 @@ def test_login(client: testing.FlaskClient, create_remove_user: str) -> None:
 
 
 @pytest.fixture()
-def example_auction(connection: Connection) -> int:
+def example_auction(connection: Connection) -> Generator[int, None, None]:
     ends_at = datetime.now() + timedelta(days=3)
     result_proxy = connection.execute(
         auctions.insert(
@@ -91,7 +91,7 @@ def example_auction(connection: Connection) -> int:
     )
     auction_id = result_proxy.lastrowid
     connection.execute(bids.insert({"auction_id": auction_id, "amount": "1.00", "bidder_id": 1}))
-    yield auction_id
+    yield int(auction_id)
     connection.execute(bids.delete(bids.c.auction_id == auction_id))
     connection.execute(auctions.delete(auctions.c.id == auction_id))
 

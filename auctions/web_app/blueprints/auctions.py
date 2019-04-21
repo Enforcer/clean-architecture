@@ -42,8 +42,7 @@ class PlacingBidSchema(Schema):
 
 
 class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
-    def __init__(self) -> None:
-        self.response = None
+    response: Response
 
     def present(self, output_dto: placing_bid.PlacingBidOutputDto) -> None:
         message = (

@@ -16,12 +16,12 @@ class BTC(Currency):
 @pytest.mark.parametrize("currency, amount", [(None, None), (USD, "bazinga"), ("bazinga", "10"), (USD, "15.10001")])
 def test_invalid_inputs(currency: object, amount: object) -> None:
     with pytest.raises(ValueError):
-        Money(currency, amount)
+        Money(currency, amount)  # type: ignore
 
 
 @pytest.mark.parametrize("currency, amount", [(USD, "9.99"), (BTC, "1.00000020")])
 def test_valid_inputs(currency: object, amount: object) -> None:
-    assert Money(currency, amount)
+    assert Money(currency, amount)  # type: ignore
 
 
 @pytest.mark.parametrize(

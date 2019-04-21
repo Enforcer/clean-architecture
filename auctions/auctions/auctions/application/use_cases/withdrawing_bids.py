@@ -15,6 +15,7 @@ class WithdrawingBidsInputDto:
 class WithdrawingBids:
     @inject.autoparams("auctions_repo")
     def __init__(self, auctions_repo: AuctionsRepository = None) -> None:
+        assert isinstance(auctions_repo, AuctionsRepository)
         self._auctions_repo = auctions_repo
 
     def execute(self, input_dto: WithdrawingBidsInputDto) -> None:

@@ -36,7 +36,7 @@ class Money:
     def amount(self) -> Decimal:
         return self._amount
 
-    def __eq__(self, other: "Money") -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Money):
             raise TypeError
         return self.currency == other.currency and self.amount == other.amount
