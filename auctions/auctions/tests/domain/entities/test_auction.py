@@ -98,7 +98,8 @@ def test_should_emit_event_upon_overbid() -> None:
     new_bid_amount = get_dollars("20.00")
     auction.place_bid(bidder_id=2, amount=new_bid_amount)
 
-    assert BidderHasBeenOverbid(auction.id, bid_that_will_lose.bidder_id, new_bid_amount) in auction.domain_events
+    expected_event = BidderHasBeenOverbid(auction.id, bid_that_will_lose.bidder_id, new_bid_amount, auction.title)
+    assert expected_event in auction.domain_events
 
 
 def test_should_emit_winning_event_if_the_first_offer() -> None:
@@ -107,7 +108,7 @@ def test_should_emit_winning_event_if_the_first_offer() -> None:
 
     auction.place_bid(bidder_id=1, amount=winning_amount)
 
-    assert auction.domain_events == [WinningBidPlaced(auction.id, 1, winning_amount)]
+    assert auction.domain_events == [WinningBidPlaced(auction.id, 1, winning_amount, auction.title)]
 
 
 def test_should_emit_winning_if_overbids() -> None:
@@ -116,6 +117,6 @@ def test_should_emit_winning_if_overbids() -> None:
 
     auction.place_bid(bidder_id=2, amount=winning_amount)
 
-    expected_winning_event = WinningBidPlaced(auction.id, 2, winning_amount)
-    expected_overbid_event = BidderHasBeenOverbid(auction.id, 1, winning_amount)
+    expected_winning_event = WinningBidPlaced(auction.id, 2, winning_amount, auction.title)
+    expected_overbid_event = BidderHasBeenOverbid(auction.id, 1, winning_amount, auction.title)
     assert auction.domain_events == [expected_winning_event, expected_overbid_event]

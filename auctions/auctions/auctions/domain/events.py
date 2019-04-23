@@ -11,6 +11,7 @@ class BidderHasBeenOverbid(Event):
     auction_id: AuctionId
     bidder_id: BidderId
     new_price: Money
+    auction_title: str
 
 
 @dataclass(frozen=True)
@@ -18,3 +19,4 @@ class WinningBidPlaced(Event):
     auction_id: AuctionId
     bidder_id: BidderId
     bid_amount: Money
+    auction_title: str

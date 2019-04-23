@@ -35,9 +35,9 @@ class Auction:
         old_winner = self.winners[0] if self.bids else None
         if amount > self.current_price:
             self.bids.append(Bid(id=None, bidder_id=bidder_id, amount=amount))
-            self._record_event(WinningBidPlaced(self.id, bidder_id, amount))
+            self._record_event(WinningBidPlaced(self.id, bidder_id, amount, self.title))
             if old_winner:
-                self._record_event(BidderHasBeenOverbid(self.id, old_winner, amount))
+                self._record_event(BidderHasBeenOverbid(self.id, old_winner, amount, self.title))
 
     @property
     def current_price(self) -> Money:
