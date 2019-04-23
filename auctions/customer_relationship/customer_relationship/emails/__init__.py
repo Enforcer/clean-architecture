@@ -3,7 +3,7 @@ from abc import abstractmethod
 from auctions.domain.value_objects import Money
 
 
-class Message:
+class Email:
     @property
     @abstractmethod
     def title(self) -> str:
@@ -20,7 +20,7 @@ class Message:
         pass
 
 
-class Overbid(Message):
+class Overbid(Email):
     def __init__(self, auction_title: str, new_price: Money) -> None:
         pass
 
@@ -37,7 +37,7 @@ class Overbid(Message):
         return "Bazinga"
 
 
-class Winning(Message):
+class Winning(Email):
     def __init__(self, auction_title: str, amount: Money) -> None:
         pass
 
