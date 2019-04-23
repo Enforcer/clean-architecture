@@ -5,8 +5,9 @@ from pybuses import EventBus
 
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
 from customer_relationship import emails
-from customer_relationship.email_sender import EmailSender
 from customer_relationship.config import CustomerRelationshipConfig
+from customer_relationship.email_sender import EmailSender
+from customer_relationship.models import customers
 
 
 class CustomerRelationshipFacade:
@@ -18,10 +19,10 @@ class CustomerRelationshipFacade:
         event_bus.subscribe(self.send_email_about_winning)
 
     def create_customer(self, conn: Connection, customer_id: int, email: str) -> None:
-        pass
+        conn.execute(customers.insert({"id": customer_id, "email": email}))
 
     def update_customer(self, conn: Connection, customer_id: int, email: str) -> None:
-        pass
+        conn.execute(customers.update().where(customers.c.id == customer_id).values(email=email))
 
     def send_email_about_overbid(self, event: BidderHasBeenOverbid) -> None:
         email = emails.Overbid(auction_title=event.auction_title, new_price=event.new_price)

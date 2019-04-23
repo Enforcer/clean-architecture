@@ -3,10 +3,12 @@ from typing import Generator
 
 import inject
 import pytest
+from _pytest.fixtures import SubRequest
 from flask import testing, Flask
 from sqlalchemy.engine import Connection
 
 from auctions_infrastructure import auctions, bids
+from customer_relationship.models import customers
 
 from ..app import create_app
 from ..security import User
@@ -32,6 +34,7 @@ def sqlalchemy_connect_url(app: Flask) -> str:
 def remove_user(connection: Connection) -> Generator:
     yield
     connection.execute(User.__table__.delete(User.email == "test+register@cleanarchitecture.io"))
+    connection.execute(customers.delete(customers.c.email == "test+register@cleanarchitecture.io"))
 
 
 @pytest.fixture()
@@ -44,6 +47,7 @@ def create_remove_user(connection: Connection) -> Generator[str, None, None]:
     )
     yield str(result_proxy.lastrowid)
     connection.execute(User.__table__.delete(User.email == "test+login@cleanarchitecture.io"))
+    connection.execute(customers.delete(customers.c.email == "test+login@cleanarchitecture.io"))
 
 
 def test_returns_list_of_auctions(client: testing.FlaskClient) -> None:
@@ -54,7 +58,7 @@ def test_returns_list_of_auctions(client: testing.FlaskClient) -> None:
 
 
 @pytest.mark.usefixtures("remove_user")
-def test_register(client: testing.FlaskClient) -> None:
+def test_register(request: SubRequest, client: testing.FlaskClient) -> None:
     response = client.post(
         "/register",
         headers={"Content-type": "application/json"},
@@ -66,6 +70,11 @@ def test_register(client: testing.FlaskClient) -> None:
     assert isinstance(json_response_body["response"]["user"].pop("authentication_token"), str)
     assert isinstance(json_response_body["response"]["user"].pop("id"), str)
     assert json_response_body == {"meta": {"code": 200}, "response": {"user": {}}}
+    assert_customer_with_given_email_exists(request, "test+register@cleanarchitecture.io")
+
+
+def assert_customer_with_given_email_exists(request: SubRequest, email: str) -> None:
+    assert request.getfixturevalue("connection").execute(customers.select().where(customers.c.email == email)).first()
 
 
 def test_login(client: testing.FlaskClient, create_remove_user: str) -> None:
