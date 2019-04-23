@@ -1,5 +1,6 @@
 from typing import Callable
 
+from sqlalchemy.engine import Connection
 from pybuses import EventBus
 
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
@@ -16,14 +17,20 @@ class CustomerRelationshipFacade:
         event_bus.subscribe(self.send_email_about_overbid)
         event_bus.subscribe(self.send_email_about_winning)
 
+    def create_customer(self, conn: Connection, customer_id: int, email: str) -> None:
+        pass
+
+    def update_customer(self, conn: Connection, customer_id: int, email: str) -> None:
+        pass
+
     def send_email_about_overbid(self, event: BidderHasBeenOverbid) -> None:
         email = emails.Overbid(auction_title=event.auction_title, new_price=event.new_price)
-        # TODO: create query OR sync data between contexts in different way
+        # TODO: fetch customer
         self._send("sebastian@cleanarchitecture.io", email)
 
     def send_email_about_winning(self, event: WinningBidPlaced) -> None:
         email = emails.Winning(auction_title=event.auction_title, amount=event.bid_amount)
-        # TODO: create query OR sync data between contexts in different way
+        # TODO: fetch customer
         self._send("sebastian@cleanarchitecture.io", email)
 
     def _send(self, recipient: str, email: emails.Email) -> None:

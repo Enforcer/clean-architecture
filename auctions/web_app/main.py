@@ -24,6 +24,7 @@ from db_infrastructure import metadata
 # Models has to be in one place to be discoverable for metadata.create_all
 from web_app.security import User, Role, RolesUsers  # noqa
 from auctions_infrastructure import auctions, bids, bidders  # noqa
+from customer_relationship.models import customers  # noqa
 
 
 def setup(app: Flask) -> None:
@@ -48,7 +49,8 @@ def setup(app: Flask) -> None:
 
         sa_event.listen(inject.instance(Connection), "commit", listener, once=True)
 
-    setup_dependency_injection(settings, connection_provider, event_bus, enqueue_after_commit)
+    setup_contexts(settings, event_bus, enqueue_after_commit)
+    setup_dependency_injection(settings, connection_provider, event_bus)
 
 
 def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
@@ -80,9 +82,7 @@ def setup_rq() -> Callable:
     return queue.enqueue
 
 
-def setup_dependency_injection(
-    settings: dict, connection_provider: "ThreadlocalConnectionProvider", event_bus: EventBus, enqueue_fun: Callable
-) -> None:
+def setup_contexts(settings: dict, event_bus: EventBus, enqueue_fun: Callable) -> None:
     cr_config = CustomerRelationshipConfig(
         email_host=settings["email.host"],
         email_port=int(settings["email.port"]),
@@ -90,8 +90,20 @@ def setup_dependency_injection(
         email_password=settings["email.password"],
         email_from=(settings["email.from.name"], settings["email.from.address"]),
     )
-    CustomerRelationshipFacade(cr_config, event_bus, enqueue_fun)
+    cr_context = CustomerRelationshipFacade(cr_config, event_bus, enqueue_fun)
 
+    @sa_event.listens_for(User, "after_insert")
+    def insert_cb(_mapper, connection: Connection, user: User) -> None:
+        cr_context.create_customer(connection, user.id, user.email)
+
+    @sa_event.listens_for(User, "after_update")
+    def update_cb(_mapper, connection: Connection, user: User) -> None:
+        cr_context.update_customer(connection, user.id, user.email)
+
+
+def setup_dependency_injection(
+    settings: dict, connection_provider: "ThreadlocalConnectionProvider", event_bus: EventBus
+) -> None:
     def di_config(binder: inject.Binder) -> None:
         binder.bind_to_provider(Connection, connection_provider)
         binder.bind_to_provider(Session, connection_provider.provide_session)

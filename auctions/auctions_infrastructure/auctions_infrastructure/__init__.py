@@ -1,9 +1,6 @@
 from sqlalchemy import Table, Column, Integer, String, Numeric, ForeignKey, DateTime
 
-from db_infrastructure import Base
-
-
-metadata = Base.metadata
+from db_infrastructure import metadata
 
 
 bidders = Table("bidders", metadata, Column("id", Integer, primary_key=True), Column("email", String(255), unique=True))

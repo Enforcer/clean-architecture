@@ -1,3 +1,5 @@
 auctions
 dataclasses==0.6
 pybuses==1.1.0
+sqlalchemy==1.2.16
+db_infrastructure
