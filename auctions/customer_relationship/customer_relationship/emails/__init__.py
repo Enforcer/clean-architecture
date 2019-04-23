@@ -55,4 +55,4 @@ class Winning(Email):
 
     @property
     def html(self) -> str:
-        return "Bazinga"
+        return self.text
