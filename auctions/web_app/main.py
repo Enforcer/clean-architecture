@@ -1,10 +1,14 @@
 import os
 import threading
+from typing import Callable
 
 import dotenv
 import inject
 from flask import Flask, request, Response
 from pybuses import EventBus
+from redis import Redis
+from rq import Queue
+from sqlalchemy import event as sa_event
 from sqlalchemy.engine import Connection, Engine, create_engine
 from sqlalchemy.orm import Session
 
@@ -36,8 +40,15 @@ def setup(app: Flask) -> None:
     }
     connection_provider = setup_db(app)
     event_bus = EventBus()
+    enqueue_in_rq = setup_rq()
 
-    setup_dependency_injection(settings, connection_provider, event_bus)
+    def enqueue_after_commit(fun: Callable, *args, **kwargs):
+        def listener(_conn):
+            enqueue_in_rq(fun, *args, **kwargs)
+
+        sa_event.listen(inject.instance(Connection), "commit", listener, once=True)
+
+    setup_dependency_injection(settings, connection_provider, event_bus, enqueue_after_commit)
 
 
 def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
@@ -64,8 +75,13 @@ def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
     return connection_provider
 
 
+def setup_rq() -> Callable:
+    queue = Queue(connection=Redis())
+    return queue.enqueue
+
+
 def setup_dependency_injection(
-    settings: dict, connection_provider: "ThreadlocalConnectionProvider", event_bus: EventBus
+    settings: dict, connection_provider: "ThreadlocalConnectionProvider", event_bus: EventBus, enqueue_fun: Callable
 ) -> None:
     cr_config = CustomerRelationshipConfig(
         email_host=settings["email.host"],
@@ -74,7 +90,7 @@ def setup_dependency_injection(
         email_password=settings["email.password"],
         email_from=(settings["email.from.name"], settings["email.from.address"]),
     )
-    CustomerRelationshipFacade(cr_config, event_bus)
+    CustomerRelationshipFacade(cr_config, event_bus, enqueue_fun)
 
     def di_config(binder: inject.Binder) -> None:
         binder.bind_to_provider(Connection, connection_provider)
