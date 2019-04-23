@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from dataclasses import dataclass
+
 from auctions.domain.value_objects import Money
 
 
@@ -20,9 +22,10 @@ class Email:
         pass
 
 
+@dataclass
 class Overbid(Email):
-    def __init__(self, auction_title: str, new_price: Money) -> None:
-        pass
+    auction_title: str
+    new_price: Money
 
     @property
     def title(self) -> "str":
@@ -30,16 +33,17 @@ class Overbid(Email):
 
     @property
     def text(self) -> str:
-        return ""
+        return f'A new bid has been placed on the auction "{self.auction_title}". New price is {self.new_price}.'
 
     @property
     def html(self) -> str:
-        return "Bazinga"
+        return self.text
 
 
+@dataclass
 class Winning(Email):
-    def __init__(self, auction_title: str, amount: Money) -> None:
-        pass
+    auction_title: str
+    amount: Money
 
     @property
     def title(self) -> "str":
@@ -47,7 +51,7 @@ class Winning(Email):
 
     @property
     def text(self) -> str:
-        return ""
+        return f'Congratulations! Your bid {self.amount} is the winning one one the auction "{self.auction_title}"'
 
     @property
     def html(self) -> str:

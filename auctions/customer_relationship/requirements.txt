@@ -1,2 +1,3 @@
 auctions
+dataclasses==0.6
 pybuses==1.1.0
