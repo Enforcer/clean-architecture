@@ -1,0 +1,2 @@
+class PaymentFailedError(Exception):
+    pass

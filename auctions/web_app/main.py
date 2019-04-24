@@ -13,10 +13,8 @@ from sqlalchemy.engine import Connection, Engine, create_engine
 from sqlalchemy.orm import Session
 
 from auctions.application import queries as auction_queries
-from auctions.application.ports import PaymentProvider
 from auctions.application.repositories import AuctionsRepository
 from auctions_infrastructure import queries as auctions_inf_queries
-from auctions_infrastructure.adapters import CaPaymentsPaymentProvider
 from auctions_infrastructure.repositories.auctions import SqlAlchemyAuctionsRepo
 from customer_relationship import CustomerRelationshipConfig, CustomerRelationshipFacade
 from db_infrastructure import metadata
@@ -113,9 +111,6 @@ def setup_dependency_injection(
         binder.bind_to_provider(auction_queries.GetSingleAuction, auctions_inf_queries.SqlGetSingleAuction)
 
         binder.bind(EventBus, event_bus)
-        binder.bind(
-            PaymentProvider, CaPaymentsPaymentProvider(settings["payments.login"], settings["payments.password"])
-        )
 
     inject.configure(di_config)
 
