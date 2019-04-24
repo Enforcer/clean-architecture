@@ -1,6 +1,6 @@
-import inspect
 from decimal import Decimal, DecimalException
 from functools import total_ordering
+import inspect
 from typing import Any, Type
 
 from foundation.value_objects.currency import Currency

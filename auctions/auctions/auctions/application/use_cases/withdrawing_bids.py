@@ -1,7 +1,7 @@
+from dataclasses import dataclass
 from typing import List
 
 import inject
-from dataclasses import dataclass
 
 from auctions.application.repositories import AuctionsRepository
 

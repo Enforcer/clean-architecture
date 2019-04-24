@@ -3,9 +3,10 @@ from dataclasses import dataclass
 
 import inject
 
+from foundation.value_objects import Money
+
 from auctions.application.repositories import AuctionsRepository
 from auctions.domain.types import AuctionId, BidderId
-from foundation.value_objects import Money
 
 
 @dataclass

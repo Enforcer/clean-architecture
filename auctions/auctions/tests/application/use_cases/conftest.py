@@ -7,6 +7,7 @@ import pytest
 from auctions.application.repositories import AuctionsRepository
 from auctions.application.use_cases.placing_bid import PlacingBidOutputBoundary
 from auctions.domain.entities import Auction
+
 from ...factories import create_auction
 
 

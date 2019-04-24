@@ -1,15 +1,13 @@
 from typing import Any, Optional
 
-import inject
-
 from flask import Flask
-from flask_security import Security, UserMixin, RoleMixin
+from flask_security import RoleMixin, Security, UserMixin
 from flask_security.datastore import UserDatastore
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
-from sqlalchemy.orm import Session, relationship, backref
+import inject
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import Session, backref, relationship
 
 from db_infrastructure import Base
-
 
 __all__ = ["setup", "User"]
 

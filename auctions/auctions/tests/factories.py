@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
 
+from foundation.value_objects.factories import get_dollars
+
 from auctions.domain.entities import Auction, Bid
 from auctions.domain.types import AuctionId
-from foundation.value_objects.factories import get_dollars
 
 
 def create_auction(

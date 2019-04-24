@@ -1,5 +1,4 @@
 import inject
-
 from sqlalchemy.engine import Connection
 
 

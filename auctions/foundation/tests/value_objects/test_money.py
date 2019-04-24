@@ -1,5 +1,5 @@
-import operator
 from decimal import Decimal
+import operator
 from typing import Any, Callable
 
 import pytest

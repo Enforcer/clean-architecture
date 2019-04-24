@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
+from pybuses import EventBus
 import pytest
 import pytz
-from pybuses import EventBus
 
 
 @pytest.fixture()

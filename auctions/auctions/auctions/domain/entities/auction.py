@@ -1,13 +1,13 @@
-from typing import List
 from datetime import datetime
+from typing import List
 
 from foundation.events import Event
+from foundation.value_objects import Money
 
 from auctions.domain.entities.bid import Bid
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
-from auctions.domain.types import AuctionId, BidId, BidderId
-from foundation.value_objects import Money
 from auctions.domain.exceptions import BidOnEndedAuction
+from auctions.domain.types import AuctionId, BidderId, BidId
 
 
 class Auction:

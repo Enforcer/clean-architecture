@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 from typing import Generator
 
+from _pytest.fixtures import SubRequest
+from flask import Flask, testing
 import inject
 import pytest
-from _pytest.fixtures import SubRequest
-from flask import testing, Flask
 from sqlalchemy.engine import Connection
 
 from auctions_infrastructure import auctions, bids
@@ -73,7 +73,7 @@ def another_user(connection: Connection) -> Generator[str, None, None]:
 
 @pytest.fixture()
 def logged_in_user(create_remove_user: str, client: testing.FlaskClient) -> None:
-    with client.session_transaction() as session:
+    with client.session_transaction() as session:  # type: ignore
         session["user_id"] = create_remove_user
         session["_fresh"] = True
 

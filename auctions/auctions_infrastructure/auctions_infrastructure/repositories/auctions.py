@@ -2,14 +2,15 @@ import copy
 from typing import Dict, List
 
 import inject
-import pytz
 from pybuses import EventBus
+import pytz
 from sqlalchemy.engine import Connection, RowProxy
+
+from foundation.value_objects.factories import get_dollars
 
 from auctions.application.repositories import AuctionsRepository
 from auctions.domain.entities import Auction, Bid
 from auctions.domain.types import AuctionId
-from foundation.value_objects.factories import get_dollars
 from auctions_infrastructure import auctions, bids
 
 

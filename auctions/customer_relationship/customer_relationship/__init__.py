@@ -1,8 +1,8 @@
 from typing import Callable
 
 import inject
-from sqlalchemy.engine import Connection
 from pybuses import EventBus
+from sqlalchemy.engine import Connection
 
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
 from customer_relationship import emails

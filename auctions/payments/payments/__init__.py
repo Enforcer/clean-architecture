@@ -4,9 +4,8 @@ from typing import Type, TypeVar
 import requests
 
 from payments.config import PaymentsConfig
-from payments.requests import Request
 from payments.exceptions import PaymentFailedError
-
+from payments.requests import Request
 
 ResponseCls = TypeVar("ResponseCls")
 

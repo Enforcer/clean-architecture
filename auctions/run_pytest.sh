@@ -4,4 +4,5 @@ for dirname in $(ls); do
         pytest $dirname
     fi
 done
+pytest web_app
 

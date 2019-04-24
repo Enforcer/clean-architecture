@@ -4,4 +4,4 @@ for dirname in $(ls); do
         mypy --ignore-missing-imports $dirname
     fi
 done
-
+mypy --ignore-missing-imports web_app

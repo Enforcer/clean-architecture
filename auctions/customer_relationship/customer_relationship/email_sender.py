@@ -1,10 +1,9 @@
-import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import smtplib
 
-
-from customer_relationship.emails import Email
 from customer_relationship.config import CustomerRelationshipConfig
+from customer_relationship.emails import Email
 
 
 class EmailSender:

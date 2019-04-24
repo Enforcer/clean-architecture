@@ -3,8 +3,8 @@ import threading
 from typing import Callable
 
 import dotenv
+from flask import Flask, Response, request
 import inject
-from flask import Flask, request, Response
 from pybuses import EventBus
 from redis import Redis
 from rq import Queue
@@ -18,11 +18,7 @@ from auctions_infrastructure import queries as auctions_inf_queries
 from auctions_infrastructure.repositories.auctions import SqlAlchemyAuctionsRepo
 from customer_relationship import CustomerRelationshipConfig, CustomerRelationshipFacade
 from db_infrastructure import metadata
-
-# Models has to be in one place to be discoverable for metadata.create_all
-from web_app.security import User, Role, RolesUsers  # noqa
-from auctions_infrastructure import auctions, bids, bidders  # noqa
-from customer_relationship.models import customers  # noqa
+from web_app.security import User
 
 
 def setup(app: Flask) -> None:
@@ -68,6 +64,11 @@ def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
             connection_provider.close_if_present()
 
         return response
+
+    # Models has to be imported for metadata.create_all to discover them
+    from auctions_infrastructure import auctions, bidders, bids  # noqa
+    from customer_relationship.models import customers  # noqa
+    from web_app.security import Role, RolesUsers, User  # noqa
 
     # TODO: Use migrations for that
     metadata.create_all(engine)

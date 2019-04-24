@@ -1,13 +1,15 @@
 from datetime import datetime
 
-from flask import Flask, json, abort, request
+from flask import Flask, abort, json, request
 
-from .main import setup
-from .blueprints.auctions import auctions_blueprint
-from .security import setup as security_setup
-from auctions.application import queries as auction_queries
-from auctions.domain.value_objects import Money
 from foundation.method_dispatch import method_dispatch
+from foundation.value_objects import Money
+
+from auctions.application import queries as auction_queries
+
+from .blueprints.auctions import auctions_blueprint
+from .main import setup
+from .security import setup as security_setup
 
 
 class JSONEncoder(json.JSONEncoder):

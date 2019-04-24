@@ -2,10 +2,12 @@ from datetime import datetime, timedelta
 
 import pytest
 
+from foundation.value_objects.factories import get_dollars
+
 from auctions.domain.entities import Bid
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
 from auctions.domain.exceptions import BidOnEndedAuction
-from foundation.value_objects.factories import get_dollars
+
 from ...factories import create_auction
 
 

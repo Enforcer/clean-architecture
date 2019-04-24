@@ -1,8 +1,7 @@
 from abc import abstractmethod
-
 from dataclasses import dataclass
 
-from auctions.domain.value_objects import Money
+from foundation.value_objects import Money
 
 
 class Email:
