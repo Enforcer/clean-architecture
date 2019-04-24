@@ -3,6 +3,8 @@ from typing import Type, TypeVar
 
 import requests
 
+from foundation.value_objects import Money
+
 from payments.config import PaymentsConfig
 from payments.exceptions import PaymentFailedError
 from payments.requests import Request
@@ -21,7 +23,7 @@ class PaymentsFacade:
         else:
             return response_cls(**response.json())  # type: ignore
 
-    def trigger_payment(self, auction_id, bidder_id, charge) -> None:
+    def trigger_payment(self, auction_id: int, bidder_id: int, charge: Money) -> None:
         # moze dostac event AuctionWon i musi zostac przepakowany na cos innego
         # moze rzucic event PaymentSuccessful i powinno isc do Sagi
         # moze rzucic event PaymentFailed i to tez powinno isc do Sagi, ktora odpowiednio zareaguje

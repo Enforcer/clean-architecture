@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Any, Callable, Dict
 
 import inject
 from pybuses import EventBus
@@ -12,7 +12,7 @@ from customer_relationship.models import customers
 
 
 class CustomerRelationshipFacade:
-    def __init__(self, config: CustomerRelationshipConfig, event_bus: EventBus, enqueue_fun: Callable) -> None:
+    def __init__(self, config: CustomerRelationshipConfig, event_bus: EventBus, enqueue_fun: Callable[..., None]) -> None:
         self._sender = EmailSender(config)
         self._enqueue_fun = enqueue_fun
 
@@ -36,7 +36,7 @@ class CustomerRelationshipFacade:
         self._send(customer["email"], email)
 
     @inject.autoparams("conn")
-    def _get_customer(self, customer_id: int, conn: Connection = None) -> dict:
+    def _get_customer(self, customer_id: int, conn: Connection = None) -> Dict[str, Any]:
         assert conn
         return dict(conn.execute(customers.select(customers.c.id == customer_id)).first())
 

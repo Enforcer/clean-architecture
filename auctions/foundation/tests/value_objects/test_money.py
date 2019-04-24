@@ -55,11 +55,11 @@ def test_equality(one: Money, another: Money, expected: bool) -> None:
     assert (one == another) == expected
 
 
-def test_lt_the_same_currency():
+def test_lt_the_same_currency() -> None:
     assert Money(USD, "12.49") < Money(USD, "15.00")
 
 
-def test_lt_different_currency():
+def test_lt_different_currency() -> None:
     with pytest.raises(TypeError):
         assert Money(BTC, "0.49000012") < Money(USD, "12.49")
 
@@ -74,7 +74,7 @@ def test_lt_different_currency():
     ],
 )
 def test_supports_different_comparison_operators(
-    one: Money, another: Money, cmp_operator: Callable, expected_result: bool
+    one: Money, another: Money, cmp_operator: Callable[[Money, Money], bool], expected_result: bool
 ) -> None:
     assert cmp_operator(one, another) == expected_result
 
@@ -87,7 +87,7 @@ def test_supports_different_comparison_operators(
     ],
 )
 def test_supports_basic_math_operators_if_the_same_currency(
-    one: Money, another: Money, math_operator: Callable, expected_result: Money
+    one: Money, another: Money, math_operator: Callable[[Money, Money], Money], expected_result: Money
 ) -> None:
     assert math_operator(one, another) == expected_result
 

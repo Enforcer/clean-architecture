@@ -1,11 +1,11 @@
 import functools
-from typing import Callable
+from typing import Any, Callable
 
 
-def method_dispatch(func: Callable) -> Callable:
+def method_dispatch(func: Callable[..., Any]) -> Callable[..., Any]:
     dispatcher = functools.singledispatch(func)
 
-    def wrapper(*args, **kw):
+    def wrapper(*args, **kw):  # type: ignore
         return dispatcher.dispatch(args[1].__class__)(*args, **kw)
 
     wrapper.register = dispatcher.register  # type: ignore
