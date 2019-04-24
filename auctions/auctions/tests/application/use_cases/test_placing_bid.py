@@ -6,7 +6,7 @@ from auctions.application.use_cases import PlacingBid
 from auctions.application.use_cases.placing_bid import PlacingBidInputDto, PlacingBidOutputDto
 from auctions.domain.entities import Auction
 from auctions.domain.factories import get_dollars
-from auctions.domain.value_objects import Money
+from foundation.value_objects import Money
 
 
 @pytest.fixture()

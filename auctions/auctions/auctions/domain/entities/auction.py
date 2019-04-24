@@ -6,7 +6,7 @@ from foundation.events import Event
 from auctions.domain.entities.bid import Bid
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
 from auctions.domain.types import AuctionId, BidId, BidderId
-from auctions.domain.value_objects import Money
+from foundation.value_objects import Money
 from auctions.domain.exceptions import BidOnEndedAuction
 
 

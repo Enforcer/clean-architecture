@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List
 
-from auctions.domain.value_objects import Money
+from foundation.value_objects import Money
 
 
 @dataclass

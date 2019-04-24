@@ -3,7 +3,7 @@ from decimal import Decimal, DecimalException
 from functools import total_ordering
 from typing import Any, Type
 
-from auctions.domain.value_objects.currency import Currency
+from foundation.value_objects.currency import Currency
 
 
 @total_ordering

@@ -4,8 +4,8 @@ from typing import Any, Callable
 
 import pytest
 
-from auctions.domain.value_objects import Currency, Money
-from auctions.domain.value_objects.currency import USD
+from foundation.value_objects import Currency, Money
+from foundation.value_objects.currency import USD
 
 
 class BTC(Currency):

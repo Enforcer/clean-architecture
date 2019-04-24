@@ -3,8 +3,8 @@ from unittest.mock import Mock
 
 import pytest
 
+from foundation.value_objects import Money
 from auctions.domain.entities import Auction, Bid
-from auctions.domain.value_objects import Money
 from auctions.domain.factories import get_dollars
 from auctions_infrastructure.repositories import InMemoryAuctionsRepository
 

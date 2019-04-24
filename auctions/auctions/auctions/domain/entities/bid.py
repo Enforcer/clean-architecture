@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from auctions.domain.types import BidderId, BidId
-from auctions.domain.value_objects import Money
+from foundation.value_objects import Money
 
 
 @dataclass(unsafe_hash=True)
