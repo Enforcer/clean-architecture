@@ -1,5 +1,6 @@
 from typing import Callable
 
+import inject
 from sqlalchemy.engine import Connection
 from pybuses import EventBus
 
@@ -24,15 +25,20 @@ class CustomerRelationshipFacade:
     def update_customer(self, conn: Connection, customer_id: int, email: str) -> None:
         conn.execute(customers.update().where(customers.c.id == customer_id).values(email=email))
 
+    @inject.autoparams("conn")
+    def _get_customer(self, customer_id: int, conn: Connection = None) -> dict:
+        assert conn
+        return dict(conn.execute(customers.select(customers.c.id == customer_id)).first())
+
     def send_email_about_overbid(self, event: BidderHasBeenOverbid) -> None:
         email = emails.Overbid(auction_title=event.auction_title, new_price=event.new_price)
-        # TODO: fetch customer
-        self._send("sebastian@cleanarchitecture.io", email)
+        customer = self._get_customer(event.bidder_id)
+        self._send(customer["email"], email)
 
     def send_email_about_winning(self, event: WinningBidPlaced) -> None:
         email = emails.Winning(auction_title=event.auction_title, amount=event.bid_amount)
-        # TODO: fetch customer
-        self._send("sebastian@cleanarchitecture.io", email)
+        customer = self._get_customer(event.bidder_id)
+        self._send(customer["email"], email)
 
     def _send(self, recipient: str, email: emails.Email) -> None:
         self._enqueue_fun(self._sender.send, recipient, email)
