@@ -5,6 +5,7 @@ from pybuses import EventBus
 from sqlalchemy.engine import Connection
 
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
+
 from customer_relationship import emails
 from customer_relationship.config import CustomerRelationshipConfig
 from customer_relationship.email_sender import EmailSender
@@ -12,7 +13,9 @@ from customer_relationship.models import customers
 
 
 class CustomerRelationshipFacade:
-    def __init__(self, config: CustomerRelationshipConfig, event_bus: EventBus, enqueue_fun: Callable[..., None]) -> None:
+    def __init__(
+        self, config: CustomerRelationshipConfig, event_bus: EventBus, enqueue_fun: Callable[..., None]
+    ) -> None:
         self._sender = EmailSender(config)
         self._enqueue_fun = enqueue_fun
 

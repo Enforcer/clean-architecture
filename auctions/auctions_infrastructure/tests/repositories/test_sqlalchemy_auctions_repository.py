@@ -10,9 +10,10 @@ from sqlalchemy.engine import Connection, Engine, RowProxy
 from foundation.value_objects.factories import get_dollars
 
 from auctions.domain.entities import Auction, Bid
+from db_infrastructure import Base
+
 from auctions_infrastructure import auctions, bidders, bids
 from auctions_infrastructure.repositories import SqlAlchemyAuctionsRepo
-from db_infrastructure import Base
 
 
 @pytest.fixture(scope="session")

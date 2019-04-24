@@ -6,6 +6,7 @@ from sqlalchemy.engine import RowProxy
 from foundation.value_objects.factories import get_dollars
 
 from auctions.application.queries import AuctionDto, GetActiveAuctions, GetSingleAuction
+
 from auctions_infrastructure import auctions
 from auctions_infrastructure.queries.base import SqlQuery
 
