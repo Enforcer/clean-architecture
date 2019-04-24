@@ -2,6 +2,7 @@ from typing import Type
 
 import inject
 from flask import Blueprint, abort, jsonify, make_response, request, Response
+from flask_login import current_user
 from marshmallow import fields, exceptions as marshmallow_exceptions, post_load, Schema
 
 
@@ -67,16 +68,13 @@ def single_auction(auction_id: int, query: auction_queries.GetSingleAuction) -> 
 
 @auctions_blueprint.route("/<int:auction_id>/bids", methods=["POST"])
 def place_bid(auction_id: AuctionId) -> Response:
+    if not current_user.is_authenticated:
+        abort(403)
+
     presenter = PlacingBidPresenter()
 
     placing_bid.PlacingBid(output_boundary=presenter).execute(
-        get_input_dto(
-            PlacingBidSchema,
-            context={
-                "auction_id": auction_id,
-                "bidder_id": 2,  # hardcoded for now, should be taken from request authentication
-            },
-        )
+        get_input_dto(PlacingBidSchema, context={"auction_id": auction_id, "bidder_id": current_user.id})
     )
 
     return presenter.response

@@ -39,15 +39,43 @@ def remove_user(connection: Connection) -> Generator:
 
 @pytest.fixture()
 def create_remove_user(connection: Connection) -> Generator[str, None, None]:
+    email = "test+login@cleanarchitecture.io"
+    password = "Dummy123!"
+    connection.execute(User.__table__.delete(User.email == email))
+    connection.execute(customers.delete(customers.c.email == email))
     result_proxy = connection.execute(
         User.__table__.insert(
             # passwords are hashed automagically by Flask-security
-            {"email": "test+login@cleanarchitecture.io", "password": "Dummy123!", "active": True}
+            {"email": email, "password": password, "active": True}
         )
     )
+    connection.execute(customers.insert({"id": result_proxy.lastrowid, "email": email}))
     yield str(result_proxy.lastrowid)
-    connection.execute(User.__table__.delete(User.email == "test+login@cleanarchitecture.io"))
-    connection.execute(customers.delete(customers.c.email == "test+login@cleanarchitecture.io"))
+    connection.execute(User.__table__.delete(User.email == email))
+    connection.execute(customers.delete(customers.c.email == email))
+
+
+@pytest.fixture()
+def another_user(connection: Connection) -> Generator[str, None, None]:
+    email = "test+bidder@cleanarchitecture.io"
+    password = "Dummy123!"
+    result_proxy = connection.execute(
+        User.__table__.insert(
+            # passwords are hashed automagically by Flask-security
+            {"email": email, "password": password, "active": True}
+        )
+    )
+    connection.execute(customers.insert({"id": result_proxy.lastrowid, "email": email}))
+    yield str(result_proxy.lastrowid)
+    connection.execute(User.__table__.delete(User.email == email))
+    connection.execute(customers.delete(customers.c.email == email))
+
+
+@pytest.fixture()
+def logged_in_user(create_remove_user: str, client: testing.FlaskClient) -> None:
+    with client.session_transaction() as session:
+        session["user_id"] = create_remove_user
+        session["_fresh"] = True
 
 
 def test_returns_list_of_auctions(client: testing.FlaskClient) -> None:
@@ -91,7 +119,7 @@ def test_login(client: testing.FlaskClient, create_remove_user: str) -> None:
 
 
 @pytest.fixture()
-def example_auction(connection: Connection) -> Generator[int, None, None]:
+def example_auction(connection: Connection, another_user: str) -> Generator[int, None, None]:
     ends_at = datetime.now() + timedelta(days=3)
     result_proxy = connection.execute(
         auctions.insert(
@@ -99,7 +127,7 @@ def example_auction(connection: Connection) -> Generator[int, None, None]:
         )
     )
     auction_id = result_proxy.lastrowid
-    connection.execute(bids.insert({"auction_id": auction_id, "amount": "1.00", "bidder_id": 1}))
+    connection.execute(bids.insert({"auction_id": auction_id, "amount": "1.00", "bidder_id": another_user}))
     yield int(auction_id)
     connection.execute(bids.delete(bids.c.auction_id == auction_id))
     connection.execute(auctions.delete(auctions.c.id == auction_id))
@@ -112,6 +140,7 @@ def test_return_single_auction(client: testing.FlaskClient, example_auction: int
     assert type(response.json) == dict
 
 
+@pytest.mark.usefixtures("logged_in_user")
 def test_places_bid(client: testing.FlaskClient, example_auction: int) -> None:
     response = client.post(
         f"/{example_auction}/bids", headers={"Content-type": "application/json"}, json={"amount": "15.99"}
