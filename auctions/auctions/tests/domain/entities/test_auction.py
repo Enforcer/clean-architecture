@@ -11,13 +11,13 @@ from auctions.domain.exceptions import BidOnEndedAuction
 from ...factories import create_auction
 
 
-def test_should_use_starting_price_as_current_price_for_empty_bids_list():
+def test_should_use_starting_price_as_current_price_for_empty_bids_list() -> None:
     auction = create_auction()
 
     assert auction.current_price == auction.starting_price
 
 
-def test_should_return_highest_bid_for_current_price():
+def test_should_return_highest_bid_for_current_price() -> None:
     auction = create_auction(
         bids=[Bid(id=1, bidder_id=1, amount=get_dollars("20")), Bid(id=2, bidder_id=2, amount=get_dollars("15"))]
     )
@@ -25,13 +25,13 @@ def test_should_return_highest_bid_for_current_price():
     assert auction.current_price == get_dollars("20")
 
 
-def test_should_return_no_winners_for_empty_bids_list():
+def test_should_return_no_winners_for_empty_bids_list() -> None:
     auction = create_auction()
 
     assert auction.winners == []
 
 
-def test_should_return_highest_bids_user_id_for_winners_list():
+def test_should_return_highest_bids_user_id_for_winners_list() -> None:
     auction = create_auction(
         bids=[
             Bid(id=1, bidder_id=1, amount=get_dollars("101")),
@@ -43,7 +43,7 @@ def test_should_return_highest_bids_user_id_for_winners_list():
     assert auction.winners == [1]
 
 
-def test_should_win_auction_if_is_the_only_bidder_above_starting_price():
+def test_should_win_auction_if_is_the_only_bidder_above_starting_price() -> None:
     auction = create_auction()
 
     auction.place_bid(bidder_id=1, amount=get_dollars("11"))
@@ -51,7 +51,7 @@ def test_should_win_auction_if_is_the_only_bidder_above_starting_price():
     assert auction.winners == [1]
 
 
-def test_should_not_be_winning_auction_if_bids_below_starting_price():
+def test_should_not_be_winning_auction_if_bids_below_starting_price() -> None:
     auction = create_auction()
 
     auction.place_bid(bidder_id=1, amount=get_dollars("5"))
@@ -59,7 +59,7 @@ def test_should_not_be_winning_auction_if_bids_below_starting_price():
     assert auction.winners == []
 
 
-def test_should_withdraw_the_only_bid():
+def test_should_withdraw_the_only_bid() -> None:
     auction = create_auction(bids=[Bid(id=1, bidder_id=1, amount=get_dollars("50"))])
 
     auction.withdraw_bids([1])
@@ -68,7 +68,7 @@ def test_should_withdraw_the_only_bid():
     assert auction.current_price == auction.starting_price
 
 
-def test_should_add_withdrawn_bids_ids_to_separate_list():
+def test_should_add_withdrawn_bids_ids_to_separate_list() -> None:
     auction = create_auction(bids=[Bid(id=1, bidder_id=1, amount=get_dollars("50"))])
 
     auction.withdraw_bids([1])

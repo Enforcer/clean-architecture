@@ -25,7 +25,7 @@ class Auction:
         self._pending_domain_events.append(event)
 
     @property
-    def domain_events(self) -> list:
+    def domain_events(self) -> List[Event]:
         return self._pending_domain_events[:]
 
     def place_bid(self, bidder_id: BidderId, amount: Money) -> None:
@@ -56,7 +56,7 @@ class Auction:
     def _highest_bid(self) -> Bid:
         return self.bids[-1]
 
-    def withdraw_bids(self, bids_ids: List[int]):
+    def withdraw_bids(self, bids_ids: List[int]) -> None:
         self.bids = [bid for bid in self.bids if bid.id not in bids_ids]
         self._withdrawn_bids_ids.extend(bids_ids)
 
@@ -64,7 +64,7 @@ class Auction:
     def withdrawn_bids_ids(self) -> List[BidId]:
         return self._withdrawn_bids_ids[:]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'<Auction #{self.id} title="{self.title}" current_price={self.current_price}>'
 
     def __eq__(self, other: object) -> bool:

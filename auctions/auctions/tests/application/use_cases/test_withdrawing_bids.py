@@ -28,7 +28,9 @@ def test_loads_auction_using_id(auction: Auction, input_dto: WithdrawingBidsInpu
     auctions_repo_mock.get.assert_called_once_with(auction.id)
 
 
-def test_saves_auction_afterwards(auctions_repo_mock: Mock, auction, input_dto: WithdrawingBidsInputDto) -> None:
+def test_saves_auction_afterwards(
+    auctions_repo_mock: Mock, auction: Auction, input_dto: WithdrawingBidsInputDto
+) -> None:
     WithdrawingBids().execute(input_dto)
 
     auctions_repo_mock.save.assert_called_once_with(auction)
