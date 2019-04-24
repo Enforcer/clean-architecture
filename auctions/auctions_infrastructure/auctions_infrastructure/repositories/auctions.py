@@ -9,7 +9,7 @@ from sqlalchemy.engine import Connection, RowProxy
 from auctions.application.repositories import AuctionsRepository
 from auctions.domain.entities import Auction, Bid
 from auctions.domain.types import AuctionId
-from auctions.domain.factories import get_dollars
+from foundation.value_objects.factories import get_dollars
 from auctions_infrastructure import auctions, bids
 
 

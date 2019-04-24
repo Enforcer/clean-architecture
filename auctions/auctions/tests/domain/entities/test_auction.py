@@ -5,7 +5,7 @@ import pytest
 from auctions.domain.entities import Bid
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
 from auctions.domain.exceptions import BidOnEndedAuction
-from auctions.domain.factories import get_dollars
+from foundation.value_objects.factories import get_dollars
 from ...factories import create_auction
 
 

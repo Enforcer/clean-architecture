@@ -6,7 +6,7 @@ import pytest
 from auctions.application.use_cases import WithdrawingBids
 from auctions.application.use_cases.withdrawing_bids import WithdrawingBidsInputDto
 from auctions.domain.entities import Auction, Bid
-from auctions.domain.factories import get_dollars
+from foundation.value_objects.factories import get_dollars
 from ...factories import create_auction
 
 

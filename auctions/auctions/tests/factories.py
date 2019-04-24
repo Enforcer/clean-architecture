@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from auctions.domain.entities import Auction, Bid
 from auctions.domain.types import AuctionId
-from auctions.domain.factories import get_dollars
+from foundation.value_objects.factories import get_dollars
 
 
 def create_auction(

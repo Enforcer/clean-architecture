@@ -8,7 +8,7 @@ from marshmallow import fields, exceptions as marshmallow_exceptions, post_load,
 
 from auctions.application.use_cases import placing_bid
 from auctions.application import queries as auction_queries
-from auctions.domain.factories import get_dollars
+from foundation.value_objects.factories import get_dollars
 from auctions.domain.types import AuctionId
 
 

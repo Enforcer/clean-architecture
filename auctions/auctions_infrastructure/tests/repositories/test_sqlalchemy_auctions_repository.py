@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.engine import Connection, Engine, RowProxy
 
 from auctions.domain.entities import Auction, Bid
-from auctions.domain.factories import get_dollars
+from foundation.value_objects.factories import get_dollars
 from auctions_infrastructure import auctions, bidders, bids
 from auctions_infrastructure.repositories import SqlAlchemyAuctionsRepo
 
