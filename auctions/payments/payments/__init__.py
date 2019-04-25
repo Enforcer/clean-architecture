@@ -1,42 +1,26 @@
-import dataclasses
-from typing import Type, TypeVar
-
-import requests
+from pybuses import EventBus
 
 from foundation.value_objects import Money
 
+from payments.api import ApiConsumer
 from payments.config import PaymentsConfig
-from payments.exceptions import PaymentFailedError
-from payments.requests import Request
-
-ResponseCls = TypeVar("ResponseCls")
 
 
 class PaymentsFacade:
-    def __init__(self, config: PaymentsConfig) -> None:
-        self.auth = config.login, config.password
+    def __init__(self, config: PaymentsConfig, event_bus: EventBus) -> None:
+        self._api_consumer = ApiConsumer(config.username, config.password)
 
-    def _execute_request(self, request: Request, response_cls: Type[ResponseCls]) -> ResponseCls:
-        response = requests.post(request.url, auth=self.auth, json=dataclasses.asdict(request))
-        if not response.ok:
-            raise PaymentFailedError
-        else:
-            return response_cls(**response.json())  # type: ignore
+        # event_bus.subscribe()
 
-    def trigger_payment(self, auction_id: int, bidder_id: int, charge: Money) -> None:
-        # moze dostac event AuctionWon i musi zostac przepakowany na cos innego
-        # moze rzucic event PaymentSuccessful i powinno isc do Sagi
-        # moze rzucic event PaymentFailed i to tez powinno isc do Sagi, ktora odpowiednio zareaguje
-        """
-        To teraz tak:
-         1. Zapisz payment w DB, z jakims statusem
-         2. Pusc taska w tlo ktory wykona zadanie i zupdate'uje, ewentualnie pusci kolejny event do Sagi
-        """
+    def get_pending_payments(self, customer_id: int) -> None:
         pass
-        # currency = charge.currency.iso_code
-        # amount = f"{charge.amount:f}"
-        #
-        # request = ChargeRequest(card_token=dao.get_bidders_card_token(bidder_id), currency=currency, amount=amount)
-        # response = self._execute_request(request, ChargeResponse)
-        #
-        # dao.record_successful_payment(auction_id, bidder_id, charge, charge_uuid=response.charge_uuid)
+
+    def record_new_pending_payment(self, customer_id: int, amount: Money, description: str) -> None:
+        # this will react to an event
+        pass
+
+    def pay(self, customer_id: int, payment_id: int, token: str) -> None:
+        pass
+
+    def get_invoices(self, customer_id: int) -> None:
+        pass

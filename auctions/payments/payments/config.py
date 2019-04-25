@@ -3,5 +3,5 @@ from dataclasses import dataclass
 
 @dataclass(repr=False)
 class PaymentsConfig:
-    login: str
+    username: str
     password: str
