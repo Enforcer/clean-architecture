@@ -12,7 +12,7 @@ from foundation.value_objects.factories import get_dollars
 from auctions.domain.entities import Auction, Bid
 from db_infrastructure import Base
 
-from auctions_infrastructure import auctions, bidders, bids
+from auctions_infrastructure import auctions, bids
 from auctions_infrastructure.repositories import SqlAlchemyAuctionsRepo
 
 
@@ -33,10 +33,12 @@ def winning_bid_amount() -> Decimal:
 
 @pytest.fixture()
 def bidder_id(connection: Connection) -> int:
-    return connection.execute(bidders.insert()).inserted_primary_key[0]
+    return 1
 
 
-another_bidder_id = bidder_id
+@pytest.fixture()
+def another_bidder_id() -> int:
+    return 2
 
 
 @pytest.fixture()

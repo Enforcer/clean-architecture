@@ -66,7 +66,7 @@ def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
         return response
 
     # Models has to be imported for metadata.create_all to discover them
-    from auctions_infrastructure import auctions, bidders, bids  # noqa
+    from auctions_infrastructure import auctions, bids  # noqa
     from customer_relationship.models import customers  # noqa
     from web_app.security import Role, RolesUsers, User  # noqa
 
