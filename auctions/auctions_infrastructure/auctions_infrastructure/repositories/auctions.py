@@ -36,6 +36,7 @@ class InMemoryAuctionsRepository(AuctionsRepository):
             starting_price=copied.starting_price,
             bids=copied.bids,
             ends_at=copied.ends_at,
+            ended=copied.ended,
         )
 
     def save(self, auction: Auction) -> None:
@@ -70,6 +71,7 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
             get_dollars(auction_proxy.starting_price),
             auction_bids,
             auction_proxy.ends_at.replace(tzinfo=pytz.UTC),
+            auction_proxy.ended,
         )
 
     def save(self, auction: Auction) -> None:
@@ -78,6 +80,7 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
             "starting_price": auction.starting_price.amount,
             "current_price": auction.current_price.amount,
             "ends_at": auction.ends_at,
+            "ended": auction.ended,
         }
         update_result = self._conn.execute(auctions.update(values=raw_auction, whereclause=auctions.c.id == auction.id))
         assert update_result.rowcount == 1  # no support for creating

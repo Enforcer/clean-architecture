@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Numeric, String, Table
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String, Table
 
 from db_infrastructure import metadata
 
@@ -13,6 +13,7 @@ auctions = Table(
     Column("starting_price", Numeric, nullable=False),
     Column("current_price", Numeric, nullable=False),
     Column("ends_at", DateTime, nullable=False),
+    Column("ended", Boolean, nullable=False, default=False),
 )
 
 

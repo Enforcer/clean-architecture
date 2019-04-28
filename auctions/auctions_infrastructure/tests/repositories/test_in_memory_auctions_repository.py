@@ -19,7 +19,9 @@ def winning_bid_amount() -> Money:
 @pytest.fixture()
 def auction_with_a_bid(winning_bid_amount: Money, ends_at: datetime) -> Auction:
     bids = [Bid(id=1, bidder_id=1, amount=winning_bid_amount)]
-    return Auction(id=1, title="Awesome book", starting_price=get_dollars("9.99"), bids=bids, ends_at=ends_at)
+    return Auction(
+        id=1, title="Awesome book", starting_price=get_dollars("9.99"), bids=bids, ends_at=ends_at, ended=False
+    )
 
 
 def test_should_get_back_saved_auction(auction_with_a_bid: Auction, event_bus_mock: Mock) -> None:
@@ -44,6 +46,7 @@ def test_saves_auction_changes(auction_with_a_bid: Auction, ends_at: datetime, e
         starting_price=auction_with_a_bid.starting_price,
         ends_at=ends_at,
         bids=[the_only_bid, Bid(id=None, bidder_id=2, amount=the_only_bid.amount + get_dollars("1.00"))],
+        ended=auction_with_a_bid.ended,
     )
 
     repo = InMemoryAuctionsRepository([auction_with_a_bid], event_bus_mock)
@@ -60,6 +63,7 @@ def test_removes_withdrawn_bids(auction_with_a_bid: Auction, ends_at: datetime, 
         starting_price=auction_with_a_bid.starting_price,
         bids=[the_only_bid],
         ends_at=ends_at,
+        ended=auction_with_a_bid.ended,
     )
     auction.withdraw_bids([the_only_bid.id])
 

@@ -1,23 +1,26 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from foundation.events import Event
 from foundation.value_objects import Money
 
 from auctions.domain.entities.bid import Bid
-from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
-from auctions.domain.exceptions import BidOnEndedAuction
+from auctions.domain.events import AuctionEnded, BidderHasBeenOverbid, WinningBidPlaced
+from auctions.domain.exceptions import AuctionAlreadyEnded, AuctionHasNotEnded, BidOnEndedAuction
 from auctions.domain.types import AuctionId, BidderId, BidId
 
 
 class Auction:
-    def __init__(self, id: AuctionId, title: str, starting_price: Money, bids: List[Bid], ends_at: datetime) -> None:
+    def __init__(
+        self, id: AuctionId, title: str, starting_price: Money, bids: List[Bid], ends_at: datetime, ended: bool
+    ) -> None:
         assert isinstance(starting_price, Money)
         self.id = id
         self.title = title
         self.starting_price = starting_price
         self.bids = sorted(bids, key=lambda bid: bid.amount)
         self.ends_at = ends_at
+        self.ended = ended
         self._withdrawn_bids_ids: List[BidId] = []
         self._pending_domain_events: List[Event] = []
 
@@ -29,7 +32,7 @@ class Auction:
         return self._pending_domain_events[:]
 
     def place_bid(self, bidder_id: BidderId, amount: Money) -> None:
-        if datetime.now(tz=self.ends_at.tzinfo) > self.ends_at:
+        if self.should_end:
             raise BidOnEndedAuction
 
         old_winner = self.winners[0] if self.bids else None
@@ -38,6 +41,10 @@ class Auction:
             self._record_event(WinningBidPlaced(self.id, bidder_id, amount, self.title))
             if old_winner:
                 self._record_event(BidderHasBeenOverbid(self.id, old_winner, amount, self.title))
+
+    @property
+    def should_end(self) -> bool:
+        return datetime.now(tz=self.ends_at.tzinfo) > self.ends_at
 
     @property
     def current_price(self) -> Money:
@@ -63,6 +70,19 @@ class Auction:
     @property
     def withdrawn_bids_ids(self) -> List[BidId]:
         return self._withdrawn_bids_ids[:]
+
+    def end_auction(self) -> None:
+        if not self.should_end:
+            raise AuctionHasNotEnded
+        if self.ended:
+            raise AuctionAlreadyEnded
+
+        winner_id: Optional[BidderId] = None
+        if self.bids:
+            winner_id = self._highest_bid.bidder_id
+
+        self.ended = True
+        self._record_event(AuctionEnded(self.id, winner_id, self.current_price, self.title))
 
     def __str__(self) -> str:
         return f'<Auction #{self.id} title="{self.title}" current_price={self.current_price}>'

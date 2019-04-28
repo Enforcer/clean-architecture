@@ -5,10 +5,15 @@ import pytest
 from foundation.value_objects.factories import get_dollars
 
 from auctions.domain.entities import Bid
-from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
-from auctions.domain.exceptions import BidOnEndedAuction
+from auctions.domain.events import AuctionEnded, BidderHasBeenOverbid, WinningBidPlaced
+from auctions.domain.exceptions import AuctionAlreadyEnded, AuctionHasNotEnded, BidOnEndedAuction
 
 from ...factories import create_auction
+
+
+@pytest.fixture()
+def yesterday() -> datetime:
+    return datetime.now() - timedelta(days=1)
 
 
 def test_should_use_starting_price_as_current_price_for_empty_bids_list() -> None:
@@ -85,8 +90,7 @@ def test_should_not_be_winning_if_bid_lower_than_current_price() -> None:
     assert lower_bid_bidder_id not in auction.winners
 
 
-def test_should_not_allow_placing_bids_for_ended_auction() -> None:
-    yesterday = datetime.now() - timedelta(days=1)
+def test_should_not_allow_placing_bids_for_ended_auction(yesterday: datetime) -> None:
     auction = create_auction(ends_at=yesterday)
 
     with pytest.raises(BidOnEndedAuction):
@@ -122,3 +126,36 @@ def test_should_emit_winning_if_overbids() -> None:
     expected_winning_event = WinningBidPlaced(auction.id, 2, winning_amount, auction.title)
     expected_overbid_event = BidderHasBeenOverbid(auction.id, 1, winning_amount, auction.title)
     assert auction.domain_events == [expected_winning_event, expected_overbid_event]
+
+
+def test_should_emit_auction_ended(yesterday: datetime) -> None:
+    auction = create_auction(bids=[Bid(id=1, bidder_id=1, amount=get_dollars("15.00"))], ends_at=yesterday)
+
+    auction.end_auction()
+
+    expected_event = AuctionEnded(auction.id, auction.winners[0], auction.current_price, auction.title)
+    assert auction.domain_events == [expected_event]
+
+
+def test_should_emit_event_with_none_winner_if_no_winners(yesterday: datetime) -> None:
+    auction = create_auction(ends_at=yesterday)
+
+    auction.end_auction()
+
+    expected_event = AuctionEnded(auction.id, None, auction.current_price, auction.title)
+    assert auction.domain_events == [expected_event]
+
+
+def test_should_raise_if_auction_has_not_been_ended() -> None:
+    auction = create_auction()
+
+    with pytest.raises(AuctionHasNotEnded):
+        auction.end_auction()
+
+
+def test_should_not_let_to_end_auction_multiple_times(yesterday: datetime) -> None:
+    auction = create_auction(ends_at=yesterday)
+
+    auction.end_auction()
+    with pytest.raises(AuctionAlreadyEnded):
+        auction.end_auction()

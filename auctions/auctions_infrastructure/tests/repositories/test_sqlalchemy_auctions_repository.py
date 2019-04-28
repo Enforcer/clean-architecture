@@ -49,6 +49,7 @@ def expired_auction(connection: Connection, past_date: datetime) -> RowProxy:
                 "starting_price": Decimal("1.99"),
                 "current_price": Decimal("1.99"),
                 "ends_at": past_date,
+                "ended": False,
             }
         )
     )
@@ -67,6 +68,7 @@ def auction_model_with_a_bid(
                 "starting_price": winning_bid_amount / 2,
                 "current_price": winning_bid_amount,
                 "ends_at": ends_at,
+                "ended": False,
             }
         )
     )
@@ -116,17 +118,15 @@ def test_saves_auction_changes(
             Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount)),
             Bid(None, another_bidder_id, new_bid_price),
         ],
+        ended=True,
     )
 
     SqlAlchemyAuctionsRepo(connection, event_bus_mock).save(auction)
 
     assert connection.execute(select([func.count()]).select_from(bids)).scalar() == 2
-    assert (
-        connection.execute(
-            select([auctions.c.current_price]).where(auctions.c.id == auction_model_with_a_bid.id)
-        ).scalar()
-        == new_bid_price.amount
-    )
+    proxy = connection.execute(select([auctions]).where(auctions.c.id == auction_model_with_a_bid.id)).first()
+    assert proxy.current_price == new_bid_price.amount
+    assert proxy.ended
 
 
 @pytest.mark.usefixtures("transaction")
@@ -139,6 +139,7 @@ def test_removes_withdrawn_bids(
         starting_price=get_dollars(auction_model_with_a_bid.starting_price),
         ends_at=ends_at,
         bids=[Bid(bid_model.id, bid_model.bidder_id, get_dollars(bid_model.amount))],
+        ended=False,
     )
     auction.withdraw_bids([bid_model.id])
 
