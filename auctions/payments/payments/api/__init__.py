@@ -1,4 +1,4 @@
-__all__ = ["ApiConsumer", "ChargeRequest"]
+__all__ = ["ApiConsumer", "PaymentFailedError"]
 
 from payments.api.consumer import ApiConsumer
-from payments.api.requests import ChargeRequest
+from payments.api.exceptions import PaymentFailedError

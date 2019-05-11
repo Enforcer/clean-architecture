@@ -1,26 +1,43 @@
-from pybuses import EventBus
+from typing import Callable, List
+from uuid import UUID
+
+from sqlalchemy.engine import Connection
 
 from foundation.value_objects import Money
 
-from payments.api import ApiConsumer
+from payments import dao
+from payments.api import ApiConsumer, PaymentFailedError
 from payments.config import PaymentsConfig
+
+__all__ = ["PaymentsFacade"]
 
 
 class PaymentsFacade:
-    def __init__(self, config: PaymentsConfig, event_bus: EventBus) -> None:
+    def __init__(self, config: PaymentsConfig, conn_provider: Callable[[], Connection]) -> None:
         self._api_consumer = ApiConsumer(config.username, config.password)
+        self._conn_provider = conn_provider
 
-        # event_bus.subscribe()
+    def get_pending_payments(self, customer_id: int) -> List[dao.PaymentDto]:
+        return dao.get_pending_payments(customer_id, self._conn_provider())
 
-    def get_pending_payments(self, customer_id: int) -> None:
-        pass
+    def start_new_payment(self, payment_uuid: UUID, customer_id: int, amount: Money, description: str) -> None:
+        dao.start_new_payment(payment_uuid, customer_id, amount, description, self._conn_provider())
 
-    def record_new_pending_payment(self, customer_id: int, amount: Money, description: str) -> None:
-        # this will react to an event
-        pass
+    def pay(self, payment_uuid: UUID, customer_id: int, token: str) -> None:
+        payment = dao.get_payment(payment_uuid, customer_id, self._conn_provider())
+        if payment.status != dao.PaymentStatus.NEW.value:
+            raise Exception(f"Can't pay - unexpected status {payment.status}")
 
-    def pay(self, customer_id: int, payment_id: int, token: str) -> None:
-        pass
+        try:
+            charge_id = self._api_consumer.charge(payment.amount, token, str(payment_uuid))
+        except PaymentFailedError:
+            dao.update_payment(
+                payment_uuid, customer_id, {"status": dao.PaymentStatus.FAILED.value}, self._conn_provider()
+            )
+        else:
+            update_values = {"status": dao.PaymentStatus.CHARGED.value, "charge_id": charge_id}
+            dao.update_payment(payment_uuid, customer_id, update_values, self._conn_provider())
 
-    def get_invoices(self, customer_id: int) -> None:
+    def capture_payment(self, payment_uuid: UUID) -> None:
+        # this should be triggered by Saga once it registers that payment succeeded
         pass
