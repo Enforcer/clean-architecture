@@ -29,7 +29,7 @@ class PaymentsFacade:
             raise Exception(f"Can't pay - unexpected status {payment.status}")
 
         try:
-            charge_id = self._api_consumer.charge(payment.amount, token, str(payment_uuid))
+            charge_id = self._api_consumer.charge(payment.amount, token)
         except PaymentFailedError:
             dao.update_payment(
                 payment_uuid, customer_id, {"status": dao.PaymentStatus.FAILED.value}, self._conn_provider()

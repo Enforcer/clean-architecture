@@ -15,7 +15,7 @@ class ApiConsumer:
     def __init__(self, login: str, password: str) -> None:
         self.auth = login, password  # basic auth
 
-    def charge(self, amount: Money, source: str, idempotency_token: str) -> str:
+    def charge(self, amount: Money, source: str) -> str:
         currency, converted_amount = self._get_iso_code_and_amount(amount)
         request = ChargeRequest(source, currency, str(converted_amount))
         response = self._execute_request(request, ChargeResponse)

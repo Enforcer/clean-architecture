@@ -98,9 +98,7 @@ def test_successful_charge_updates_status(
     with patch.object(ApiConsumer, "charge", return_value=charge_id) as charge_mock:
         facade.pay(uuid.UUID(inserted_payment["uuid"]), inserted_payment["customer_id"], "token")
 
-    charge_mock.assert_called_once_with(
-        get_dollars(inserted_payment["amount"] / 100), "token", inserted_payment["uuid"]
-    )
+    charge_mock.assert_called_once_with(get_dollars(inserted_payment["amount"] / 100), "token")
     payment_row = get_payment(connection, inserted_payment["uuid"])
     assert payment_row.status == PaymentStatus.CHARGED.value
     assert payment_row.charge_id == charge_id
@@ -113,7 +111,5 @@ def test_unsuccessful_charge_updates_status(
     with patch.object(ApiConsumer, "charge", side_effect=PaymentFailedError) as charge_mock:
         facade.pay(uuid.UUID(inserted_payment["uuid"]), inserted_payment["customer_id"], "token")
 
-    charge_mock.assert_called_once_with(
-        get_dollars(inserted_payment["amount"] / 100), "token", inserted_payment["uuid"]
-    )
+    charge_mock.assert_called_once_with(get_dollars(inserted_payment["amount"] / 100), "token")
     assert get_payment(connection, inserted_payment["uuid"]).status == PaymentStatus.FAILED.value

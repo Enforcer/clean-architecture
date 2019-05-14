@@ -38,7 +38,7 @@ def source(api_key: str) -> str:
 
 @pytest.mark.stripe
 def test_charge_then_capture(api_consumer: ApiConsumer, source: str, api_key: str) -> None:
-    charge_id = api_consumer.charge(get_dollars("15.00"), source, "idempotency")
+    charge_id = api_consumer.charge(get_dollars("15.00"), source)
     api_consumer.capture(charge_id)
 
     response = requests.get(f"{Request.url}/v1/charges/{charge_id}", auth=(api_key, ""))
