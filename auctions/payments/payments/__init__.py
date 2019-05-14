@@ -38,6 +38,10 @@ class PaymentsFacade:
             update_values = {"status": dao.PaymentStatus.CHARGED.value, "charge_id": charge_id}
             dao.update_payment(payment_uuid, customer_id, update_values, self._conn_provider())
 
-    def capture_payment(self, payment_uuid: UUID) -> None:
-        # this should be triggered by Saga once it registers that payment succeeded
-        pass
+    def capture_payment(self, payment_uuid: UUID, customer_id: int) -> None:
+        charge_id = dao.get_payment_charge_id(payment_uuid, customer_id, self._conn_provider())
+        assert charge_id, f"No charge_id available for {payment_uuid}, aborting capture"
+        self._api_consumer.capture(charge_id)
+        dao.update_payment(
+            payment_uuid, customer_id, {"status": dao.PaymentStatus.CAPTURED.value}, self._conn_provider()
+        )

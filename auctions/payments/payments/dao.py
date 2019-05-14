@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List
+from typing import Any, List, Optional
 from uuid import UUID
 
 from sqlalchemy.engine import Connection
@@ -57,6 +57,13 @@ def get_payment(payment_uuid: UUID, customer_id: int, conn: Connection) -> Payme
         payments.select((payments.c.customer_id == customer_id) & (payments.c.uuid == str(payment_uuid)))
     ).first()
     return PaymentDto.from_row(row)
+
+
+def get_payment_charge_id(payment_uuid: UUID, customer_id: int, conn: Connection) -> Optional[str]:
+    row = conn.execute(
+        payments.select((payments.c.customer_id == customer_id) & (payments.c.uuid == str(payment_uuid)))
+    ).first()
+    return str(row.charge_id) if row.charge_id else None
 
 
 def update_payment(payment_uuid: UUID, customer_id: int, values: dict, conn: Connection) -> None:

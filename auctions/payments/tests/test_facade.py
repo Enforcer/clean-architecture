@@ -33,13 +33,16 @@ def facade(connection: Connection) -> PaymentsFacade:
 
 @pytest.fixture()
 def inserted_payment(request: SubRequest, connection: Connection) -> dict:
+    status = getattr(request, "param", None) or PaymentStatus.NEW.value
+    charge_id = None if status not in (PaymentStatus.CHARGED, PaymentStatus.CAPTURED) else "token"
     data = {
         "uuid": str(uuid.uuid4()),
         "customer_id": 1,
         "amount": 100,
         "currency": "USD",
-        "status": getattr(request, "param", None) or PaymentStatus.NEW.value,
+        "status": status,
         "description": "irrelevant",
+        "charge_id": charge_id,
     }
     connection.execute(payments.insert(data))
     return data
@@ -113,3 +116,13 @@ def test_unsuccessful_charge_updates_status(
 
     charge_mock.assert_called_once_with(get_dollars(inserted_payment["amount"] / 100), "token")
     assert get_payment(connection, inserted_payment["uuid"]).status == PaymentStatus.FAILED.value
+
+
+@pytest.mark.parametrize("inserted_payment", [PaymentStatus.CHARGED.value], indirect=["inserted_payment"])
+@pytest.mark.usefixtures("transaction")
+def test_capture(facade: PaymentsFacade, inserted_payment: dict, connection: Connection) -> None:
+    with patch.object(ApiConsumer, "capture") as capture_mock:
+        facade.capture_payment(inserted_payment["uuid"], inserted_payment["customer_id"])
+
+    capture_mock.assert_called_once_with(inserted_payment["charge_id"])
+    assert get_payment(connection, inserted_payment["uuid"]).status == PaymentStatus.CAPTURED.value
