@@ -10,11 +10,12 @@ from foundation.value_objects.factories import get_dollars
 
 from db_infrastructure import Base
 
-from payments import PaymentsConfig, PaymentsFacade
 from payments.api import ApiConsumer
 from payments.api.exceptions import PaymentFailedError
+from payments.config import PaymentsConfig
 from payments.dao import PaymentDto, PaymentStatus
 from payments.events import PaymentCaptured, PaymentCharged, PaymentFailed, PaymentStarted
+from payments.facade import PaymentsFacade
 from payments.models import payments
 
 
@@ -24,7 +25,7 @@ def sqlalchemy_connect_url() -> str:
 
 
 @pytest.fixture()
-def event_bus():
+def event_bus() -> EventBus:
     return EventBus()
 
 
@@ -35,7 +36,7 @@ def setup_teardown_tables(engine: Engine) -> None:
 
 @pytest.fixture()
 def facade(connection: Connection, event_bus: EventBus) -> PaymentsFacade:
-    return PaymentsFacade(PaymentsConfig("", ""), lambda: connection, event_bus)
+    return PaymentsFacade(PaymentsConfig("", ""), connection, event_bus)
 
 
 @pytest.fixture()
