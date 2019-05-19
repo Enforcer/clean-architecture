@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import Generator
 
 from _pytest.fixtures import SubRequest
+from _pytest.tmpdir import TempPathFactory
 from flask import Flask, testing
 import inject
 import pytest
@@ -15,9 +16,10 @@ from ..security import User
 
 
 @pytest.fixture(scope="session")
-def app() -> Flask:
+def app(tmp_path_factory: TempPathFactory) -> Flask:
+    temp_dir = tmp_path_factory.mktemp("test_db")
     inject.clear()
-    return create_app()
+    return create_app(db_dsn=f"sqlite:///{temp_dir}/db.sqlite")
 
 
 @pytest.fixture()

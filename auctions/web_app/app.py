@@ -36,7 +36,7 @@ class JSONEncoder(json.JSONEncoder):
         return obj.isoformat()
 
 
-def create_app() -> Flask:
+def create_app(db_dsn=None) -> Flask:
     app = Flask(__name__)
 
     app.json_encoder = JSONEncoder
@@ -55,7 +55,7 @@ def create_app() -> Flask:
     app.config["SECURITY_REGISTERABLE"] = True
     app.config["SECURITY_PASSWORD_SALT"] = "99f885320c0f867cde17876a7849904c41a2b8120a9a9e76d1789e458e543af9"
     app.config["WTF_CSRF_ENABLED"] = False
-    app.config["DB_DSN"] = "sqlite:///foo.db"
+    app.config["DB_DSN"] = db_dsn or "sqlite:///foo.db"
 
     setup(app)
     security_setup(app)
