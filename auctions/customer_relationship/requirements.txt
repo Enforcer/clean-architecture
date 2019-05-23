@@ -1,6 +1,6 @@
 auctions
+db_infrastructure
 foundation
 dataclasses==0.6
-pybuses==1.1.0
+injector==0.16.1
 sqlalchemy==1.2.16
-db_infrastructure

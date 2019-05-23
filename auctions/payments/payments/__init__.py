@@ -1,35 +1,36 @@
 import injector
-from pybuses import EventBus
 from sqlalchemy.engine import Connection
+
+from foundation.events import ClassProviderMulti, EventBus, Handler
 
 from payments.config import PaymentsConfig
 from payments.events import PaymentCaptured, PaymentCharged, PaymentFailed, PaymentStarted
 from payments.facade import PaymentsFacade
 
-__all__ = ["PaymentsFacade", "PaymentsConfig", "PaymentStarted", "PaymentCharged", "PaymentCaptured", "PaymentFailed"]
-
-
-EventsSubscriptions = injector.Key("payments_events_subscriptions")
+__all__ = [
+    "Payments",
+    "PaymentsConfig",
+    "PaymentsFacade",
+    "PaymentStarted",
+    "PaymentCharged",
+    "PaymentCaptured",
+    "PaymentFailed",
+]
 
 
 class Payments(injector.Module):
     @injector.provider
-    def facade(
-        self,
-        config: PaymentsConfig,
-        connection: Connection,
-        event_bus: EventBus,
-        _subscriptions: EventsSubscriptions,  # type: ignore
-    ) -> PaymentsFacade:
+    def facade(self, config: PaymentsConfig, connection: Connection, event_bus: EventBus) -> PaymentsFacade:
         return PaymentsFacade(config, connection, event_bus)
 
-    @injector.singleton
-    @injector.provider
-    def subscribe_for_events(self, event_bus: EventBus) -> EventsSubscriptions:  # type: ignore
-        event_bus.subscribe(run_charge_in_background)
-        return  # type: ignore
+    def configure(self, binder: injector.Binder) -> None:
+        binder.multibind(Handler[PaymentCharged], to=ClassProviderMulti(PaymentChargedHandler))
 
 
-def run_charge_in_background(event: PaymentCharged) -> None:
-    # TODO: just extract parameters from `event` and call task
-    pass
+class PaymentChargedHandler:
+    @injector.inject
+    def __init__(self, i: injector.Injector) -> None:
+        self._i = i
+
+    def __call__(self, event: PaymentCharged) -> None:
+        print("TODO")

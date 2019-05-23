@@ -2,7 +2,7 @@ from typing import Type
 
 from flask import Blueprint, Response, abort, jsonify, make_response, request
 from flask_login import current_user
-import inject
+import injector
 from marshmallow import Schema, exceptions as marshmallow_exceptions, fields, post_load
 
 from foundation.value_objects.factories import get_dollars
@@ -12,6 +12,12 @@ from auctions.application.use_cases import placing_bid
 from auctions.domain.types import AuctionId
 
 auctions_blueprint = Blueprint("auctions_blueprint", __name__)
+
+
+class AuctionsWeb(injector.Module):
+    @injector.provider
+    def placing_bid_output_boundary(self) -> placing_bid.PlacingBidOutputBoundary:
+        return PlacingBidPresenter()
 
 
 class Dollars(fields.Field):
@@ -54,26 +60,21 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
 
 
 @auctions_blueprint.route("/")
-@inject.autoparams("query")
 def auctions_list(query: auction_queries.GetActiveAuctions) -> Response:
     return make_response(jsonify(query.query()))
 
 
 @auctions_blueprint.route("/<int:auction_id>")
-@inject.autoparams("query")
 def single_auction(auction_id: int, query: auction_queries.GetSingleAuction) -> Response:
     return make_response(jsonify(query.query(auction_id)))
 
 
 @auctions_blueprint.route("/<int:auction_id>/bids", methods=["POST"])
-def place_bid(auction_id: AuctionId) -> Response:
+def place_bid(auction_id: AuctionId, placing_bid_uc: placing_bid.PlacingBid) -> Response:
     if not current_user.is_authenticated:
         abort(403)
 
-    presenter = PlacingBidPresenter()
-
-    placing_bid.PlacingBid(output_boundary=presenter).execute(
+    placing_bid_uc.execute(
         get_input_dto(PlacingBidSchema, context={"auction_id": auction_id, "bidder_id": current_user.id})
     )
-
-    return presenter.response
+    return placing_bid_uc.output_boundary.response

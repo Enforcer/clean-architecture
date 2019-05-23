@@ -1,7 +1,6 @@
 import copy
 from typing import Dict, List
 
-import inject
 from pybuses import EventBus
 import pytz
 from sqlalchemy.engine import Connection, RowProxy
@@ -16,7 +15,6 @@ from auctions_infrastructure import auctions, bids
 
 
 class InMemoryAuctionsRepository(AuctionsRepository):
-    @inject.autoparams("event_bus")
     def __init__(self, objects: List[Auction] = None, event_bus: EventBus = None) -> None:
         assert isinstance(event_bus, EventBus)
         if not objects:
@@ -48,10 +46,7 @@ class InMemoryAuctionsRepository(AuctionsRepository):
 
 
 class SqlAlchemyAuctionsRepo(AuctionsRepository):
-    @inject.autoparams("connection", "event_bus")
-    def __init__(self, connection: Connection = None, event_bus: EventBus = None) -> None:
-        assert isinstance(connection, Connection)
-        assert isinstance(event_bus, EventBus)
+    def __init__(self, connection: Connection, event_bus: EventBus) -> None:
         self._conn = connection
         self._event_bus = event_bus
 

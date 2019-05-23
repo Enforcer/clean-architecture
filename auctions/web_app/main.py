@@ -1,23 +1,24 @@
 import os
 import threading
-from typing import Callable
 
 import dotenv
 from flask import Flask, Response, request
-import inject
-from pybuses import EventBus
+from flask_injector import FlaskInjector
+import injector
 from redis import Redis
 from rq import Queue
 from sqlalchemy import event as sa_event
 from sqlalchemy.engine import Connection, Engine, create_engine
 from sqlalchemy.orm import Session
 
-from auctions.application import queries as auction_queries
-from auctions.application.repositories import AuctionsRepository
-from auctions_infrastructure import queries as auctions_inf_queries
-from auctions_infrastructure.repositories.auctions import SqlAlchemyAuctionsRepo
-from customer_relationship import CustomerRelationshipConfig, CustomerRelationshipFacade
+from foundation.events import Enqueue, EventBus, InjectorEventBus
+
+from auctions import Auctions
+from auctions_infrastructure import AuctionsInfrastructure
+from customer_relationship import CustomerRelationship, CustomerRelationshipConfig, CustomerRelationshipFacade
 from db_infrastructure import metadata
+from payments import Payments, PaymentsConfig
+from web_app.blueprints.auctions import AuctionsWeb
 from web_app.security import User
 
 
@@ -34,17 +35,8 @@ def setup(app: Flask) -> None:
         "email.from.address": os.environ["EMAIL_FROM_ADDRESS"],
     }
     connection_provider = setup_db(app)
-    event_bus = EventBus()
-    enqueue_in_rq = setup_rq()
 
-    def enqueue_after_commit(fun: Callable, *args, **kwargs):
-        def listener(_conn):
-            enqueue_in_rq(fun, *args, **kwargs)
-
-        sa_event.listen(inject.instance(Connection), "commit", listener, once=True)
-
-    setup_contexts(settings, event_bus, enqueue_after_commit)
-    setup_dependency_injection(settings, connection_provider, event_bus)
+    setup_contexts(app, settings, connection_provider)
 
 
 def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
@@ -54,6 +46,7 @@ def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
     @app.before_request
     def transaction_start() -> None:
         request.tx = connection_provider.open().begin()
+        request.session = connection_provider.provide_session()
 
     @app.after_request
     def transaction_commit(response: Response) -> Response:
@@ -76,44 +69,31 @@ def setup_db(app: Flask) -> "ThreadlocalConnectionProvider":
     return connection_provider
 
 
-def setup_rq() -> Callable:
-    queue = Queue(connection=Redis())
-    return queue.enqueue
-
-
-def setup_contexts(settings: dict, event_bus: EventBus, enqueue_fun: Callable) -> None:
-    cr_config = CustomerRelationshipConfig(
-        email_host=settings["email.host"],
-        email_port=int(settings["email.port"]),
-        email_username=settings["email.username"],
-        email_password=settings["email.password"],
-        email_from=(settings["email.from.name"], settings["email.from.address"]),
+def setup_contexts(app: Flask, settings: dict, connection_provider: "ThreadlocalConnectionProvider") -> None:
+    di_container = injector.Injector(
+        [
+            Db(connection_provider),
+            Rq(),
+            EventBusMod(),
+            Configs(settings),
+            Auctions(),
+            AuctionsInfrastructure(),
+            CustomerRelationship(),
+            Payments(),
+            AuctionsWeb(),
+        ],
+        auto_bind=False,
     )
-    cr_context = CustomerRelationshipFacade(cr_config, event_bus, enqueue_fun)
 
     @sa_event.listens_for(User, "after_insert")
-    def insert_cb(_mapper, connection: Connection, user: User) -> None:
-        cr_context.create_customer(connection, user.id, user.email)
+    def insert_cb(_mapper, _connection: Connection, user: User) -> None:
+        di_container.get(CustomerRelationshipFacade).create_customer(user.id, user.email)
 
     @sa_event.listens_for(User, "after_update")
-    def update_cb(_mapper, connection: Connection, user: User) -> None:
-        cr_context.update_customer(connection, user.id, user.email)
+    def update_cb(_mapper, _connection: Connection, user: User) -> None:
+        di_container.get(CustomerRelationshipFacade).update_customer(user.id, user.email)
 
-
-def setup_dependency_injection(
-    settings: dict, connection_provider: "ThreadlocalConnectionProvider", event_bus: EventBus
-) -> None:
-    def di_config(binder: inject.Binder) -> None:
-        binder.bind_to_provider(Connection, connection_provider)
-        binder.bind_to_provider(Session, connection_provider.provide_session)
-        binder.bind_to_provider(AuctionsRepository, SqlAlchemyAuctionsRepo)
-
-        binder.bind_to_provider(auction_queries.GetActiveAuctions, auctions_inf_queries.SqlGetActiveAuctions)
-        binder.bind_to_provider(auction_queries.GetSingleAuction, auctions_inf_queries.SqlGetSingleAuction)
-
-        binder.bind(EventBus, event_bus)
-
-    inject.configure(di_config)
+    FlaskInjector(app, injector=di_container)
 
 
 class ThreadlocalConnectionProvider:
@@ -151,3 +131,47 @@ class ThreadlocalConnectionProvider:
             del self._storage.session
         except AttributeError:
             pass
+
+
+class Db(injector.Module):
+    def __init__(self, conn_provider: ThreadlocalConnectionProvider) -> None:
+        self._conn_provider = conn_provider
+
+    def configure(self, binder: injector.Binder) -> None:
+        binder.bind(Connection, to=injector.CallableProvider(self._conn_provider))
+        binder.bind(Session, to=self._conn_provider.provide_session)
+
+
+class Rq(injector.Module):
+    @injector.singleton
+    @injector.provider
+    def enqueue(self) -> Enqueue:
+        queue = Queue(connection=Redis())
+        return queue.enqueue
+
+
+class EventBusMod(injector.Module):
+    @injector.provider
+    def event_bus(self, inj: injector.Injector) -> EventBus:
+        return InjectorEventBus(inj)
+
+
+class Configs(injector.Module):
+    def __init__(self, settings: dict) -> None:
+        self._settings = settings
+
+    @injector.singleton
+    @injector.provider
+    def customer_relationship_config(self) -> CustomerRelationshipConfig:
+        return CustomerRelationshipConfig(
+            email_host=self._settings["email.host"],
+            email_port=int(self._settings["email.port"]),
+            email_username=self._settings["email.username"],
+            email_password=self._settings["email.password"],
+            email_from=(self._settings["email.from.name"], self._settings["email.from.address"]),
+        )
+
+    @injector.singleton
+    @injector.provider
+    def payments_config(self) -> PaymentsConfig:
+        return PaymentsConfig(username=self._settings["payments.login"], password=self._settings["payments.password"])

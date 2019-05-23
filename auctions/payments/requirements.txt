@@ -1,5 +1,6 @@
 dataclasses==0.6
 injector==0.16.1
+pytest==4.5.0
 requests==2.20.1
 stripe==2.27.0
 sqlalchemy==1.2.16

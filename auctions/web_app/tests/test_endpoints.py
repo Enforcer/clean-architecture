@@ -4,7 +4,6 @@ from typing import Generator
 from _pytest.fixtures import SubRequest
 from _pytest.tmpdir import TempPathFactory
 from flask import Flask, testing
-import inject
 import pytest
 from sqlalchemy.engine import Connection
 
@@ -18,7 +17,6 @@ from ..security import User
 @pytest.fixture(scope="session")
 def app(tmp_path_factory: TempPathFactory) -> Flask:
     temp_dir = tmp_path_factory.mktemp("test_db")
-    inject.clear()
     return create_app(db_dsn=f"sqlite:///{temp_dir}/db.sqlite")
 
 
@@ -80,13 +78,6 @@ def logged_in_user(create_remove_user: str, client: testing.FlaskClient) -> None
         session["_fresh"] = True
 
 
-def test_returns_list_of_auctions(client: testing.FlaskClient) -> None:
-    response = client.get("/", headers={"Content-type": "application/json"})
-
-    assert response.status_code == 200
-    assert type(response.json) == list
-
-
 @pytest.mark.usefixtures("remove_user")
 def test_register(request: SubRequest, client: testing.FlaskClient) -> None:
     response = client.post(
@@ -140,6 +131,13 @@ def test_return_single_auction(client: testing.FlaskClient, example_auction: int
 
     assert response.status_code == 200
     assert type(response.json) == dict
+
+
+def test_returns_list_of_auctions(client: testing.FlaskClient) -> None:
+    response = client.get("/", headers={"Content-type": "application/json"})
+
+    assert response.status_code == 200
+    assert type(response.json) == list
 
 
 @pytest.mark.usefixtures("logged_in_user")

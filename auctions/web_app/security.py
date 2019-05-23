@@ -1,9 +1,8 @@
 from typing import Any, Optional
 
-from flask import Flask
+from flask import Flask, request
 from flask_security import RoleMixin, Security, UserMixin
 from flask_security.datastore import UserDatastore
-import inject
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Session, backref, relationship
 
@@ -46,23 +45,27 @@ class SaUserDatastore(UserDatastore):
         except (ValueError, TypeError):
             return None
         else:
-            return inject.instance(Session).query(User).filter(User.email == email).one_or_none()
+            return self.session.query(User).filter(User.email == email).one_or_none()
 
     def find_user(self, **kwargs: dict) -> User:
-        return inject.instance(Session).query(User).filter_by(**kwargs).one()
+        return self.session.query(User).filter_by(**kwargs).one()
 
     def put(self, model: User) -> User:
-        inject.instance(Session).add(model)
+        self.session.add(model)
         return model
 
     def delete(self, model: User) -> None:
-        inject.instance(Session).delete(model)
+        self.session.delete(model)
 
     def commit(self) -> None:
-        inject.instance(Session).commit()
+        self.session.commit()
 
     def find_role(self, *args, **kwargs) -> None:
         raise NotImplementedError
+
+    @property
+    def session(self) -> Session:
+        return request.session
 
 
 def setup(app: Flask) -> None:

@@ -1,4 +1,5 @@
-pytest==3.6.0
+injector==0.16.1
+pytest==4.5.0
 pytz==2018.4
 requests==2.20.1
 sqlalchemy==1.2.16
