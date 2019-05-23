@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from typing import List
 
-import inject
-
 from auctions.application.repositories import AuctionsRepository
 
 
@@ -13,7 +11,6 @@ class WithdrawingBidsInputDto:
 
 
 class WithdrawingBids:
-    @inject.autoparams("auctions_repo")
     def __init__(self, auctions_repo: AuctionsRepository = None) -> None:
         assert isinstance(auctions_repo, AuctionsRepository)
         self._auctions_repo = auctions_repo

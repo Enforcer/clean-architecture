@@ -1,8 +1,6 @@
 import abc
 from dataclasses import dataclass
 
-import inject
-
 from foundation.value_objects import Money
 
 from auctions.application.repositories import AuctionsRepository
@@ -29,7 +27,6 @@ class PlacingBidOutputBoundary(metaclass=abc.ABCMeta):
 
 
 class PlacingBid:
-    @inject.autoparams("output_boundary", "auctions_repo")
     def __init__(self, output_boundary: PlacingBidOutputBoundary, auctions_repo: AuctionsRepository) -> None:
         self.output_boundary = output_boundary
         self.auctions_repo = auctions_repo

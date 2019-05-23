@@ -1,4 +1,4 @@
 dataclasses==0.6
-Inject==3.4.0
-pytest==3.6.0
+injector==0.16.1
+pytest==4.5.0
 foundation

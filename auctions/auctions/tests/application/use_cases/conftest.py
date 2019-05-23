@@ -1,11 +1,11 @@
 from typing import List
 from unittest.mock import Mock
 
-import inject
 import pytest
 
 from auctions.application.repositories import AuctionsRepository
-from auctions.application.use_cases.placing_bid import PlacingBidOutputBoundary
+from auctions.application.use_cases.placing_bid import PlacingBid, PlacingBidOutputBoundary
+from auctions.application.use_cases.withdrawing_bids import WithdrawingBids
 from auctions.domain.entities import Auction
 
 from ...factories import create_auction
@@ -31,10 +31,11 @@ def placing_bid_output_boundary_mock() -> Mock:
     return Mock(spec_set=PlacingBidOutputBoundary)
 
 
-@pytest.fixture(autouse=True)
-def dependency_injection_config(auctions_repo_mock: Mock, placing_bid_output_boundary_mock: Mock) -> None:
-    def configure(binder: inject.Binder) -> None:
-        binder.bind(AuctionsRepository, auctions_repo_mock)
-        binder.bind(PlacingBidOutputBoundary, placing_bid_output_boundary_mock)
+@pytest.fixture()
+def placing_bid_uc(placing_bid_output_boundary_mock: Mock, auctions_repo_mock: Mock) -> PlacingBid:
+    return PlacingBid(placing_bid_output_boundary_mock, auctions_repo_mock)
 
-    inject.clear_and_configure(configure)
+
+@pytest.fixture()
+def withdrawing_bids_uc(auctions_repo_mock: Mock) -> WithdrawingBids:
+    return WithdrawingBids(auctions_repo_mock)

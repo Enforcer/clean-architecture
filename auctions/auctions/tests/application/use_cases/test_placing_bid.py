@@ -25,29 +25,33 @@ def input_dto(auction: Auction, bidder_id: int, amount: Money) -> PlacingBidInpu
     return PlacingBidInputDto(bidder_id, auction.id, amount)
 
 
-def test_loads_auction_using_id(auction: Auction, auctions_repo_mock: Mock, input_dto: PlacingBidInputDto) -> None:
-    PlacingBid().execute(input_dto)
+def test_loads_auction_using_id(
+    placing_bid_uc: PlacingBid, auction: Auction, auctions_repo_mock: Mock, input_dto: PlacingBidInputDto
+) -> None:
+    placing_bid_uc.execute(input_dto)
 
     auctions_repo_mock.get.assert_called_once_with(auction.id)
 
 
-def test_makes_an_expected_bid(input_dto: PlacingBidInputDto, auction: Auction) -> None:
+def test_makes_an_expected_bid(placing_bid_uc: PlacingBid, input_dto: PlacingBidInputDto, auction: Auction) -> None:
     with patch.object(Auction, "place_bid", wraps=auction.place_bid) as make_a_bid_mock:
-        PlacingBid().execute(input_dto)
+        placing_bid_uc.execute(input_dto)
 
     make_a_bid_mock.assert_called_once_with(bidder_id=input_dto.bidder_id, amount=input_dto.amount)
 
 
-def test_saves_auction(auctions_repo_mock: Mock, auction: Auction, input_dto: PlacingBidInputDto) -> None:
-    PlacingBid().execute(input_dto)
+def test_saves_auction(
+    placing_bid_uc: PlacingBid, auctions_repo_mock: Mock, auction: Auction, input_dto: PlacingBidInputDto
+) -> None:
+    placing_bid_uc.execute(input_dto)
 
     auctions_repo_mock.save.assert_called_once_with(auction)
 
 
 def test_presents_output_dto(
-    input_dto: PlacingBidInputDto, placing_bid_output_boundary_mock: Mock, auction: Auction
+    placing_bid_uc: PlacingBid, input_dto: PlacingBidInputDto, placing_bid_output_boundary_mock: Mock, auction: Auction
 ) -> None:
-    PlacingBid().execute(input_dto)
+    placing_bid_uc.execute(input_dto)
 
     expected_output_dto = PlacingBidOutputDto(is_winner=True, current_price=input_dto.amount)
     placing_bid_output_boundary_mock.present.assert_called_once_with(expected_output_dto)
