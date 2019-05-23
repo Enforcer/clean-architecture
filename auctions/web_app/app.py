@@ -1,14 +1,15 @@
 from datetime import datetime
 
-from flask import Flask, abort, json, request
+from flask import Flask, Response, abort, json, request
+from flask_injector import FlaskInjector
+from main import bootstrap_app
 
 from foundation.method_dispatch import method_dispatch
 from foundation.value_objects import Money
 
 from auctions.application import queries as auction_queries
 
-from .blueprints.auctions import auctions_blueprint
-from .main import setup
+from .blueprints.auctions import AuctionsWeb, auctions_blueprint
 from .security import setup as security_setup
 
 
@@ -36,7 +37,7 @@ class JSONEncoder(json.JSONEncoder):
         return obj.isoformat()
 
 
-def create_app(db_dsn=None) -> Flask:
+def create_app() -> Flask:
     app = Flask(__name__)
 
     app.json_encoder = JSONEncoder
@@ -55,9 +56,26 @@ def create_app(db_dsn=None) -> Flask:
     app.config["SECURITY_REGISTERABLE"] = True
     app.config["SECURITY_PASSWORD_SALT"] = "99f885320c0f867cde17876a7849904c41a2b8120a9a9e76d1789e458e543af9"
     app.config["WTF_CSRF_ENABLED"] = False
-    app.config["DB_DSN"] = db_dsn or "sqlite:///foo.db"
 
-    setup(app)
+    app_context = bootstrap_app()
+    FlaskInjector(app, modules=[AuctionsWeb()], injector=app_context.injector)
+
+    @app.before_request
+    def transaction_start() -> None:
+        request.tx = app_context.connection_provider.open().begin()
+        request.session = app_context.connection_provider.provide_session()
+
+    @app.after_request
+    def transaction_commit(response: Response) -> Response:
+        try:
+            if hasattr(request, "tx") and response.status_code < 400:
+                request.tx.commit()
+        finally:
+            app_context.connection_provider.close_if_present()
+
+        return response
+
+    # has to be after DB-hooks, because it relies on DB
     security_setup(app)
 
     return app

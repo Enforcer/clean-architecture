@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import os
 from typing import Generator
 
 from _pytest.fixtures import SubRequest
@@ -15,9 +16,31 @@ from ..security import User
 
 
 @pytest.fixture(scope="session")
-def app(tmp_path_factory: TempPathFactory) -> Flask:
-    temp_dir = tmp_path_factory.mktemp("test_db")
-    return create_app(db_dsn=f"sqlite:///{temp_dir}/db.sqlite")
+def config_path(tmp_path_factory: TempPathFactory) -> str:
+    temp_dir = tmp_path_factory.mktemp("config")
+    db_dir = tmp_path_factory.mktemp("test_db")
+    conf_file_path = temp_dir / ".test_env_file"
+    with open(conf_file_path, "w") as f:
+        f.writelines(
+            [
+                "PAYMENTS_LOGIN=empty\n",
+                "PAYMENTS_PASSWORD=empty\n",
+                "EMAIL_HOST=localhost\n",
+                "EMAIL_PORT=12525\n",
+                "EMAIL_USERNAME=none\n",
+                "EMAIL_PASSWORD=none\n",
+                "EMAIL_FROM_NAME=Auctions\n",
+                "EMAIL_FROM_ADDRESS=auctions@cleanarchitecture.io\n",
+                f"DB_DSN=sqlite:///{db_dir}/db.sqlite\n",
+            ]
+        )
+    return str(conf_file_path)
+
+
+@pytest.fixture(scope="session")
+def app(config_path: str) -> Flask:
+    os.environ["CONFIG_PATH"] = config_path
+    return create_app()
 
 
 @pytest.fixture()
@@ -27,7 +50,7 @@ def client(app: Flask) -> testing.FlaskClient:
 
 @pytest.fixture(scope="session")
 def sqlalchemy_connect_url(app: Flask) -> str:
-    return app.config["DB_DSN"]
+    return os.environ["DB_DSN"]
 
 
 @pytest.fixture()
