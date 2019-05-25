@@ -59,7 +59,6 @@ class EventBus(abc.ABC):
         raise NotImplementedError
 
 
-Enqueue = Key("enqueue_function")
 RunAsyncHandler = Key("run_async_handler")
 
 

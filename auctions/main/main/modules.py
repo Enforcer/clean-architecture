@@ -4,7 +4,7 @@ from rq import Queue
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Session
 
-from foundation.events import Enqueue, EventBus, InjectorEventBus, RunAsyncHandler
+from foundation.events import EventBus, InjectorEventBus, RunAsyncHandler
 
 from customer_relationship import CustomerRelationshipConfig
 from payments import PaymentsConfig
@@ -25,13 +25,15 @@ class Db(injector.Module):
 class Rq(injector.Module):
     @injector.singleton
     @injector.provider
-    def enqueue(self) -> Enqueue:
+    def enqueue(self) -> Queue:
         queue = Queue(connection=Redis())
-        return queue.enqueue
+        return queue
 
     @injector.provider
-    def run_async_handler(self, enqueue: Enqueue) -> RunAsyncHandler:
-        return lambda handler_cls, *args, **kwargs: enqueue(async_handler_generic_task, handler_cls, *args, **kwargs)
+    def run_async_handler(self, queue: Queue) -> RunAsyncHandler:
+        return lambda handler_cls, *args, **kwargs: queue.enqueue(
+            async_handler_generic_task, handler_cls, *args, **kwargs
+        )
 
 
 class EventBusMod(injector.Module):

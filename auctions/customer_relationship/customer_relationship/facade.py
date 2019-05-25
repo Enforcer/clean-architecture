@@ -2,8 +2,6 @@ from typing import Any, Dict
 
 from sqlalchemy.engine import Connection
 
-from foundation.events import Enqueue
-
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
 
 from customer_relationship import emails
@@ -13,9 +11,8 @@ from customer_relationship.models import customers
 
 
 class CustomerRelationshipFacade:
-    def __init__(self, config: CustomerRelationshipConfig, enqueue_fun: Enqueue, connection: Connection) -> None:
+    def __init__(self, config: CustomerRelationshipConfig, connection: Connection) -> None:
         self._sender = EmailSender(config)
-        self._enqueue_fun = enqueue_fun
         self._connection = connection
 
     def create_customer(self, customer_id: int, email: str) -> None:
@@ -38,4 +35,4 @@ class CustomerRelationshipFacade:
         return dict(self._connection.execute(customers.select(customers.c.id == customer_id)).first())
 
     def _send(self, recipient: str, email: emails.Email) -> None:
-        self._enqueue_fun(self._sender.send, recipient, email)
+        self._sender.send(recipient, email)
