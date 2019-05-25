@@ -29,8 +29,9 @@ class Payments(injector.Module):
 
 class PaymentChargedHandler:
     @injector.inject
-    def __init__(self, i: injector.Injector) -> None:
-        self._i = i
+    def __init__(self, facade: PaymentsFacade) -> None:
+        self._facade = facade
 
     def __call__(self, event: PaymentCharged) -> None:
         print("TODO")
+        self._facade.capture_payment(event.payment_uuid, event.customer_id)

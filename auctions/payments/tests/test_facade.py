@@ -88,7 +88,7 @@ def test_adding_new_payment_is_reflected_on_pending_payments_list(
     pending_payments = facade.get_pending_payments(customer_id)
 
     assert pending_payments == [PaymentDto(payment_uuid, amount, description, PaymentStatus.NEW.value)]
-    post_mock.assert_called_once_with(PaymentStarted(payment_uuid))
+    post_mock.assert_called_once_with(PaymentStarted(payment_uuid, customer_id))
 
 
 @pytest.mark.parametrize(
@@ -118,7 +118,7 @@ def test_successful_charge_updates_status(
     payment_row = get_payment(connection, inserted_payment["uuid"])
     assert payment_row.status == PaymentStatus.CHARGED.value
     assert payment_row.charge_id == charge_id
-    post_mock.assert_called_once_with(PaymentCharged(payment_uuid))
+    post_mock.assert_called_once_with(PaymentCharged(payment_uuid, inserted_payment["customer_id"]))
 
 
 @pytest.mark.usefixtures("transaction")
@@ -133,7 +133,7 @@ def test_unsuccessful_charge(
 
     charge_mock.assert_called_once_with(get_dollars(inserted_payment["amount"] / 100), "token")
     assert get_payment(connection, inserted_payment["uuid"]).status == PaymentStatus.FAILED.value
-    post_mock.assert_called_once_with(PaymentFailed(payment_uuid))
+    post_mock.assert_called_once_with(PaymentFailed(payment_uuid, inserted_payment["customer_id"]))
 
 
 @pytest.mark.parametrize("inserted_payment", [PaymentStatus.CHARGED.value], indirect=["inserted_payment"])
@@ -146,4 +146,4 @@ def test_capture(facade: PaymentsFacade, inserted_payment: dict, connection: Con
 
     capture_mock.assert_called_once_with(inserted_payment["charge_id"])
     assert get_payment(connection, inserted_payment["uuid"]).status == PaymentStatus.CAPTURED.value
-    post_mock.assert_called_once_with(PaymentCaptured(payment_uuid))
+    post_mock.assert_called_once_with(PaymentCaptured(payment_uuid, inserted_payment["customer_id"]))

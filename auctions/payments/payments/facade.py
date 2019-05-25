@@ -23,7 +23,7 @@ class PaymentsFacade:
 
     def start_new_payment(self, payment_uuid: UUID, customer_id: int, amount: Money, description: str) -> None:
         dao.start_new_payment(payment_uuid, customer_id, amount, description, self._connection)
-        self._event_bus.post(PaymentStarted(payment_uuid))
+        self._event_bus.post(PaymentStarted(payment_uuid, customer_id))
 
     def pay(self, payment_uuid: UUID, customer_id: int, token: str) -> None:
         payment = dao.get_payment(payment_uuid, customer_id, self._connection)
@@ -34,15 +34,15 @@ class PaymentsFacade:
             charge_id = self._api_consumer.charge(payment.amount, token)
         except PaymentFailedError:
             dao.update_payment(payment_uuid, customer_id, {"status": dao.PaymentStatus.FAILED.value}, self._connection)
-            self._event_bus.post(PaymentFailed(payment_uuid))
+            self._event_bus.post(PaymentFailed(payment_uuid, customer_id))
         else:
             update_values = {"status": dao.PaymentStatus.CHARGED.value, "charge_id": charge_id}
             dao.update_payment(payment_uuid, customer_id, update_values, self._connection)
-            self._event_bus.post(PaymentCharged(payment_uuid))
+            self._event_bus.post(PaymentCharged(payment_uuid, customer_id))
 
     def capture_payment(self, payment_uuid: UUID, customer_id: int) -> None:
         charge_id = dao.get_payment_charge_id(payment_uuid, customer_id, self._connection)
         assert charge_id, f"No charge_id available for {payment_uuid}, aborting capture"
         self._api_consumer.capture(charge_id)
         dao.update_payment(payment_uuid, customer_id, {"status": dao.PaymentStatus.CAPTURED.value}, self._connection)
-        self._event_bus.post(PaymentCaptured(payment_uuid))
+        self._event_bus.post(PaymentCaptured(payment_uuid, customer_id))
