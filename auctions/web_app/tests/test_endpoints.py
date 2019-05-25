@@ -26,7 +26,7 @@ def config_path(tmp_path_factory: TempPathFactory) -> str:
                 "PAYMENTS_LOGIN=empty\n",
                 "PAYMENTS_PASSWORD=empty\n",
                 "EMAIL_HOST=localhost\n",
-                "EMAIL_PORT=12525\n",
+                "EMAIL_PORT=2525\n",
                 "EMAIL_USERNAME=none\n",
                 "EMAIL_PASSWORD=none\n",
                 "EMAIL_FROM_NAME=Auctions\n",
