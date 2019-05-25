@@ -1,6 +1,7 @@
 import injector
 from redis import Redis
 from rq import Queue
+from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Session
 
@@ -25,15 +26,18 @@ class Db(injector.Module):
 class Rq(injector.Module):
     @injector.singleton
     @injector.provider
-    def enqueue(self) -> Queue:
+    def queue(self) -> Queue:
         queue = Queue(connection=Redis())
         return queue
 
     @injector.provider
-    def run_async_handler(self, queue: Queue) -> RunAsyncHandler:
-        return lambda handler_cls, *args, **kwargs: queue.enqueue(
-            async_handler_generic_task, handler_cls, *args, **kwargs
-        )
+    def run_async_handler(self, queue: Queue, connection: Connection) -> RunAsyncHandler:
+        def enqueue_after_commit(handler_cls, *args, **kwargs):
+            sqlalchemy_event.listens_for(connection, "commit")(
+                lambda _conn: queue.enqueue(async_handler_generic_task, handler_cls, *args, **kwargs)
+            )
+
+        return enqueue_after_commit
 
 
 class EventBusMod(injector.Module):

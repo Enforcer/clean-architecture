@@ -33,5 +33,4 @@ class PaymentChargedHandler:
         self._facade = facade
 
     def __call__(self, event: PaymentCharged) -> None:
-        print("TODO")
         self._facade.capture_payment(event.payment_uuid, event.customer_id)
