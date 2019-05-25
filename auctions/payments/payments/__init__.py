@@ -1,7 +1,7 @@
 import injector
 from sqlalchemy.engine import Connection
 
-from foundation.events import ClassProviderMulti, EventBus, Handler
+from foundation.events import AsyncEventHandlerProvider, AsyncHandler, EventBus
 
 from payments.config import PaymentsConfig
 from payments.events import PaymentCaptured, PaymentCharged, PaymentFailed, PaymentStarted
@@ -24,7 +24,7 @@ class Payments(injector.Module):
         return PaymentsFacade(config, connection, event_bus)
 
     def configure(self, binder: injector.Binder) -> None:
-        binder.multibind(Handler[PaymentCharged], to=ClassProviderMulti(PaymentChargedHandler))
+        binder.multibind(AsyncHandler[PaymentCharged], to=AsyncEventHandlerProvider(PaymentChargedHandler))
 
 
 class PaymentChargedHandler:

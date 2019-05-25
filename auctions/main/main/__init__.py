@@ -3,8 +3,6 @@ import os
 
 import dotenv
 import injector
-from main.db import ThreadlocalConnectionProvider
-from main.modules import Configs, Db, EventBusMod, Rq
 from sqlalchemy import event as sa_event
 from sqlalchemy.engine import Connection, Engine, create_engine
 from web_app_models import User
@@ -14,6 +12,9 @@ from auctions_infrastructure import AuctionsInfrastructure
 from customer_relationship import CustomerRelationship, CustomerRelationshipFacade
 from db_infrastructure import metadata
 from payments import Payments
+
+from main.db import ThreadlocalConnectionProvider
+from main.modules import Configs, Db, EventBusMod, Rq
 
 __all__ = ["bootstrap_app"]
 

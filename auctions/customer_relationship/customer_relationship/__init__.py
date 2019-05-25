@@ -1,7 +1,7 @@
 import injector
 from sqlalchemy.engine import Connection
 
-from foundation.events import ClassProviderMulti, Enqueue, Handler
+from foundation.events import Enqueue, EventHandlerProvider, Handler
 
 from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
 
@@ -19,8 +19,8 @@ class CustomerRelationship(injector.Module):
         return CustomerRelationshipFacade(config, enqueue_fun, connection)
 
     def configure(self, binder: injector.Binder) -> None:
-        binder.multibind(Handler[BidderHasBeenOverbid], to=ClassProviderMulti(BidderHasBeenOverbidHandler))
-        binder.multibind(Handler[WinningBidPlaced], to=ClassProviderMulti(WinningBidPlacedHandler))
+        binder.multibind(Handler[BidderHasBeenOverbid], to=EventHandlerProvider(BidderHasBeenOverbidHandler))
+        binder.multibind(Handler[WinningBidPlaced], to=EventHandlerProvider(WinningBidPlacedHandler))
 
 
 class BidderHasBeenOverbidHandler:

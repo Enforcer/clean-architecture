@@ -25,7 +25,7 @@ class AsyncHandler(Generic[T]):
     pass
 
 
-class ClassProviderMulti(Provider):
+class EventHandlerProvider(Provider):
     """Useful for configuring bind for event handlers.
 
     Using DI for dispatching events to handlers requires ability to bind multiple
@@ -39,10 +39,28 @@ class ClassProviderMulti(Provider):
         return [injector.create_object(self._cls)]
 
 
+class AsyncEventHandlerProvider(Provider):
+    """An async counterpart of EventHandlerProvider.
+
+    In async, one does not need to actually construct the instance.
+    It is enough to obtain class itself.
+    """
+
+    def __init__(self, cls: Type[T]) -> None:
+        self._cls = cls
+
+    def get(self, _injector: Injector) -> List[Type[T]]:
+        return [self._cls]
+
+
 class EventBus(abc.ABC):
     @abc.abstractmethod
     def post(self, event: Event) -> None:
         raise NotImplementedError
+
+
+Enqueue = Key("enqueue_function")
+RunAsyncHandler = Key("run_async_handler")
 
 
 class InjectorEventBus(EventBus):
@@ -53,12 +71,13 @@ class InjectorEventBus(EventBus):
     TypeError is thrown due to usage of `Handler` and `AsyncHandler` generics.
     """
 
-    def __init__(self, injector: Injector) -> None:
+    def __init__(self, injector: Injector, run_async_handler: RunAsyncHandler) -> None:
         self._injector = injector
+        self._run_async_handler = run_async_handler
 
     def post(self, event: Event) -> None:
         try:
-            handlers = self._injector.get(Handler[type(Event)])
+            handlers = self._injector.get(Handler[type(event)])
         except UnsatisfiedRequirement:
             pass
         else:
@@ -67,17 +86,10 @@ class InjectorEventBus(EventBus):
                 handler(event)
 
         try:
-            async_handlers = self._injector.get(AsyncHandler[type(Event)])
+            async_handlers = self._injector.get(AsyncHandler[type(event)])
         except UnsatisfiedRequirement:
             pass
         else:
             assert isinstance(async_handlers, list)
-            raise NotImplementedError("Not supported YET.")
-            # Now we use `enqueue` to run handler in the background.
-            # enqueue will be also injected.
-            # Enqueue will effectively just either run the generic task with handler path (module/class_name) and args
-            # or will just enqueue the function itself (rq). The worker has to have the app context, to be able
-            # to run injector and reconstruct handler
-
-
-Enqueue = Key("enqueue_function")
+            for async_handler in async_handlers:
+                self._run_async_handler(async_handler, event)

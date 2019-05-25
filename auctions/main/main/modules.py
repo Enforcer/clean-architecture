@@ -1,14 +1,16 @@
 import injector
-from main.db import ThreadlocalConnectionProvider
 from redis import Redis
 from rq import Queue
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Session
 
-from foundation.events import Enqueue, EventBus, InjectorEventBus
+from foundation.events import Enqueue, EventBus, InjectorEventBus, RunAsyncHandler
 
 from customer_relationship import CustomerRelationshipConfig
 from payments import PaymentsConfig
+
+from main.async_handler_task import async_handler_generic_task
+from main.db import ThreadlocalConnectionProvider
 
 
 class Db(injector.Module):
@@ -27,11 +29,15 @@ class Rq(injector.Module):
         queue = Queue(connection=Redis())
         return queue.enqueue
 
+    @injector.provider
+    def run_async_handler(self, enqueue: Enqueue) -> RunAsyncHandler:
+        return lambda handler_cls, *args, **kwargs: enqueue(async_handler_generic_task, handler_cls, *args, **kwargs)
+
 
 class EventBusMod(injector.Module):
     @injector.provider
-    def event_bus(self, inj: injector.Injector) -> EventBus:
-        return InjectorEventBus(inj)
+    def event_bus(self, inj: injector.Injector, run_async_handler: RunAsyncHandler) -> EventBus:
+        return InjectorEventBus(inj, run_async_handler)
 
 
 class Configs(injector.Module):
