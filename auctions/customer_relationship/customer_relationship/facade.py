@@ -2,7 +2,9 @@ from typing import Any, Dict
 
 from sqlalchemy.engine import Connection
 
-from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
+from foundation.value_objects import Money
+
+from auctions.domain.events import BidderHasBeenOverbid
 
 from customer_relationship import emails
 from customer_relationship.config import CustomerRelationshipConfig
@@ -26,9 +28,14 @@ class CustomerRelationshipFacade:
         customer = self._get_customer(event.bidder_id)
         self._send(customer["email"], email)
 
-    def send_email_about_winning(self, event: WinningBidPlaced) -> None:
-        email = emails.Winning(auction_title=event.auction_title, amount=event.bid_amount)
-        customer = self._get_customer(event.bidder_id)
+    def send_email_about_winning(self, customer_id: int, bid_amount: Money, auction_title: str) -> None:
+        email = emails.Winning(auction_title=auction_title, amount=bid_amount)
+        customer = self._get_customer(customer_id)
+        self._send(customer["email"], email)
+
+    def send_email_after_successful_payment(self, customer_id: int, paid_price: Money, auction_title: str) -> None:
+        email = emails.PaymentSuccessful(auction_title=auction_title, paid_price=paid_price)
+        customer = self._get_customer(customer_id)
         self._send(customer["email"], email)
 
     def _get_customer(self, customer_id: int) -> Dict[str, Any]:

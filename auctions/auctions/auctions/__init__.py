@@ -4,8 +4,10 @@ from auctions.application.queries import GetActiveAuctions, GetSingleAuction
 from auctions.application.repositories import AuctionsRepository
 from auctions.application.use_cases.placing_bid import PlacingBid, PlacingBidOutputBoundary
 from auctions.application.use_cases.withdrawing_bids import WithdrawingBids
+from auctions.domain.events import AuctionEnded
 
 __all__ = [
+    "AuctionEnded",
     "Auctions",
     "AuctionsRepository",
     "PlacingBid",

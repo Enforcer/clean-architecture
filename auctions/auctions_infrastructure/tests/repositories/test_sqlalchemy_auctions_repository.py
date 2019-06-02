@@ -1,6 +1,5 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Generator
 from unittest.mock import Mock
 
 import pytest
@@ -22,7 +21,7 @@ def sqlalchemy_connect_url() -> str:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_teardown_tables(engine: Engine) -> Generator:
+def setup_teardown_tables(engine: Engine) -> None:
     Base.metadata.create_all(engine)
 
 
