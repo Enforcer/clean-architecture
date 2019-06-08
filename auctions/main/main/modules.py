@@ -6,12 +6,14 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Session
 
 from foundation.events import EventBus, InjectorEventBus, RunAsyncHandler
+from foundation.locks import Lock, LockFactory
 
 from customer_relationship import CustomerRelationshipConfig
 from payments import PaymentsConfig
 
 from main.async_handler_task import async_handler_generic_task
 from main.db import ThreadlocalConnectionProvider
+from main.redis import RedisLock
 
 
 class Db(injector.Module):
@@ -23,11 +25,23 @@ class Db(injector.Module):
         binder.bind(Session, to=self._conn_provider.provide_session)
 
 
+class RedisMod(injector.Module):
+    def configure(self, binder: injector.Binder) -> None:
+        binder.bind(Redis, Redis())
+
+    @injector.provider
+    def lock(self, redis: Redis) -> LockFactory:
+        def create_lock(name: str, timeout: int = 30) -> Lock:
+            return RedisLock(redis, name, timeout)
+
+        return create_lock
+
+
 class Rq(injector.Module):
     @injector.singleton
     @injector.provider
-    def queue(self) -> Queue:
-        queue = Queue(connection=Redis())
+    def queue(self, redis: Redis) -> Queue:
+        queue = Queue(connection=redis)
         return queue
 
     @injector.provider

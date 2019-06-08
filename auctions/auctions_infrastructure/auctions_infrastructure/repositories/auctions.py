@@ -1,10 +1,9 @@
-import copy
-from typing import Dict, List
+from typing import List
 
-from pybuses import EventBus
 import pytz
 from sqlalchemy.engine import Connection, RowProxy
 
+from foundation.events import EventBus
 from foundation.value_objects.factories import get_dollars
 
 from auctions.application.repositories import AuctionsRepository
@@ -12,37 +11,6 @@ from auctions.domain.entities import Auction, Bid
 from auctions.domain.types import AuctionId
 
 from auctions_infrastructure import auctions, bids
-
-
-class InMemoryAuctionsRepository(AuctionsRepository):
-    def __init__(self, objects: List[Auction] = None, event_bus: EventBus = None) -> None:
-        assert isinstance(event_bus, EventBus)
-        if not objects:
-            objects = []
-
-        self._storage: Dict[AuctionId, Auction] = {}
-        for object in objects:
-            self.save(object)
-
-        self._event_bus = event_bus
-
-    def get(self, auction_id: AuctionId) -> Auction:
-        copied = copy.deepcopy(self._storage[auction_id])
-        return Auction(
-            id=copied.id,
-            title=copied.title,
-            starting_price=copied.starting_price,
-            bids=copied.bids,
-            ends_at=copied.ends_at,
-            ended=copied.ended,
-        )
-
-    def save(self, auction: Auction) -> None:
-        copied = copy.deepcopy(auction)
-        copied.bids = [bid for bid in copied.bids if bid.id not in copied.withdrawn_bids_ids]
-        self._storage[auction.id] = copied
-        for event in auction.domain_events:
-            self._event_bus.post(event)
 
 
 class SqlAlchemyAuctionsRepo(AuctionsRepository):

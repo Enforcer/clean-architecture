@@ -3,6 +3,7 @@ import os
 
 import dotenv
 import injector
+from processes import Processes
 from sqlalchemy import event as sa_event
 from sqlalchemy.engine import Connection, Engine, create_engine
 from web_app_models import User
@@ -14,7 +15,7 @@ from db_infrastructure import metadata
 from payments import Payments
 
 from main.db import ThreadlocalConnectionProvider
-from main.modules import Configs, Db, EventBusMod, Rq
+from main.modules import Configs, Db, EventBusMod, RedisMod, Rq
 
 __all__ = ["bootstrap_app"]
 
@@ -44,7 +45,7 @@ def bootstrap_app() -> App:
         "email.from.address": os.environ["EMAIL_FROM_ADDRESS"],
     }
 
-    engine = create_engine(os.environ["DB_DSN"])
+    engine = create_engine(os.environ["DB_DSN"], echo=True)
     connection_provider = ThreadlocalConnectionProvider(engine)
     dependency_injector = _setup_dependency_injection(settings, connection_provider)
     _setup_orm_events(dependency_injector)
@@ -60,6 +61,7 @@ def _setup_dependency_injection(
     dependency_injector = injector.Injector(
         [
             Db(connection_provider),
+            RedisMod(),
             Rq(),
             EventBusMod(),
             Configs(settings),
@@ -67,6 +69,7 @@ def _setup_dependency_injection(
             AuctionsInfrastructure(),
             CustomerRelationship(),
             Payments(),
+            Processes(),
         ],
         auto_bind=False,
     )

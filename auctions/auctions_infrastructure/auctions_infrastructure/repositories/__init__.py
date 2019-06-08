@@ -1,3 +1,3 @@
-__all__ = ["InMemoryAuctionsRepository", "SqlAlchemyAuctionsRepo"]
+__all__ = ["SqlAlchemyAuctionsRepo"]
 
-from auctions_infrastructure.repositories.auctions import InMemoryAuctionsRepository, SqlAlchemyAuctionsRepo
+from auctions_infrastructure.repositories.auctions import SqlAlchemyAuctionsRepo

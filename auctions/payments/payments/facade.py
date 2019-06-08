@@ -1,9 +1,9 @@
 from typing import List
 from uuid import UUID
 
-from pybuses import EventBus
 from sqlalchemy.engine import Connection
 
+from foundation.events import EventBus
 from foundation.value_objects import Money
 
 from payments import dao
