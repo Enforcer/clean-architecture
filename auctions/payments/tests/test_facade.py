@@ -112,7 +112,7 @@ def test_successful_charge_updates_status(
 
     with patch.object(event_bus, "post") as post_mock:
         with patch.object(ApiConsumer, "charge", return_value=charge_id) as charge_mock:
-            facade.pay(uuid.UUID(inserted_payment["uuid"]), inserted_payment["customer_id"], "token")
+            facade.charge(uuid.UUID(inserted_payment["uuid"]), inserted_payment["customer_id"], "token")
 
     charge_mock.assert_called_once_with(get_dollars(inserted_payment["amount"] / 100), "token")
     payment_row = get_payment(connection, inserted_payment["uuid"])
@@ -129,7 +129,7 @@ def test_unsuccessful_charge(
 
     with patch.object(event_bus, "post") as post_mock:
         with patch.object(ApiConsumer, "charge", side_effect=PaymentFailedError) as charge_mock:
-            facade.pay(payment_uuid, inserted_payment["customer_id"], "token")
+            facade.charge(payment_uuid, inserted_payment["customer_id"], "token")
 
     charge_mock.assert_called_once_with(get_dollars(inserted_payment["amount"] / 100), "token")
     assert get_payment(connection, inserted_payment["uuid"]).status == PaymentStatus.FAILED.value
@@ -142,7 +142,7 @@ def test_capture(facade: PaymentsFacade, inserted_payment: dict, connection: Con
     payment_uuid = uuid.UUID(inserted_payment["uuid"])
     with patch.object(event_bus, "post") as post_mock:
         with patch.object(ApiConsumer, "capture") as capture_mock:
-            facade.capture_payment(payment_uuid, inserted_payment["customer_id"])
+            facade.capture(payment_uuid, inserted_payment["customer_id"])
 
     capture_mock.assert_called_once_with(inserted_payment["charge_id"])
     assert get_payment(connection, inserted_payment["uuid"]).status == PaymentStatus.CAPTURED.value

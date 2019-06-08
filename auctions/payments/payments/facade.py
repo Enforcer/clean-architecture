@@ -25,7 +25,7 @@ class PaymentsFacade:
         dao.start_new_payment(payment_uuid, customer_id, amount, description, self._connection)
         self._event_bus.post(PaymentStarted(payment_uuid, customer_id))
 
-    def pay(self, payment_uuid: UUID, customer_id: int, token: str) -> None:
+    def charge(self, payment_uuid: UUID, customer_id: int, token: str) -> None:
         payment = dao.get_payment(payment_uuid, customer_id, self._connection)
         if payment.status != dao.PaymentStatus.NEW.value:
             raise Exception(f"Can't pay - unexpected status {payment.status}")
@@ -40,7 +40,7 @@ class PaymentsFacade:
             dao.update_payment(payment_uuid, customer_id, update_values, self._connection)
             self._event_bus.post(PaymentCharged(payment_uuid, customer_id))
 
-    def capture_payment(self, payment_uuid: UUID, customer_id: int) -> None:
+    def capture(self, payment_uuid: UUID, customer_id: int) -> None:
         charge_id = dao.get_payment_charge_id(payment_uuid, customer_id, self._connection)
         assert charge_id, f"No charge_id available for {payment_uuid}, aborting capture"
         self._api_consumer.capture(charge_id)
