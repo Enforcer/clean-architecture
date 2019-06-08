@@ -3,7 +3,7 @@ from sqlalchemy.engine import Connection
 
 from foundation.events import AsyncEventHandlerProvider, AsyncHandler
 
-from auctions.domain.events import BidderHasBeenOverbid, WinningBidPlaced
+from auctions import BidderHasBeenOverbid, WinningBidPlaced
 
 from customer_relationship.config import CustomerRelationshipConfig
 from customer_relationship.facade import CustomerRelationshipFacade
@@ -27,7 +27,7 @@ class BidderHasBeenOverbidHandler:
         self._facade = facade
 
     def __call__(self, event: BidderHasBeenOverbid) -> None:
-        self._facade.send_email_about_overbid(event)
+        self._facade.send_email_about_overbid(event.bidder_id, event.new_price, event.auction_title)
 
 
 class WinningBidPlacedHandler:
@@ -36,4 +36,4 @@ class WinningBidPlacedHandler:
         self._facade = facade
 
     def __call__(self, event: WinningBidPlaced) -> None:
-        self._facade.send_email_about_winning(event)
+        self._facade.send_email_about_winning(event.bidder_id, event.bid_amount, event.auction_title)

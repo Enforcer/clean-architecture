@@ -4,8 +4,6 @@ from sqlalchemy.engine import Connection
 
 from foundation.value_objects import Money
 
-from auctions.domain.events import BidderHasBeenOverbid
-
 from customer_relationship import emails
 from customer_relationship.config import CustomerRelationshipConfig
 from customer_relationship.email_sender import EmailSender
@@ -23,9 +21,9 @@ class CustomerRelationshipFacade:
     def update_customer(self, customer_id: int, email: str) -> None:
         self._connection.execute(customers.update().where(customers.c.id == customer_id).values(email=email))
 
-    def send_email_about_overbid(self, event: BidderHasBeenOverbid) -> None:
-        email = emails.Overbid(auction_title=event.auction_title, new_price=event.new_price)
-        customer = self._get_customer(event.bidder_id)
+    def send_email_about_overbid(self, customer_id: int, new_price: Money, auction_title: str) -> None:
+        email = emails.Overbid(auction_title=auction_title, new_price=new_price)
+        customer = self._get_customer(customer_id)
         self._send(customer["email"], email)
 
     def send_email_about_winning(self, customer_id: int, bid_amount: Money, auction_title: str) -> None:
