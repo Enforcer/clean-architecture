@@ -1,4 +1,0 @@
-dataclasses==0.6
-injector==0.16.1
-pytest==4.5.0
-foundation

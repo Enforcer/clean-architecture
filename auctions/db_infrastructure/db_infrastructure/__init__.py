@@ -1,3 +1,4 @@
+from typing import Any, Optional
 import uuid
 
 from sqlalchemy import MetaData
@@ -20,13 +21,13 @@ class GUID(TypeDecorator):
 
     impl = CHAR
 
-    def load_dialect_impl(self, dialect):
+    def load_dialect_impl(self, dialect: Any) -> Any:
         if dialect.name == "postgresql":
             return dialect.type_descriptor(UUID())
         else:
             return dialect.type_descriptor(CHAR(32))
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value: Any, dialect: Any) -> Optional[str]:
         if value is None:
             return value
         elif dialect.name == "postgresql":
@@ -38,10 +39,10 @@ class GUID(TypeDecorator):
                 # hexstring
                 return "%.32x" % value.int
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(self, value: Any, dialect: Any) -> Optional[uuid.UUID]:
         if value is None:
             return value
         else:
             if not isinstance(value, uuid.UUID):
                 value = uuid.UUID(value)
-            return value
+            return value  # type: ignore

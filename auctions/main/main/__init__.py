@@ -3,7 +3,6 @@ import os
 
 import dotenv
 import injector
-from processes import Processes
 from sqlalchemy import event as sa_event
 from sqlalchemy.engine import Connection, Engine, create_engine
 from web_app_models import User
@@ -13,6 +12,7 @@ from auctions_infrastructure import AuctionsInfrastructure
 from customer_relationship import CustomerRelationship, CustomerRelationshipFacade
 from db_infrastructure import metadata
 from payments import Payments
+from processes import Processes
 
 from main.db import ThreadlocalConnectionProvider
 from main.modules import Configs, Db, EventBusMod, RedisMod, Rq
