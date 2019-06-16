@@ -1,7 +1,4 @@
-dataclasses==0.6
-injector==0.16.1
-pytest==4.5.0
-requests==2.20.1
-stripe==2.27.0
-sqlalchemy==1.2.16
-db_infrastructure
+injector==0.16.2
+SQLAlchemy==1.3.4
+stripe==2.29.4
+requests==2.22.0

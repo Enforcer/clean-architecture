@@ -4,6 +4,7 @@ from flask import Flask, request
 from flask_security import Security
 from flask_security.datastore import UserDatastore
 from sqlalchemy.orm import Session
+
 from web_app_models import User
 
 __all__ = ["setup", "User"]

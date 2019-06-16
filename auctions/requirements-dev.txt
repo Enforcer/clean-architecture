@@ -1,0 +1,5 @@
+pip-tools==3.8.0
+black==19.3b0
+isort==4.3.20
+flake8==3.7.7
+

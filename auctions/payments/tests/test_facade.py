@@ -1,11 +1,11 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 import uuid
 
 from _pytest.fixtures import SubRequest
-from pybuses import EventBus
 import pytest
 from sqlalchemy.engine import Connection, Engine, RowProxy
 
+from foundation.events import EventBus
 from foundation.value_objects.factories import get_dollars
 
 from db_infrastructure import Base
@@ -25,8 +25,8 @@ def sqlalchemy_connect_url() -> str:
 
 
 @pytest.fixture()
-def event_bus() -> EventBus:
-    return EventBus()
+def event_bus() -> Mock:
+    return Mock(spec_set=EventBus)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -35,7 +35,7 @@ def setup_teardown_tables(engine: Engine) -> None:
 
 
 @pytest.fixture()
-def facade(connection: Connection, event_bus: EventBus) -> PaymentsFacade:
+def facade(connection: Connection, event_bus: Mock) -> PaymentsFacade:
     return PaymentsFacade(PaymentsConfig("", ""), connection, event_bus)
 
 
@@ -63,7 +63,7 @@ def get_payment(connection: Connection, payment_uuid: str) -> RowProxy:
 
 @pytest.mark.usefixtures("transaction")
 def test_adding_new_payment_is_reflected_on_pending_payments_list(
-    facade: PaymentsFacade, connection: Connection, event_bus: EventBus
+    facade: PaymentsFacade, connection: Connection, event_bus: Mock
 ) -> None:
     customer_id = 1
     assert facade.get_pending_payments(customer_id) == []
@@ -71,8 +71,8 @@ def test_adding_new_payment_is_reflected_on_pending_payments_list(
     payment_uuid = uuid.uuid4()
     amount = get_dollars("15.00")
     description = "Example"
-    with patch.object(event_bus, "post") as post_mock:
-        facade.start_new_payment(payment_uuid, customer_id, amount, description)
+    # with patch.object(event_bus, "post") as post_mock:
+    facade.start_new_payment(payment_uuid, customer_id, amount, description)
 
     row, = connection.execute(payments.select()).fetchall()
     assert dict(row) == {
@@ -88,7 +88,7 @@ def test_adding_new_payment_is_reflected_on_pending_payments_list(
     pending_payments = facade.get_pending_payments(customer_id)
 
     assert pending_payments == [PaymentDto(payment_uuid, amount, description, PaymentStatus.NEW.value)]
-    post_mock.assert_called_once_with(PaymentStarted(payment_uuid, customer_id))
+    event_bus.post.assert_called_once_with(PaymentStarted(payment_uuid, customer_id))
 
 
 @pytest.mark.parametrize(
@@ -105,45 +105,42 @@ def test_pending_payments_returns_only_new_payments(
 
 @pytest.mark.usefixtures("transaction")
 def test_successful_charge_updates_status(
-    facade: PaymentsFacade, inserted_payment: dict, connection: Connection, event_bus: EventBus
+    facade: PaymentsFacade, inserted_payment: dict, connection: Connection, event_bus: Mock
 ) -> None:
     payment_uuid = uuid.UUID(inserted_payment["uuid"])
     charge_id = "SOME_CHARGE_ID"
 
-    with patch.object(event_bus, "post") as post_mock:
-        with patch.object(ApiConsumer, "charge", return_value=charge_id) as charge_mock:
-            facade.charge(uuid.UUID(inserted_payment["uuid"]), inserted_payment["customer_id"], "token")
+    with patch.object(ApiConsumer, "charge", return_value=charge_id) as charge_mock:
+        facade.charge(uuid.UUID(inserted_payment["uuid"]), inserted_payment["customer_id"], "token")
 
     charge_mock.assert_called_once_with(get_dollars(inserted_payment["amount"] / 100), "token")
     payment_row = get_payment(connection, inserted_payment["uuid"])
     assert payment_row.status == PaymentStatus.CHARGED.value
     assert payment_row.charge_id == charge_id
-    post_mock.assert_called_once_with(PaymentCharged(payment_uuid, inserted_payment["customer_id"]))
+    event_bus.post.assert_called_once_with(PaymentCharged(payment_uuid, inserted_payment["customer_id"]))
 
 
 @pytest.mark.usefixtures("transaction")
 def test_unsuccessful_charge(
-    facade: PaymentsFacade, inserted_payment: dict, connection: Connection, event_bus: EventBus
+    facade: PaymentsFacade, inserted_payment: dict, connection: Connection, event_bus: Mock
 ) -> None:
     payment_uuid = uuid.UUID(inserted_payment["uuid"])
 
-    with patch.object(event_bus, "post") as post_mock:
-        with patch.object(ApiConsumer, "charge", side_effect=PaymentFailedError) as charge_mock:
-            facade.charge(payment_uuid, inserted_payment["customer_id"], "token")
+    with patch.object(ApiConsumer, "charge", side_effect=PaymentFailedError) as charge_mock:
+        facade.charge(payment_uuid, inserted_payment["customer_id"], "token")
 
     charge_mock.assert_called_once_with(get_dollars(inserted_payment["amount"] / 100), "token")
     assert get_payment(connection, inserted_payment["uuid"]).status == PaymentStatus.FAILED.value
-    post_mock.assert_called_once_with(PaymentFailed(payment_uuid, inserted_payment["customer_id"]))
+    event_bus.post.assert_called_once_with(PaymentFailed(payment_uuid, inserted_payment["customer_id"]))
 
 
 @pytest.mark.parametrize("inserted_payment", [PaymentStatus.CHARGED.value], indirect=["inserted_payment"])
 @pytest.mark.usefixtures("transaction")
-def test_capture(facade: PaymentsFacade, inserted_payment: dict, connection: Connection, event_bus: EventBus) -> None:
+def test_capture(facade: PaymentsFacade, inserted_payment: dict, connection: Connection, event_bus: Mock) -> None:
     payment_uuid = uuid.UUID(inserted_payment["uuid"])
-    with patch.object(event_bus, "post") as post_mock:
-        with patch.object(ApiConsumer, "capture") as capture_mock:
-            facade.capture(payment_uuid, inserted_payment["customer_id"])
+    with patch.object(ApiConsumer, "capture") as capture_mock:
+        facade.capture(payment_uuid, inserted_payment["customer_id"])
 
     capture_mock.assert_called_once_with(inserted_payment["charge_id"])
     assert get_payment(connection, inserted_payment["uuid"]).status == PaymentStatus.CAPTURED.value
-    post_mock.assert_called_once_with(PaymentCaptured(payment_uuid, inserted_payment["customer_id"]))
+    event_bus.post.assert_called_once_with(PaymentCaptured(payment_uuid, inserted_payment["customer_id"]))

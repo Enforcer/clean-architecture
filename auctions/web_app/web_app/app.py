@@ -8,9 +8,8 @@ from foundation.method_dispatch import method_dispatch
 from foundation.value_objects import Money
 
 from auctions.application import queries as auction_queries
-
-from .blueprints.auctions import AuctionsWeb, auctions_blueprint
-from .security import setup as security_setup
+from web_app.blueprints.auctions import AuctionsWeb, auctions_blueprint
+from web_app.security import setup as security_setup
 
 
 class JSONEncoder(json.JSONEncoder):

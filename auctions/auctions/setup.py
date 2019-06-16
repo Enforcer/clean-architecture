@@ -1,9 +1,9 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="web_app_models",
+    name="auctions",
     version="0.0.0",
     packages=find_packages(),
-    install_requires=["Flask-Security", "sqlalchemy", "db_infrastructure"],
+    install_requires=["injector", "foundation"],
     extras_require={"dev": ["pytest"]},
 )

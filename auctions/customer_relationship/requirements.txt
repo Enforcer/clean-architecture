@@ -1,6 +1,2 @@
-auctions
-db_infrastructure
-foundation
-dataclasses==0.6
-injector==0.16.1
-sqlalchemy==1.2.16
+injector==0.16.2
+SQLAlchemy==1.3.4

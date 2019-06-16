@@ -10,9 +10,8 @@ from sqlalchemy.engine import Connection
 
 from auctions_infrastructure import auctions, bids
 from customer_relationship.models import customers
-
-from ..app import create_app
-from ..security import User
+from web_app.app import create_app
+from web_app.security import User
 
 
 @pytest.fixture(scope="session")
