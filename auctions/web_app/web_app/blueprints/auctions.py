@@ -43,7 +43,7 @@ class PlacingBidSchema(Schema):
     amount = Dollars()
 
     @post_load
-    def make_dto(self, data: dict):
+    def make_dto(self, data: dict, **_kwargs: dict):
         return placing_bid.PlacingBidInputDto(**self.context, **data)
 
 
