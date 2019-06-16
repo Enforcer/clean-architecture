@@ -12,6 +12,11 @@ from payments import PaymentsFacade
 from processes.paying_for_won_item import PayingForWonItemSaga, PayingForWonItemSagaHandler
 from processes.repository import SagaDataRepo
 
+__all__ = [
+    # module
+    "Processes"
+]
+
 
 class Handler(Protocol):
     registry: Dict[Type, Callable]

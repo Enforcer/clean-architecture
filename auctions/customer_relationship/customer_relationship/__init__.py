@@ -8,7 +8,13 @@ from auctions import BidderHasBeenOverbid, WinningBidPlaced
 from customer_relationship.config import CustomerRelationshipConfig
 from customer_relationship.facade import CustomerRelationshipFacade
 
-__all__ = ["CustomerRelationship", "CustomerRelationshipConfig", "CustomerRelationshipFacade"]
+__all__ = [
+    # module
+    "CustomerRelationship",
+    "CustomerRelationshipConfig",
+    # facade
+    "CustomerRelationshipFacade",
+]
 
 
 class CustomerRelationship(injector.Module):

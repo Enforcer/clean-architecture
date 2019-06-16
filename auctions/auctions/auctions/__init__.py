@@ -7,14 +7,19 @@ from auctions.application.use_cases.withdrawing_bids import WithdrawingBids
 from auctions.domain.events import AuctionEnded, BidderHasBeenOverbid, WinningBidPlaced
 
 __all__ = [
+    # module
+    "Auctions",
+    # events
     "AuctionEnded",
     "WinningBidPlaced",
     "BidderHasBeenOverbid",
-    "Auctions",
+    # repositories
     "AuctionsRepository",
+    # use cases
     "PlacingBid",
     "PlacingBidOutputBoundary",
     "WithdrawingBids",
+    # queries
     "GetActiveAuctions",
     "GetSingleAuction",
 ]

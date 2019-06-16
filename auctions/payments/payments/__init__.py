@@ -8,9 +8,12 @@ from payments.events import PaymentCaptured, PaymentCharged, PaymentFailed, Paym
 from payments.facade import PaymentsFacade
 
 __all__ = [
+    # module
     "Payments",
     "PaymentsConfig",
+    # facade
     "PaymentsFacade",
+    # events
     "PaymentStarted",
     "PaymentCharged",
     "PaymentCaptured",

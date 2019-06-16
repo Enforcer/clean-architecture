@@ -9,7 +9,13 @@ from auctions_infrastructure.models import auctions, bids
 from auctions_infrastructure.queries import SqlGetActiveAuctions, SqlGetSingleAuction
 from auctions_infrastructure.repositories import SqlAlchemyAuctionsRepo
 
-__all__ = ["auctions", "bids", "AuctionsInfrastructure"]
+__all__ = [
+    # module
+    "AuctionsInfrastructure",
+    # models
+    "auctions",
+    "bids",
+]
 
 
 class AuctionsInfrastructure(injector.Module):
