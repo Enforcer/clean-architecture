@@ -28,7 +28,7 @@ injector==0.16.2
 itsdangerous==1.1.0       # via flask, flask-security
 jinja2==2.10.1            # via flask, flask-babelex
 markupsafe==1.1.1         # via jinja2
-marshmallow==2.19.2
+marshmallow==3.0.0rc7
 more-itertools==7.0.0     # via pytest
 packaging==19.0           # via pytest
 passlib==1.7.1            # via flask-security
