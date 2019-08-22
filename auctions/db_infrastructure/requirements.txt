@@ -1,2 +1,3 @@
 pytest-sqlalchemy==0.2.1
 SQLAlchemy==1.3.4
+psycopg2==2.8.3
