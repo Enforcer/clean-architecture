@@ -8,7 +8,7 @@ endef
 
 .PHONY: dev
 dev:
-	pip install -r requirements.txt
+	pip install -r requirements.txt -r requirements-dev.txt
 	$(foreach lib,$(libs),$(call install_dev,$(lib)))
 
 .PHONY: freeze-deps
