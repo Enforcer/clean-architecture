@@ -9,10 +9,10 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 WORKDIR /usr/src/app
-COPY auctions/requirements.txt auctions/requirements-dev.txt ./
+COPY auctioning_platform/requirements.txt auctioning_platform/requirements-dev.txt ./
 RUN pip install pip-tools==3.8.0 -r requirements.txt -r requirements-dev.txt
 
-COPY auctions/ ./
+COPY auctioning_platform/ ./
 RUN make dev
 
 ENV FLASK_APP='web_app/web_app/app.py:create_app()'

@@ -4,7 +4,7 @@ services:
   app:
     build: .
     volumes:
-      - "./auctions/:/usr/src/app"
+      - "./auctioning_platform/:/usr/src/app"
     ports:
       - "5000:5000"
     environment:
