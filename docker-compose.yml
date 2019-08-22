@@ -1,0 +1,38 @@
+version: '3.1'
+
+services:
+  app:
+    build: .
+    volumes:
+      - "./auctions/:/usr/src/app"
+    ports:
+      - "5000:5000"
+    environment:
+      PAYMENTS_LOGIN: empty
+      PAYMENTS_PASSWORD: empty
+      EMAIL_HOST: localhost
+      EMAIL_PORT: 2525
+      EMAIL_USERNAME: none
+      EMAIL_PASSWORD: none
+      EMAIL_FROM_NAME: Auctions
+      EMAIL_FROM_ADDRESS: auctions@cleanarchitecture.io
+      DB_DSN: postgresql+psycopg2://postgres:cleanarchitecture@database/cleanarchitecture
+    depends_on:
+      - database
+  database:
+    image: postgres:12
+    environment:
+      POSTGRES_PASSWORD: cleanarchitecture
+      POSTGRES_DB: cleanarchitecture
+  smtp_server:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
+      - "12525:2525"
+    environment:
+      - MH_SMTP_BIND_ADDR=0.0.0.0:2525
+  redis:
+    image: redis:5
+    ports:
+      - "6379:6379"
+

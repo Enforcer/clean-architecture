@@ -1,12 +1,21 @@
 # Implementing the Clean Architecture - Auctions
-Exemplary app.
+Example app.
 
 # Work with the repo
 Pycharm - mark each package (but simple_web) as Sources Root.
-Console - `python setup.py develop` inside every directory
+Console - `make dev` to install each subpackage in editable mode.
 
-# Start web app
+# Work with docker containers
 ```bash
-env FLASK_APP='app:create_app()' flask run --without-threads --no-debugger
+# Start everything
+docker-compose up --build
+
+# Black formatting
+docker-compose exec -T app black -l 120 ./
+# isort
+docker-compose exec -T app isort --recursive ./
+# flake8 checks
+docker-compose exec -T app flake8 --max-line-length 120 ./
 ```
+
 

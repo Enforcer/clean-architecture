@@ -1,0 +1,4 @@
+curl localhost:5000/register -H 'Content-type: application/json' -d '{"email": "nnplaya@gmail.com", "password": "password"}'
+
+curl localhost:5000/login -H 'Content-type: application/json' -X POST -d '{"email": "nnplaya@gmail.com", "password": "password"}'
+
