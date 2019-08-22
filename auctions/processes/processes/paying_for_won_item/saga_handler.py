@@ -7,6 +7,7 @@ from foundation.locks import LockFactory
 from foundation.method_dispatch import method_dispatch
 
 from auctions import AuctionEnded
+from payments import PaymentCaptured
 
 from processes.paying_for_won_item import PayingForWonItemSaga, PayingForWonItemSagaData
 from processes.repository import SagaDataRepo
@@ -23,7 +24,11 @@ class PayingForWonItemSagaHandler:
 
     @method_dispatch
     def __call__(self, event: Event) -> None:
-        saga_data_uuid = getattr(event, "payment_uuid")
+        raise NotImplementedError
+
+    @__call__.register(PaymentCaptured)
+    def handle_payment_captured(self, event: PaymentCaptured) -> None:
+        saga_data_uuid = event.payment_uuid
         data = self._repo.get(saga_data_uuid, PayingForWonItemSagaData)
         lock_name = f"saga-lock-{data.auction_id}-{data.winner_id}"
         self._run_saga(lock_name, saga_data_uuid, data, event)
