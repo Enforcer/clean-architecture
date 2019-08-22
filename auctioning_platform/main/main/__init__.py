@@ -12,6 +12,8 @@ from customer_relationship import CustomerRelationship, CustomerRelationshipFaca
 from db_infrastructure import metadata
 from payments import Payments
 from processes import Processes
+from shipping import Shipping
+from shipping_infrastructure import ShippingInfrastructure
 from web_app_models import User
 
 from main.db import ThreadlocalConnectionProvider
@@ -67,6 +69,8 @@ def _setup_dependency_injection(
             Configs(settings),
             Auctions(),
             AuctionsInfrastructure(),
+            Shipping(),
+            ShippingInfrastructure(),
             CustomerRelationship(),
             Payments(),
             Processes(),

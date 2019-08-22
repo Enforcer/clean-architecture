@@ -1,5 +1,9 @@
 import injector
 
+from shipping import AddressRepository
+
+from shipping_infrastructure.repositories import FakeAddressRepository
+
 __all__ = [
     # module
     "ShippingInfrastructure",
@@ -8,4 +12,6 @@ __all__ = [
 
 
 class ShippingInfrastructure(injector.Module):
-    pass
+    @injector.provider
+    def address_repo(self) -> AddressRepository:
+        return FakeAddressRepository()
