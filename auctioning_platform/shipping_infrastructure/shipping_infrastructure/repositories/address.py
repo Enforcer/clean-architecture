@@ -1,3 +1,5 @@
+import uuid
+
 import faker
 
 from shipping import AddressRepository
@@ -9,6 +11,7 @@ class FakeAddressRepository(AddressRepository):
     def get(self, consignee_id: ConsigneeId) -> Address:
         fake = faker.Faker()
         return Address(
+            uuid=uuid.uuid4(),
             street=fake.street_name(),
             house_number=fake.building_number(),
             city=fake.city(),
