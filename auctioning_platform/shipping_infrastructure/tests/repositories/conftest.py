@@ -1,21 +1,8 @@
 import uuid
 
 import pytest
-from sqlalchemy.engine import Engine
-
-from db_infrastructure import Base
 
 from shipping.domain.entities import Package
-
-
-@pytest.fixture(scope="session")
-def sqlalchemy_connect_url() -> str:
-    return "sqlite:///:memory:"
-
-
-@pytest.fixture(scope="session", autouse=True)
-def setup_teardown_tables(engine: Engine) -> None:
-    Base.metadata.create_all(engine)
 
 
 @pytest.fixture()
