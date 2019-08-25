@@ -1,11 +1,11 @@
 import injector
-# from sqlalchemy.engine import Connection
+from sqlalchemy.engine import Connection
 
-from shipping import AddressRepository  # GetNextPackage
+from shipping import AddressRepository, PackageRepository  # GetNextPackage
 
 from shipping_infrastructure.models import packages
 # from shipping_infrastructure.queries import SqlGetNextPackage
-from shipping_infrastructure.repositories import FakeAddressRepository
+from shipping_infrastructure.repositories import FakeAddressRepository, SqlAlchemyPackageRepository
 
 __all__ = [
     # module
@@ -23,3 +23,7 @@ class ShippingInfrastructure(injector.Module):
     @injector.provider
     def address_repo(self) -> AddressRepository:
         return FakeAddressRepository()
+
+    @injector.provider
+    def package_repo(self, conn: Connection) -> PackageRepository:
+        return SqlAlchemyPackageRepository(conn)
