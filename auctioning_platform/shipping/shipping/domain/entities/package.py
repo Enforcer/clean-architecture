@@ -1,6 +1,7 @@
 import uuid
 from dataclasses import dataclass, field
 
+from shipping.domain.exceptions import PackageAlreadyShipped
 from shipping.domain.types import ConsigneeId
 from shipping.domain.value_objects import PackageStatus
 
@@ -17,3 +18,8 @@ class Package:
     zip_code: str
     country: str
     status: PackageStatus = field(default=PackageStatus.CREATED)
+
+    def ship(self) -> None:
+        if self.status == PackageStatus.SHIPPED:
+            raise PackageAlreadyShipped
+        self.status = PackageStatus.SHIPPED

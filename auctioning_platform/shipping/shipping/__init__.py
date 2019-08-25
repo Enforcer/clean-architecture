@@ -34,6 +34,6 @@ class Shipping(injector.Module):
     ) -> RegisteringPackage:
         return RegisteringPackage(address_repo, package_repo)
 
-    # @injector.provider
-    # def shipping_package_uc(self, package_repo: PackageRepository) -> ShippingPackage:
-    #     return ShippingPackage(package_repo)
+    @injector.provider
+    def shipping_package_uc(self, package_repo: PackageRepository) -> ShippingPackage:
+        return ShippingPackage(package_repo)

@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy.engine import Connection
 
 from shipping import PackageRepository
@@ -9,6 +11,9 @@ from shipping_infrastructure.models import packages
 class SqlAlchemyPackageRepository(PackageRepository):
     def __init__(self, connection: Connection) -> None:
         self._conn = connection
+
+    def get(self, package_uuid: uuid.UUID) -> Package:
+        pass
 
     def save(self, package: Package) -> None:
         raw_package = {
