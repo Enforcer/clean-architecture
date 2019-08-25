@@ -5,11 +5,11 @@ from shipping_infrastructure.queries import SqlGetNextPackage
 
 
 @pytest.mark.usefixtures("transaction", "shipped_package_model")
-def test_gets_next_package(connection: Connection, created_package_model: RowProxy) -> None:
+def test_gets_next_package(connection: Connection, package_model: RowProxy) -> None:
     package = SqlGetNextPackage(connection).query()
 
-    assert package.uuid == created_package_model.uuid
-    assert package.item_identifier == created_package_model.item_identifier
+    assert package.uuid == package_model.uuid
+    assert package.item_identifier == package_model.item_identifier
 
 
 @pytest.mark.usefixtures("transaction", "shipped_package_model")

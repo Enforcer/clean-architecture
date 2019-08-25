@@ -1,4 +1,4 @@
-import uuid
+import copy
 
 import pytest
 
@@ -6,15 +6,23 @@ from shipping.domain.entities import Package
 
 
 @pytest.fixture()
-def package() -> Package:
+def package(raw_package: dict) -> Package:
     return Package(
-        uuid=uuid.UUID("742febe3-da50-4b43-957f-62909d2bb5d7"),
-        item_identifier="iPhone X 64 GB Space Gray",
-        consignee_id=1,
-        street="Nancy Grove",
-        house_number="517",
-        city="Trevinoport",
-        state="Utah",
-        zip_code="30954",
-        country="Bouvet Island (Bouvetoya)",
+        uuid=raw_package["uuid"],
+        item_identifier=raw_package["item_identifier"],
+        consignee_id=raw_package["consignee_id"],
+        street=raw_package["street"],
+        house_number=raw_package["house_number"],
+        city=raw_package["city"],
+        state=raw_package["state"],
+        zip_code=raw_package["zip_code"],
+        country=raw_package["country"],
+        status=raw_package["status"],
     )
+
+
+@pytest.fixture()
+def shipped_package(package: Package) -> Package:
+    package_copy = copy.deepcopy(package)
+    package_copy.ship()
+    return package_copy

@@ -1,0 +1,2 @@
+class PackageNotFound(Exception):
+    pass
