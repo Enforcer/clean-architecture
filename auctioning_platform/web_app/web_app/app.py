@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Flask, Response, abort, json, request
+from flask import Flask, Response, json, request
 from flask_injector import FlaskInjector
 from main import bootstrap_app
 
@@ -40,11 +40,6 @@ def create_app() -> Flask:
     app = Flask(__name__)
 
     app.json_encoder = JSONEncoder
-
-    @app.before_request
-    def only_json():
-        if not request.is_json:
-            abort(400)
 
     app.register_blueprint(auctions_blueprint)
 
