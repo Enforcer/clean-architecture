@@ -9,6 +9,7 @@ from foundation.value_objects import Money
 
 from auctions.application import queries as auction_queries
 from web_app.blueprints.auctions import AuctionsWeb, auctions_blueprint
+from web_app.blueprints.shipping import shipping_blueprint
 from web_app.security import setup as security_setup
 
 
@@ -42,6 +43,7 @@ def create_app() -> Flask:
     app.json_encoder = JSONEncoder
 
     app.register_blueprint(auctions_blueprint, url_prefix="/auctions")
+    app.register_blueprint(shipping_blueprint, url_prefix="/shipping")
 
     # TODO: move this config
     app.config["SECRET_KEY"] = "super-secret"
