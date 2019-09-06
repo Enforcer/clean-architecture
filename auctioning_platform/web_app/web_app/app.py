@@ -41,7 +41,7 @@ def create_app() -> Flask:
 
     app.json_encoder = JSONEncoder
 
-    app.register_blueprint(auctions_blueprint)
+    app.register_blueprint(auctions_blueprint, url_prefix="/auctions")
 
     # TODO: move this config
     app.config["SECRET_KEY"] = "super-secret"

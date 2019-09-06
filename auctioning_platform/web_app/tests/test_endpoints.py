@@ -149,14 +149,14 @@ def example_auction(connection: Connection, another_user: str) -> Generator[int,
 
 
 def test_return_single_auction(client: testing.FlaskClient, example_auction: int) -> None:
-    response = client.get(f"/{example_auction}", headers={"Content-type": "application/json"})
+    response = client.get(f"/auctions/{example_auction}", headers={"Content-type": "application/json"})
 
     assert response.status_code == 200
     assert type(response.json) == dict
 
 
 def test_returns_list_of_auctions(client: testing.FlaskClient) -> None:
-    response = client.get("/", headers={"Content-type": "application/json"})
+    response = client.get("/auctions/", headers={"Content-type": "application/json"})
 
     assert response.status_code == 200
     assert type(response.json) == list
@@ -165,7 +165,7 @@ def test_returns_list_of_auctions(client: testing.FlaskClient) -> None:
 @pytest.mark.usefixtures("logged_in_user")
 def test_places_bid(client: testing.FlaskClient, example_auction: int) -> None:
     response = client.post(
-        f"/{example_auction}/bids", headers={"Content-type": "application/json"}, json={"amount": "15.99"}
+        f"/auctions/{example_auction}/bids", headers={"Content-type": "application/json"}, json={"amount": "15.99"}
     )
 
     assert response.status_code == 200
