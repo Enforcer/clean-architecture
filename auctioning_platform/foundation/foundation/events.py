@@ -10,6 +10,18 @@ class Event:
     pass
 
 
+class EventMixin:
+    def __init__(self) -> None:
+        self._pending_domain_events: List[Event] = []
+
+    def _record_event(self, event: object) -> None:
+        self._pending_domain_events.append(event)
+
+    @property
+    def domain_events(self) -> List[Event]:
+        return self._pending_domain_events[:]
+
+
 class Handler(Generic[T]):
     """Simple generic used to associate handlers with events using DI.
 

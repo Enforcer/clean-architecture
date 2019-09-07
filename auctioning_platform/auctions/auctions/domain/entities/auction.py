@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from foundation.events import Event
+from foundation.events import EventMixin
 from foundation.value_objects import Money
 
 from auctions.domain.entities.bid import Bid
@@ -10,7 +10,7 @@ from auctions.domain.exceptions import AuctionAlreadyEnded, AuctionHasNotEnded, 
 from auctions.domain.types import AuctionId, BidderId, BidId
 
 
-class Auction:
+class Auction(EventMixin):
     def __init__(
         self, id: AuctionId, title: str, starting_price: Money, bids: List[Bid], ends_at: datetime, ended: bool
     ) -> None:
@@ -22,14 +22,7 @@ class Auction:
         self.ends_at = ends_at
         self.ended = ended
         self._withdrawn_bids_ids: List[BidId] = []
-        self._pending_domain_events: List[Event] = []
-
-    def _record_event(self, event: object) -> None:
-        self._pending_domain_events.append(event)
-
-    @property
-    def domain_events(self) -> List[Event]:
-        return self._pending_domain_events[:]
+        super().__init__()
 
     def place_bid(self, bidder_id: BidderId, amount: Money) -> None:
         if self.should_end:
