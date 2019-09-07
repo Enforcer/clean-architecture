@@ -2,12 +2,14 @@ import injector
 
 from shipping import AddressRepository
 
+from shipping_infrastructure.models import packages
 from shipping_infrastructure.repositories import FakeAddressRepository
 
 __all__ = [
     # module
     "ShippingInfrastructure",
     # models
+    "packages",
 ]
 
 
