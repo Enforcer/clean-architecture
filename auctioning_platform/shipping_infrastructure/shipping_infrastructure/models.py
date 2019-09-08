@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Enum, Integer, String, Table
 
 from db_infrastructure import metadata
-
 from shipping.domain.value_objects import PackageStatus
-
 
 packages = Table(
     "packages",

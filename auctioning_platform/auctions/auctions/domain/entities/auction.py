@@ -14,7 +14,7 @@ class Auction(EventMixin):
     def __init__(
         self, id: AuctionId, title: str, starting_price: Money, bids: List[Bid], ends_at: datetime, ended: bool
     ) -> None:
-        assert isinstance(starting_price, Money)
+        super().__init__()
         self.id = id
         self.title = title
         self.starting_price = starting_price
@@ -22,7 +22,6 @@ class Auction(EventMixin):
         self.ends_at = ends_at
         self.ended = ended
         self._withdrawn_bids_ids: List[BidId] = []
-        super().__init__()
 
     def place_bid(self, bidder_id: BidderId, amount: Money) -> None:
         if self.should_end:
