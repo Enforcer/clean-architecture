@@ -1,12 +1,12 @@
 from sqlalchemy import Column, Enum, Integer, String, Table
 
-from db_infrastructure import metadata
+from db_infrastructure import GUID, metadata
 from shipping.domain.value_objects import PackageStatus
 
 packages = Table(
     "packages",
     metadata,
-    Column("uuid", String(36), primary_key=True),
+    Column("uuid", GUID, primary_key=True),
     Column("item_identifier", String(255), nullable=False),
     Column("consignee_id", Integer, nullable=False),
     Column("street", String(40), nullable=False),
