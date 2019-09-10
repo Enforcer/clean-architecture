@@ -1,9 +1,7 @@
 from flask import Blueprint, Response, abort, jsonify, make_response
 from flask_login import current_user
 
-from shipping import GetNextPackage
-
-# from shipping.application.use_cases import ...
+from shipping import GetNextPackage  # ShippingPackage, ShippingPackageInputDto
 
 shipping_blueprint = Blueprint("shipping_blueprint", __name__)
 
