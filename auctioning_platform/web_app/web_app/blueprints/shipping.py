@@ -1,7 +1,7 @@
 from flask import Blueprint, Response, abort, jsonify, make_response
 from flask_login import current_user
 
-from shipping.application import queries as shipping_queries
+from shipping import GetNextPackage
 
 # from shipping.application.use_cases import ...
 
@@ -9,7 +9,7 @@ shipping_blueprint = Blueprint("shipping_blueprint", __name__)
 
 
 @shipping_blueprint.route("/package")
-def get_next_package(query: shipping_queries.GetNextPackage) -> Response:
+def get_next_package(query: GetNextPackage) -> Response:
     return make_response(jsonify(query.query()))
 
 

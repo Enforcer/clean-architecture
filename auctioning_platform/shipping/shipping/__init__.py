@@ -1,5 +1,6 @@
 import injector
 
+from shipping.application.queries import GetNextPackage, PackageDto
 from shipping.application.repositories import AddressRepository
 
 __all__ = [
@@ -10,6 +11,8 @@ __all__ = [
     "AddressRepository",
     # use cases
     # queries
+    "GetNextPackage",
+    "PackageDto",
 ]
 
 

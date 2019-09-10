@@ -1,5 +1,6 @@
 import abc
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -9,5 +10,5 @@ class PackageDto:
 
 class GetNextPackage(abc.ABC):
     @abc.abstractmethod
-    def query(self, auction_id: int) -> PackageDto:
+    def query(self) -> Optional[PackageDto]:
         pass
