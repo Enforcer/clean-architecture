@@ -1,0 +1,2 @@
+class PackageAlreadyShipped(Exception):
+    pass

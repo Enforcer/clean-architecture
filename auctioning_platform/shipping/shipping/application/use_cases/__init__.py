@@ -1,3 +1,3 @@
-__all__ = ["SendingPackage"]
+__all__ = ["ShippingPackage", "ShippingPackageInputDto"]
 
-from shipping.application.use_cases.sending_package import SendingPackage
+from shipping.application.use_cases.shipping_package import ShippingPackage, ShippingPackageInputDto
