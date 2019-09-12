@@ -1,3 +1,4 @@
+import dataclasses
 # import uuid
 
 from flask import Blueprint, Response, abort, jsonify, make_response
@@ -11,7 +12,10 @@ shipping_blueprint = Blueprint("shipping_blueprint", __name__)
 
 @shipping_blueprint.route("/package")
 def get_next_package(query: GetNextPackage) -> Response:
-    return make_response(jsonify(query.query()))
+    result = query.query()
+    if not result:
+        abort(404)
+    return make_response(jsonify(dataclasses.asdict(result)))
 
 
 @shipping_blueprint.route("/package/<package_uuid>/ship", methods=["POST"])
