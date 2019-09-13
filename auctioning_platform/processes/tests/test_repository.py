@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from sqlalchemy.engine import Connection, Engine
@@ -35,8 +35,9 @@ def repo(connection: Connection) -> SagaDataRepo:
     "data, json_repr",
     [
         (
-            PayingForWonItemSagaData(),
+            PayingForWonItemSagaData(UUID("331831f1-3d7c-48c2-9433-955c1cf8deb6")),
             {
+                "saga_uuid": "331831f1-3d7c-48c2-9433-955c1cf8deb6",
                 "state": None,
                 "times_out_at": None,
                 "winning_bid": None,
@@ -47,9 +48,16 @@ def repo(connection: Connection) -> SagaDataRepo:
         ),
         (
             PayingForWonItemSagaData(
-                SagaState.PAYMENT_STARTED, EXAMPLE_DATETIME, get_dollars("15.99"), "Irrelevant", 1, 2
+                UUID("d1526bb4-cee4-4b63-9029-802abc0f7593"),
+                SagaState.PAYMENT_STARTED,
+                EXAMPLE_DATETIME,
+                get_dollars("15.99"),
+                "Irrelevant",
+                1,
+                2,
             ),
             {
+                "saga_uuid": "d1526bb4-cee4-4b63-9029-802abc0f7593",
                 "state": SagaState.PAYMENT_STARTED.value,
                 "times_out_at": EXAMPLE_DATETIME.isoformat(),
                 "winning_bid": {"amount": "15.99", "currency": "USD"},

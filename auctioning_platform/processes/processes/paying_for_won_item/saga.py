@@ -20,6 +20,7 @@ class SagaState(Enum):
 
 @dataclass
 class PayingForWonItemSagaData:
+    saga_uuid: uuid.UUID
     state: Optional[SagaState] = None
     times_out_at: Optional[datetime] = None
     winning_bid: Optional[Money] = None
@@ -32,12 +33,13 @@ class PayingForWonItemSaga:
     def __init__(self, payments: PaymentsFacade, customer_relationship: CustomerRelationshipFacade) -> None:
         self._payments = payments
         self._customer_relationship = customer_relationship
-        self._data = PayingForWonItemSagaData()
+        self._data: Optional[PayingForWonItemSagaData] = None
 
     def set_data(self, data: PayingForWonItemSagaData) -> None:
         self._data = data
 
     def timeout(self) -> None:
+        assert self._data
         assert self._data.times_out_at is not None and datetime.now() >= self._data.times_out_at
         assert self._data.state == SagaState.PAYMENT_STARTED
         self._data.state = SagaState.TIMED_OUT
@@ -48,6 +50,7 @@ class PayingForWonItemSaga:
 
     @handle.register(AuctionEnded)
     def handle_auction_ended(self, event: AuctionEnded) -> None:
+        assert self._data
         assert self._data.state is None
         payment_uuid = uuid.uuid4()
         self._payments.start_new_payment(payment_uuid, event.winner_id, event.winning_bid, event.auction_title)
@@ -62,6 +65,7 @@ class PayingForWonItemSaga:
 
     @handle.register(PaymentCaptured)
     def handle_payment_captured(self, event: PaymentCaptured) -> None:
+        assert self._data
         assert self._data.state == SagaState.PAYMENT_STARTED
         self._customer_relationship.send_email_after_successful_payment(
             event.customer_id, self._data.winning_bid, self._data.auction_title

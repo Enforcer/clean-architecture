@@ -34,8 +34,8 @@ def customer_relationship_mock() -> Mock:
 
 
 @pytest.fixture()
-def saga_data() -> PayingForWonItemSagaData:
-    return PayingForWonItemSagaData()
+def saga_data(mocked_uuid4) -> PayingForWonItemSagaData:
+    return PayingForWonItemSagaData(mocked_uuid4)
 
 
 @pytest.fixture()
@@ -73,9 +73,9 @@ def test_should_start_new_payment_upon_auction_ended(
 
 
 @pytest.fixture()
-def saga_data_waiting_for_payment(saga: PayingForWonItemSaga) -> PayingForWonItemSagaData:
+def saga_data_waiting_for_payment(mocked_uuid4: uuid.UUID, saga: PayingForWonItemSaga) -> PayingForWonItemSagaData:
     return PayingForWonItemSagaData(
-        SagaState.PAYMENT_STARTED, datetime.now() + timedelta(days=3), get_dollars("15.99"), "Irrelevant"
+        mocked_uuid4, SagaState.PAYMENT_STARTED, datetime.now() + timedelta(days=3), get_dollars("15.99"), "Irrelevant"
     )
 
 

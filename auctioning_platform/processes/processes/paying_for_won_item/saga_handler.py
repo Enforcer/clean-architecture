@@ -28,24 +28,20 @@ class PayingForWonItemSagaHandler:
 
     @__call__.register(PaymentCaptured)
     def handle_payment_captured(self, event: PaymentCaptured) -> None:
-        saga_data_uuid = event.payment_uuid
-        data = self._repo.get(saga_data_uuid, PayingForWonItemSagaData)
+        data = self._repo.get(event.payment_uuid, PayingForWonItemSagaData)
         lock_name = f"saga-lock-{data.auction_id}-{data.winner_id}"
-        self._run_saga(lock_name, saga_data_uuid, data, event)
+        self._run_saga(lock_name, data, event)
 
     @__call__.register(AuctionEnded)
     def handle_beginning(self, event: AuctionEnded) -> None:
-        data = PayingForWonItemSagaData()
-        saga_data_uuid = uuid.uuid4()
+        data = PayingForWonItemSagaData(saga_uuid=uuid.uuid4())
         lock_name = f'saga-lock-{getattr(event, "auction_id")}-{getattr(event, "winner_id")}'
-        self._run_saga(lock_name, saga_data_uuid, data, event)
+        self._run_saga(lock_name, data, event)
 
-    def _run_saga(
-        self, lock_name: str, saga_data_uuid: uuid.UUID, data: PayingForWonItemSagaData, event: Event
-    ) -> None:
+    def _run_saga(self, lock_name: str, data: PayingForWonItemSagaData, event: Event) -> None:
         lock = self._lock_factory(lock_name, self.LOCK_TIMEOUT)
 
         with lock:
             self._saga.set_data(data)
             self._saga.handle(event)
-            self._repo.save(saga_data_uuid, data)
+            self._repo.save(data.saga_uuid, data)
