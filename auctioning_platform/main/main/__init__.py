@@ -60,7 +60,7 @@ def bootstrap_app() -> App:
 def _setup_dependency_injection(
     settings: dict, connection_provider: ThreadlocalConnectionProvider
 ) -> injector.Injector:
-    dependency_injector = injector.Injector(
+    return injector.Injector(  # type: ignore
         [
             Db(connection_provider),
             RedisMod(),
@@ -78,16 +78,14 @@ def _setup_dependency_injection(
         auto_bind=False,
     )
 
-    return dependency_injector
-
 
 def _setup_orm_events(dependency_injector: injector.Injector) -> None:
     @sa_event.listens_for(User, "after_insert")
-    def insert_cb(_mapper, _connection: Connection, user: User) -> None:
+    def insert_cb(_mapper, _connection: Connection, user: User) -> None:  # type: ignore
         dependency_injector.get(CustomerRelationshipFacade).create_customer(user.id, user.email)
 
     @sa_event.listens_for(User, "after_update")
-    def update_cb(_mapper, _connection: Connection, user: User) -> None:
+    def update_cb(_mapper, _connection: Connection, user: User) -> None:  # type: ignore
         dependency_injector.get(CustomerRelationshipFacade).update_customer(user.id, user.email)
 
 

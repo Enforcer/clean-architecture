@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from unittest.mock import Mock, patch
 import uuid
 
@@ -43,7 +44,7 @@ def facade(connection: Connection, event_bus: Mock) -> PaymentsFacade:
 def inserted_payment(request: SubRequest, connection: Connection) -> dict:
     status = getattr(request, "param", None) or PaymentStatus.NEW.value
     charge_id = None if status not in (PaymentStatus.CHARGED.value, PaymentStatus.CAPTURED.value) else "token"
-    data = {
+    data: Dict[str, Any] = {
         "uuid": str(uuid.uuid4()),
         "customer_id": 1,
         "amount": 100,

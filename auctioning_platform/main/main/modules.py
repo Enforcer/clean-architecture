@@ -21,13 +21,13 @@ class Db(injector.Module):
         self._conn_provider = conn_provider
 
     def configure(self, binder: injector.Binder) -> None:
-        binder.bind(Connection, to=injector.CallableProvider(self._conn_provider))
-        binder.bind(Session, to=self._conn_provider.provide_session)
+        binder.bind(Connection, to=injector.CallableProvider(self._conn_provider))  # type: ignore
+        binder.bind(Session, to=self._conn_provider.provide_session)  # type: ignore
 
 
 class RedisMod(injector.Module):
     def configure(self, binder: injector.Binder) -> None:
-        binder.bind(Redis, Redis(host="redis"))
+        binder.bind(Redis, Redis(host="redis"))  # type: ignore
 
     @injector.provider
     def lock(self, redis: Redis) -> LockFactory:
@@ -46,7 +46,7 @@ class Rq(injector.Module):
 
     @injector.provider
     def run_async_handler(self, queue: Queue, connection: Connection) -> RunAsyncHandler:
-        def enqueue_after_commit(handler_cls, *args, **kwargs):
+        def enqueue_after_commit(handler_cls, *args, **kwargs):  # type: ignore
             sqlalchemy_event.listens_for(connection, "commit")(
                 lambda _conn: queue.enqueue(async_handler_generic_task, handler_cls, *args, **kwargs)
             )

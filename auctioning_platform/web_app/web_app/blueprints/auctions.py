@@ -11,6 +11,7 @@ from auctions.application import queries as auction_queries
 from auctions.application.use_cases import placing_bid
 from auctions.domain.types import AuctionId
 
+46
 auctions_blueprint = Blueprint("auctions_blueprint", __name__)
 
 
@@ -21,10 +22,10 @@ class AuctionsWeb(injector.Module):
 
 
 class Dollars(fields.Field):
-    def _serialize(self, value, attr, obj, **kwargs):
+    def _serialize(self, value, attr, obj, **kwargs):  # type: ignore
         return str(value)
 
-    def _deserialize(self, value, attr, data, **kwargs):
+    def _deserialize(self, value, attr, data, **kwargs):  # type: ignore
         try:
             return get_dollars(value)
         except ValueError as exc:
@@ -43,7 +44,7 @@ class PlacingBidSchema(Schema):
     amount = Dollars()
 
     @post_load
-    def make_dto(self, data: dict, **_kwargs: dict):
+    def make_dto(self, data: dict, **_kwargs: dict) -> placing_bid.PlacingBidInputDto:
         return placing_bid.PlacingBidInputDto(**self.context, **data)
 
 
@@ -61,12 +62,12 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
 
 @auctions_blueprint.route("/")
 def auctions_list(query: auction_queries.GetActiveAuctions) -> Response:
-    return make_response(jsonify(query.query()))
+    return make_response(jsonify(query.query()))  # type: ignore
 
 
 @auctions_blueprint.route("/<int:auction_id>")
 def single_auction(auction_id: int, query: auction_queries.GetSingleAuction) -> Response:
-    return make_response(jsonify(query.query(auction_id)))
+    return make_response(jsonify(query.query(auction_id)))  # type: ignore
 
 
 @auctions_blueprint.route("/<int:auction_id>/bids", methods=["POST"])
@@ -77,4 +78,4 @@ def place_bid(auction_id: AuctionId, placing_bid_uc: placing_bid.PlacingBid) -> 
     placing_bid_uc.execute(
         get_input_dto(PlacingBidSchema, context={"auction_id": auction_id, "bidder_id": current_user.id})
     )
-    return placing_bid_uc.output_boundary.response
+    return placing_bid_uc.output_boundary.response  # type: ignore

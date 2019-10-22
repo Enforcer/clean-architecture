@@ -18,7 +18,7 @@ def get_next_package(query: GetNextPackage) -> Response:
     result = query.query()
     if not result:
         abort(404)
-    return make_response(jsonify(dataclasses.asdict(result)))
+    return make_response(jsonify(dataclasses.asdict(result)))  # type: ignore
 
 
 @shipping_blueprint.route("/package/<package_uuid>/ship", methods=["POST"])
@@ -30,4 +30,4 @@ def ship_package(package_uuid: str, shipping_package_uc: ShippingPackage) -> Res
     # except PackageAlreadyShipped:
     #     abort(make_response(jsonify({"message": f"Package '{package_uuid}' has been shipped already"}), 400))
     # return make_response(jsonify({"message": f"Package '{package_uuid}' shipped successfully"}))
-    return make_response()
+    return make_response()  # type: ignore

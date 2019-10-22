@@ -11,7 +11,7 @@ from payments.api.requests import Request
 
 
 @pytest.fixture(scope="session")
-def api_key(request: SubRequest) -> str:
+def api_key(request: SubRequest) -> str:  # type: ignore
     try:
         return str(request.config.getoption("--stripe-secret-key"))
     except ValueError:

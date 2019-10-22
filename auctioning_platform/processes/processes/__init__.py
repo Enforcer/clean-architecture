@@ -30,8 +30,8 @@ class Saga(Protocol):
 
 
 class Processes(injector.Module):
-    SAGAS_HANDLERS: List[Tuple[Type[Saga], Type[Handler]]] = [  # type: ignore
-        (PayingForWonItemSaga, PayingForWonItemSagaHandler)
+    SAGAS_HANDLERS: List[Tuple[Type[Saga], Type[Handler]]] = [
+        (PayingForWonItemSaga, PayingForWonItemSagaHandler)  # type: ignore
     ]
 
     @injector.provider
@@ -48,6 +48,6 @@ class Processes(injector.Module):
         for saga, handler_cls in self.SAGAS_HANDLERS:
             handled_events = [event for event in saga.handle.registry.keys() if issubclass(event, Event)]
             for event in handled_events:
-                binder.multibind(AsyncHandler[event], to=AsyncEventHandlerProvider(handler_cls))  # type: ignore
+                binder.multibind(AsyncHandler[event], to=AsyncEventHandlerProvider(handler_cls))
 
         return None

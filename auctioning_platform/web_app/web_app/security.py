@@ -32,7 +32,7 @@ class SaUserDatastore(UserDatastore):
     def commit(self) -> None:
         self.session.commit()
 
-    def find_role(self, *args, **kwargs) -> None:
+    def find_role(self, *args, **kwargs) -> None:  # type: ignore
         raise NotImplementedError
 
     @property

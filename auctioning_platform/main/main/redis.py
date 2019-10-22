@@ -2,6 +2,7 @@ from types import TracebackType
 from typing import Optional, Type
 
 from redis import StrictRedis
+from typing_extensions import Literal
 
 from foundation.locks import AlreadyLocked, Lock
 
@@ -20,7 +21,7 @@ class RedisLock(Lock):
 
     def __exit__(
         self, exc_type: Optional[Type[BaseException]], exc_val: Optional[BaseException], exc_tb: Optional[TracebackType]
-    ) -> bool:
+    ) -> Literal[False]:
         if exc_type != AlreadyLocked:
-            self._redis.delete(self._lock_name)
+            self._redis.delete(self._lock_name)  # type: ignore
         return False

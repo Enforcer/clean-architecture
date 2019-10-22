@@ -1,4 +1,4 @@
-def async_handler_generic_task(cls, *args, **kwargs):
+def async_handler_generic_task(cls, *args, **kwargs):  # type: ignore
     """
     This function is meant to be used for running asynchronous event handlers.
 

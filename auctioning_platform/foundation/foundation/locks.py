@@ -1,7 +1,7 @@
 from types import TracebackType
 from typing import Callable, Optional, Type
 
-from typing_extensions import Protocol
+from typing_extensions import Literal, Protocol
 
 
 class AlreadyLocked(Exception):
@@ -14,7 +14,7 @@ class Lock(Protocol):
 
     def __exit__(
         self, exc_type: Optional[Type[BaseException]], exc_val: Optional[BaseException], exc_tb: Optional[TracebackType]
-    ) -> bool:
+    ) -> Literal[False]:
         ...
 
 

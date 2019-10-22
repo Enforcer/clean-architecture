@@ -2,8 +2,10 @@ import dataclasses
 from datetime import datetime
 from enum import Enum
 import json
-from typing import Tuple, Type, TypeVar
+from typing import Dict, Tuple, Type, TypeVar
 from uuid import UUID
+
+from typing_extensions import Protocol
 
 from foundation.value_objects import Money
 from foundation.value_objects.factories import get_dollars
@@ -11,7 +13,13 @@ from foundation.value_objects.factories import get_dollars
 T = TypeVar("T")
 
 
-def _extract_type_if_optional(type_hint) -> Tuple[Type, bool]:
+class Dataclass(Protocol):
+    # as already noted in comments, checking for this attribute is currently
+    # the most reliable way to ascertain that something is a dataclass
+    __dataclass_fields__: Dict
+
+
+def _extract_type_if_optional(type_hint: Type) -> Tuple[Type, bool]:
     if hasattr(type_hint, "__args__") and type(None) in type_hint.__args__:
         return type_hint.__args__[0], True
     elif type_hint in serializers and type_hint in deserializers:
@@ -20,7 +28,7 @@ def _extract_type_if_optional(type_hint) -> Tuple[Type, bool]:
         raise Exception(f"Jeszcze tego nie ogarniam - {type_hint}")
 
 
-def _deserialize_dt(raw_dt) -> datetime:
+def _deserialize_dt(raw_dt: str) -> datetime:
     try:
         return datetime.strptime(raw_dt, "%Y-%m-%dT%H:%M:%S.%f%z")  # with tz info
     except ValueError:
@@ -56,14 +64,14 @@ def from_json(json_repr: dict, dataclass: Type[T]) -> T:
                 raise Exception(f"Type {field_type} not supported")
 
         if json_repr[field.name]:
-            data[field.name] = deserializers[field_type](json_repr[field.name])
+            data[field.name] = deserializers[field_type](json_repr[field.name])  # type: ignore
         else:
             data[field.name] = None
 
-    return dataclass(**data)
+    return dataclass(**data)  # type: ignore
 
 
-def to_json(dataclass_instance):
+def to_json(dataclass_instance: Dataclass) -> str:
     data = {}
     for field in dataclasses.fields(type(dataclass_instance)):
         field_type, _ = _extract_type_if_optional(field.type)
@@ -74,7 +82,7 @@ def to_json(dataclass_instance):
                 raise Exception(f"Type {field_type} not supported")
 
         if getattr(dataclass_instance, field.name):
-            data[field.name] = serializers[field_type](getattr(dataclass_instance, field.name))
+            data[field.name] = serializers[field_type](getattr(dataclass_instance, field.name))  # type: ignore
         else:
             data[field.name] = None
 

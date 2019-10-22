@@ -1,5 +1,5 @@
 import abc
-from typing import Generic, List, Type, TypeVar
+from typing import Callable, Generic, List, Type, TypeVar
 
 from injector import Injector, Key, Provider, UnsatisfiedRequirement
 
@@ -14,7 +14,7 @@ class EventMixin:
     def __init__(self) -> None:
         self._pending_domain_events: List[Event] = []
 
-    def _record_event(self, event: object) -> None:
+    def _record_event(self, event: Event) -> None:
         self._pending_domain_events.append(event)
 
     @property
@@ -71,7 +71,7 @@ class EventBus(abc.ABC):
         raise NotImplementedError
 
 
-RunAsyncHandler = Key("run_async_handler")
+RunAsyncHandler = Callable[[AsyncHandler[T], T], None]
 
 
 class InjectorEventBus(EventBus):
@@ -88,7 +88,7 @@ class InjectorEventBus(EventBus):
 
     def post(self, event: Event) -> None:
         try:
-            handlers = self._injector.get(Handler[type(event)])
+            handlers = self._injector.get(Handler[type(event)])  # type: ignore
         except UnsatisfiedRequirement:
             pass
         else:
@@ -97,7 +97,7 @@ class InjectorEventBus(EventBus):
                 handler(event)
 
         try:
-            async_handlers = self._injector.get(AsyncHandler[type(event)])
+            async_handlers = self._injector.get(AsyncHandler[type(event)])  # type: ignore
         except UnsatisfiedRequirement:
             pass
         else:
