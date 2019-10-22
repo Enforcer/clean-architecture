@@ -1,7 +1,7 @@
 import abc
 from typing import Callable, Generic, List, Type, TypeVar
 
-from injector import Injector, Key, Provider, UnsatisfiedRequirement
+from injector import Injector, Provider, UnsatisfiedRequirement
 
 T = TypeVar("T")
 

@@ -45,6 +45,7 @@ def bootstrap_app() -> App:
         "email.password": os.environ["EMAIL_PASSWORD"],
         "email.from.name": os.environ["EMAIL_FROM_NAME"],
         "email.from.address": os.environ["EMAIL_FROM_ADDRESS"],
+        "redis.host": os.environ["REDIS_HOST"],
     }
 
     engine = create_engine(os.environ["DB_DSN"])
@@ -63,7 +64,7 @@ def _setup_dependency_injection(
     return injector.Injector(  # type: ignore
         [
             Db(connection_provider),
-            RedisMod(),
+            RedisMod(settings["redis.host"]),
             Rq(),
             EventBusMod(),
             Configs(settings),

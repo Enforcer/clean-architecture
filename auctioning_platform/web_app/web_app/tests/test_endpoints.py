@@ -29,6 +29,7 @@ def config_path(tmp_path_factory: TempPathFactory) -> str:
                 "EMAIL_PASSWORD=none\n",
                 "EMAIL_FROM_NAME=Auctions\n",
                 "EMAIL_FROM_ADDRESS=auctions@cleanarchitecture.io\n",
+                "REDIS_HOST=localhost\n",
                 f"DB_DSN=sqlite:///{db_dir}/db.sqlite\n",
             ]
         )

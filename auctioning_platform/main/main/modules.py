@@ -26,8 +26,11 @@ class Db(injector.Module):
 
 
 class RedisMod(injector.Module):
+    def __init__(self, redis_host: str) -> None:
+        self._redis_host = redis_host
+
     def configure(self, binder: injector.Binder) -> None:
-        binder.bind(Redis, Redis(host="redis"))  # type: ignore
+        binder.bind(Redis, Redis(host=self._redis_host))  # type: ignore
 
     @injector.provider
     def lock(self, redis: Redis) -> LockFactory:
