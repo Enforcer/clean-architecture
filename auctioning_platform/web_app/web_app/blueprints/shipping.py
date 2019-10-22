@@ -1,11 +1,12 @@
 import dataclasses
 
-# import uuid
-
 from flask import Blueprint, Response, abort, jsonify, make_response
 from flask_login import current_user
 
 from shipping import GetNextPackage, ShippingPackage  # ShippingPackageInputDto
+
+# import uuid
+
 
 # from shipping.domain.exceptions import PackageAlreadyShipped
 
