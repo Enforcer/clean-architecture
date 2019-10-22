@@ -24,7 +24,7 @@ flask-wtf==0.14.2         # via flask-security
 flask==1.0.3
 freezegun==0.3.12
 idna==2.8                 # via requests
-importlib-metadata==0.23
+importlib-metadata==0.23  # via pluggy, pytest
 injector==0.17.0
 itsdangerous==1.1.0       # via flask, flask-security
 jinja2==2.10.1            # via flask, flask-babelex
@@ -57,6 +57,6 @@ typing-extensions==3.7.4
 typing==3.6.6             # via flask-injector
 urllib3==1.25.3           # via requests
 wcwidth==0.1.7            # via pytest
-werkzeug==0.15.4          # via flask
+werkzeug==0.16.0
 wtforms==2.2.1            # via flask-wtf
 zipp==0.5.1               # via importlib-metadata
