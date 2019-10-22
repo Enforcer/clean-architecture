@@ -47,7 +47,7 @@ def bootstrap_app() -> App:
         "email.from.address": os.environ["EMAIL_FROM_ADDRESS"],
     }
 
-    engine = create_engine(os.environ["DB_DSN"], echo=True)
+    engine = create_engine(os.environ["DB_DSN"])
     connection_provider = ThreadlocalConnectionProvider(engine)
     dependency_injector = _setup_dependency_injection(settings, connection_provider)
     _setup_orm_events(dependency_injector)

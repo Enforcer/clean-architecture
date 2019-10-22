@@ -2,11 +2,10 @@ from datetime import datetime, timedelta
 import os
 from typing import Generator
 
-from _pytest.fixtures import SubRequest
 from _pytest.tmpdir import TempPathFactory
 from flask import Flask, testing
 import pytest
-from sqlalchemy.engine import Connection
+from sqlalchemy.engine import Connection, create_engine
 
 from auctions_infrastructure import auctions, bids
 from customer_relationship.models import customers
@@ -14,7 +13,7 @@ from web_app.app import create_app
 from web_app.security import User
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def config_path(tmp_path_factory: TempPathFactory) -> str:
     temp_dir = tmp_path_factory.mktemp("config")
     db_dir = tmp_path_factory.mktemp("test_db")
@@ -36,7 +35,7 @@ def config_path(tmp_path_factory: TempPathFactory) -> str:
     return str(conf_file_path)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def app(config_path: str) -> Flask:
     os.environ["CONFIG_PATH"] = config_path
     return create_app()
@@ -47,9 +46,11 @@ def client(app: Flask) -> testing.FlaskClient:
     return app.test_client()
 
 
-@pytest.fixture(scope="session")
-def sqlalchemy_connect_url(app: Flask) -> str:
-    return os.environ["DB_DSN"]
+@pytest.fixture()
+def connection(app: Flask) -> Connection:
+    engine = create_engine(os.environ["DB_DSN"])
+    yield engine.connect()
+    engine.dispose()
 
 
 @pytest.fixture()
@@ -101,7 +102,7 @@ def logged_in_user(create_remove_user: str, client: testing.FlaskClient) -> None
 
 
 @pytest.mark.usefixtures("remove_user")
-def test_register(request: SubRequest, client: testing.FlaskClient) -> None:
+def test_register(client: testing.FlaskClient, connection: Connection) -> None:
     response = client.post(
         "/register",
         headers={"Content-type": "application/json"},
@@ -113,11 +114,11 @@ def test_register(request: SubRequest, client: testing.FlaskClient) -> None:
     assert isinstance(json_response_body["response"]["user"].pop("authentication_token"), str)
     assert isinstance(json_response_body["response"]["user"].pop("id"), str)
     assert json_response_body == {"meta": {"code": 200}, "response": {"user": {}}}
-    assert_customer_with_given_email_exists(request, "test+register@cleanarchitecture.io")
+    assert_customer_with_given_email_exists(connection, "test+register@cleanarchitecture.io")
 
 
-def assert_customer_with_given_email_exists(request: SubRequest, email: str) -> None:
-    assert request.getfixturevalue("connection").execute(customers.select().where(customers.c.email == email)).first()
+def assert_customer_with_given_email_exists(connection: Connection, email: str) -> None:
+    assert connection.execute(customers.select().where(customers.c.email == email)).first()
 
 
 def test_login(client: testing.FlaskClient, create_remove_user: str) -> None:
