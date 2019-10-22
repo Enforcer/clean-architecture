@@ -27,7 +27,7 @@ idna==2.8                 # via requests
 importlib-metadata==0.23  # via pluggy, pytest
 injector==0.17.0
 itsdangerous==1.1.0       # via flask, flask-security
-jinja2==2.10.1            # via flask, flask-babelex
+jinja2==2.10.3            # via flask, flask-babelex
 markupsafe==1.1.1         # via jinja2
 marshmallow==3.0.0rc7
 more-itertools==7.0.0     # via pytest
