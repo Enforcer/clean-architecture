@@ -1,6 +1,8 @@
 # Implementing the Clean Architecture - Auctions
 Example app.
 
+[![Build Status](https://travis-ci.org/Enforcer/clean-architecture.svg?branch=master)](https://travis-ci.org/Enforcer/clean-architecture)
+
 # Work with the repo
 Pycharm - mark each package (but simple_web) as Sources Root.
 Console - `make dev` to install each subpackage in editable mode.
