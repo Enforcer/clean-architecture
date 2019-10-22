@@ -12,7 +12,10 @@ from payments.api.requests import Request
 
 @pytest.fixture(scope="session")
 def api_key(request: SubRequest) -> str:
-    return str(request.config.getoption("--stripe-secret-key"))
+    try:
+        return str(request.config.getoption("--stripe-secret-key"))
+    except ValueError:
+        pytest.skip()
 
 
 @pytest.fixture()
