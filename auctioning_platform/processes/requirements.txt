@@ -1,5 +1,5 @@
 freezegun==0.3.12
 pytest-freezegun==0.3.0.post1
 typing-extensions==3.7.2
-injector==0.16.2
+injector==0.17.0
 SQLAlchemy==1.3.4
