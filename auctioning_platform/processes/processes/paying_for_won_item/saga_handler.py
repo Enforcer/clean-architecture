@@ -35,7 +35,7 @@ class PayingForWonItemSagaHandler:
     @__call__.register(AuctionEnded)
     def handle_beginning(self, event: AuctionEnded) -> None:
         data = PayingForWonItemSagaData(saga_uuid=uuid.uuid4())
-        lock_name = f'saga-lock-{getattr(event, "auction_id")}-{getattr(event, "winner_id")}'
+        lock_name = f"saga-lock-{event.auction_id}-{event.winner_id}"
         self._run_saga(lock_name, data, event)
 
     def _run_saga(self, lock_name: str, data: PayingForWonItemSagaData, event: Event) -> None:
