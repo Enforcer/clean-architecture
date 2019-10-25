@@ -22,7 +22,7 @@ class SagaState(Enum):
 class PayingForWonItemSagaData:
     saga_uuid: uuid.UUID
     state: Optional[SagaState] = None
-    times_out_at: Optional[datetime] = None
+    timeout_at: Optional[datetime] = None
     winning_bid: Optional[Money] = None
     auction_title: Optional[str] = None
     auction_id: Optional[int] = None
@@ -35,7 +35,7 @@ class PayingForWonItemSaga:
         self._customer_relationship = customer_relationship
 
     def timeout(self, data: PayingForWonItemSagaData) -> None:
-        assert data.times_out_at is not None and datetime.now() >= data.times_out_at
+        assert data.timeout_at is not None and datetime.now() >= data.timeout_at
         assert data.state == SagaState.PAYMENT_STARTED
         data.state = SagaState.TIMED_OUT
 
@@ -53,7 +53,7 @@ class PayingForWonItemSaga:
         data.state = SagaState.PAYMENT_STARTED
         data.auction_title = event.auction_title
         data.winning_bid = event.winning_bid
-        data.times_out_at = datetime.now() + timedelta(days=3)
+        data.timeout_at = datetime.now() + timedelta(days=3)
         data.auction_id = event.auction_id
         data.winner_id = event.winner_id
 
@@ -65,4 +65,4 @@ class PayingForWonItemSaga:
         )
 
         data.state = SagaState.FINISHED
-        data.times_out_at = None
+        data.timeout_at = None

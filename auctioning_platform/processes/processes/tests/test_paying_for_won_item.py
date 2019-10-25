@@ -63,7 +63,7 @@ def test_should_start_new_payment_upon_auction_ended(
     assert saga_data.state == SagaState.PAYMENT_STARTED
     assert saga_data.winning_bid == event.winning_bid
     assert saga_data.auction_title == event.auction_title
-    assert saga_data.times_out_at == datetime.now() + timedelta(days=3)
+    assert saga_data.timeout_at == datetime.now() + timedelta(days=3)
     assert saga_data.winner_id == event.winner_id
     assert saga_data.auction_id == event.auction_id
 
@@ -88,7 +88,7 @@ def test_should_send_success_email_after_payment(
         event.customer_id, saga_data_waiting_for_payment.winning_bid, saga_data_waiting_for_payment.auction_title
     )
     assert saga_data_waiting_for_payment.state == SagaState.FINISHED
-    assert saga_data_waiting_for_payment.times_out_at is None
+    assert saga_data_waiting_for_payment.timeout_at is None
 
 
 def test_should_timeout(

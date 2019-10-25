@@ -39,7 +39,7 @@ def repo(connection: Connection) -> SagaDataRepo:
             {
                 "saga_uuid": "331831f1-3d7c-48c2-9433-955c1cf8deb6",
                 "state": None,
-                "times_out_at": None,
+                "timeout_at": None,
                 "winning_bid": None,
                 "auction_title": None,
                 "auction_id": None,
@@ -59,7 +59,7 @@ def repo(connection: Connection) -> SagaDataRepo:
             {
                 "saga_uuid": "d1526bb4-cee4-4b63-9029-802abc0f7593",
                 "state": SagaState.PAYMENT_STARTED.value,
-                "times_out_at": EXAMPLE_DATETIME.isoformat(),
+                "timeout_at": EXAMPLE_DATETIME.isoformat(),
                 "winning_bid": {"amount": "15.99", "currency": "USD"},
                 "auction_title": "Irrelevant",
                 "auction_id": 1,
