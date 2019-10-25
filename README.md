@@ -4,7 +4,8 @@ Example app.
 [![Build Status](https://travis-ci.org/Enforcer/clean-architecture.svg?branch=master)](https://travis-ci.org/Enforcer/clean-architecture)
 
 # Work with the repo
-Pycharm - mark each package (but simple_web) as Sources Root.
+Pycharm - mark each package as Sources Root.
+![Marking directories as source root in PyCharm](docs/marking_as_sources_root.png)
 Console - `make dev` to install each subpackage in editable mode.
 
 # Work with docker containers
