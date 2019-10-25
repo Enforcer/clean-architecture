@@ -39,12 +39,8 @@ def saga_data(mocked_uuid4) -> PayingForWonItemSagaData:
 
 
 @pytest.fixture()
-def saga(
-    payments_facade_mock: Mock, customer_relationship_mock: Mock, saga_data: PayingForWonItemSagaData
-) -> PayingForWonItemSaga:
-    saga = PayingForWonItemSaga(payments_facade_mock, customer_relationship_mock)
-    saga.set_data(saga_data)
-    return saga
+def saga(payments_facade_mock: Mock, customer_relationship_mock: Mock) -> PayingForWonItemSaga:
+    return PayingForWonItemSaga(payments_facade_mock, customer_relationship_mock)
 
 
 @pytest.mark.freeze_time("2019-03-25 15:38:00")
@@ -56,7 +52,7 @@ def test_should_start_new_payment_upon_auction_ended(
     saga_data: PayingForWonItemSagaData,
 ) -> None:
     event = AuctionEnded(auction_id=1, winner_id=2, winning_bid=get_dollars("99.99"), auction_title="irrelevant")
-    saga.handle(event)
+    saga.handle(event, saga_data)
 
     payments_facade_mock.start_new_payment.assert_called_once_with(
         mocked_uuid4, event.winner_id, event.winning_bid, event.auction_title
@@ -79,25 +75,14 @@ def saga_data_waiting_for_payment(mocked_uuid4: uuid.UUID, saga: PayingForWonIte
     )
 
 
-@pytest.fixture()
-def saga_waiting_for_payment(
-    payments_facade_mock: Mock,
-    customer_relationship_mock: Mock,
-    saga_data_waiting_for_payment: PayingForWonItemSagaData,
-) -> PayingForWonItemSaga:
-    saga = PayingForWonItemSaga(payments_facade_mock, customer_relationship_mock)
-    saga.set_data(saga_data_waiting_for_payment)
-    return saga
-
-
 def test_should_send_success_email_after_payment(
     mocked_uuid4: uuid.UUID,
-    saga_waiting_for_payment: PayingForWonItemSaga,
+    saga: PayingForWonItemSaga,
     customer_relationship_mock: Mock,
     saga_data_waiting_for_payment: PayingForWonItemSagaData,
 ) -> None:
     event = PaymentCaptured(mocked_uuid4, 2)
-    saga_waiting_for_payment.handle(event)
+    saga.handle(event, saga_data_waiting_for_payment)
 
     customer_relationship_mock.send_email_after_successful_payment.assert_called_once_with(
         event.customer_id, saga_data_waiting_for_payment.winning_bid, saga_data_waiting_for_payment.auction_title
@@ -108,11 +93,11 @@ def test_should_send_success_email_after_payment(
 
 def test_should_timeout(
     mocked_uuid4: uuid.UUID,
-    saga_waiting_for_payment: PayingForWonItemSaga,
+    saga: PayingForWonItemSaga,
     customer_relationship_mock: Mock,
     saga_data_waiting_for_payment: PayingForWonItemSagaData,
 ) -> None:
     with freezegun.freeze_time(datetime.now() + timedelta(days=4)):
-        saga_waiting_for_payment.timeout()
+        saga.timeout(saga_data_waiting_for_payment)
 
     assert saga_data_waiting_for_payment.state == SagaState.TIMED_OUT

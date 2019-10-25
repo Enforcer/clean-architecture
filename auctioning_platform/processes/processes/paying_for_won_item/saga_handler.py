@@ -42,6 +42,5 @@ class PayingForWonItemSagaHandler:
         lock = self._lock_factory(lock_name, self.LOCK_TIMEOUT)
 
         with lock:
-            self._saga.set_data(data)
-            self._saga.handle(event)
+            self._saga.handle(event, data)
             self._repo.save(data.saga_uuid, data)
