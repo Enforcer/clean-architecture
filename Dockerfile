@@ -10,7 +10,7 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
 
 WORKDIR /usr/src/app
 COPY auctioning_platform/requirements.txt auctioning_platform/requirements-dev.txt ./
-RUN pip install pip-tools==3.8.0 -r requirements.txt -r requirements-dev.txt
+RUN pip install -r requirements.txt -r requirements-dev.txt
 
 COPY auctioning_platform/ ./
 RUN make dev
