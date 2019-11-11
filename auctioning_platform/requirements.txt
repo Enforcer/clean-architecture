@@ -59,4 +59,4 @@ urllib3==1.25.3           # via requests
 wcwidth==0.1.7            # via pytest
 werkzeug==0.16.0
 wtforms==2.2.1            # via flask-wtf
-zipp==0.5.1               # via importlib-metadata
+zipp==0.6.0               # via importlib-metadata
