@@ -21,7 +21,7 @@ flask-mail==0.9.1         # via flask-security
 flask-principal==0.4.0    # via flask-security
 flask-security==3.0.0
 flask-wtf==0.14.2         # via flask-security
-flask==1.0.3
+flask==1.1.1
 freezegun==0.3.12
 idna==2.8                 # via requests
 importlib-metadata==0.23  # via pluggy, pytest
