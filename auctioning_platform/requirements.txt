@@ -7,7 +7,7 @@
 atomicwrites==1.3.0       # via pytest
 attrs==19.1.0             # via pytest
 babel==2.7.0              # via flask-babelex
-bcrypt==3.1.6
+bcrypt==3.1.7
 blinker==1.4              # via flask-mail, flask-principal
 certifi==2019.3.9         # via requests
 cffi==1.13.1              # via bcrypt
