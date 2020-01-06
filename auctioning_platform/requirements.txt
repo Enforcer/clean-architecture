@@ -31,7 +31,7 @@ jinja2==2.10.3            # via flask, flask-babelex
 markupsafe==1.1.1         # via jinja2
 marshmallow==3.2.1
 more-itertools==7.2.0     # via pytest
-packaging==19.0           # via pytest
+packaging==20.0           # via pytest
 passlib==1.7.1            # via flask-security
 pluggy==0.13.0            # via pytest
 psycopg2-binary==2.8.4
