@@ -7,8 +7,7 @@ from auctions.application.repositories import AuctionsRepository
 from auctions.application.use_cases.placing_bid import PlacingBid, PlacingBidOutputBoundary
 from auctions.application.use_cases.withdrawing_bids import WithdrawingBids
 from auctions.domain.entities import Auction
-
-from ...factories import create_auction
+from auctions.tests.factories import AuctionFactory
 
 
 @pytest.fixture()
@@ -18,7 +17,7 @@ def exemplary_bids_ids() -> List[int]:
 
 @pytest.fixture()
 def auction() -> Auction:
-    return create_auction()
+    return AuctionFactory()
 
 
 @pytest.fixture()

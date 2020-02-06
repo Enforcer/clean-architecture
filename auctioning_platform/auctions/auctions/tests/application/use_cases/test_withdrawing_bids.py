@@ -3,13 +3,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from foundation.value_objects.factories import get_dollars
-
 from auctions.application.use_cases import WithdrawingBids
 from auctions.application.use_cases.withdrawing_bids import WithdrawingBidsInputDto
-from auctions.domain.entities import Auction, Bid
-
-from ...factories import create_auction
+from auctions.domain.entities import Auction
 
 
 @pytest.fixture()
@@ -48,11 +44,3 @@ def test_calls_withdraw_bids_on_auction(
         withdrawing_bids_uc.execute(input_dto)
 
     withdraw_bids_mock.assert_called_once_with(exemplary_bids_ids)
-
-
-@pytest.fixture()
-def auction_with_a_winner(input_dto: WithdrawingBidsInputDto) -> Auction:
-    losing_bid = Bid(id=4, bidder_id=2, amount=get_dollars("10.50"))
-    winning_bid = Bid(id=2, bidder_id=1, amount=get_dollars("11.00"))
-    bids = [winning_bid, losing_bid]
-    return create_auction(auction_id=2, bids=bids)
