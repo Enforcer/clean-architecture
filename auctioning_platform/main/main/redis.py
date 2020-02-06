@@ -23,5 +23,5 @@ class RedisLock(Lock):
         self, exc_type: Optional[Type[BaseException]], exc_val: Optional[BaseException], exc_tb: Optional[TracebackType]
     ) -> Literal[False]:
         if exc_type != AlreadyLocked:
-            self._redis.delete(self._lock_name)  # type: ignore
+            self._redis.delete(self._lock_name)
         return False
