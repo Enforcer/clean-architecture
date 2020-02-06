@@ -75,7 +75,7 @@ def test_adding_new_payment_is_reflected_on_pending_payments_list(
     # with patch.object(event_bus, "post") as post_mock:
     facade.start_new_payment(payment_uuid, customer_id, amount, description)
 
-    row, = connection.execute(payments.select()).fetchall()
+    (row,) = connection.execute(payments.select()).fetchall()
     assert dict(row) == {
         "uuid": str(payment_uuid),
         "customer_id": customer_id,

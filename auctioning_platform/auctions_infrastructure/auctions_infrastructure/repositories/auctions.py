@@ -54,7 +54,7 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
             result = self._conn.execute(
                 bids.insert(values={"auction_id": auction.id, "amount": bid.amount.amount, "bidder_id": bid.bidder_id})
             )
-            bid.id, = result.inserted_primary_key
+            (bid.id,) = result.inserted_primary_key
 
         if auction.withdrawn_bids_ids:
             self._conn.execute(bids.delete(whereclause=bids.c.id.in_(auction.withdrawn_bids_ids)))
