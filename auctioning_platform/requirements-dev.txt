@@ -1,4 +1,4 @@
-pip-tools==4.2.0
+pip-tools==4.4.1
 black==19.10b0
 isort==4.3.21
 flake8==3.7.9
