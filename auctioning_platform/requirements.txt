@@ -4,7 +4,6 @@
 #
 #    pip-compile --output-file=requirements.txt ./auctions/requirements-dev.txt ./auctions/requirements.txt ./auctions_infrastructure/requirements-dev.txt ./auctions_infrastructure/requirements.txt ./customer_relationship/requirements-dev.txt ./customer_relationship/requirements.txt ./db_infrastructure/requirements-dev.txt ./db_infrastructure/requirements.txt ./foundation/requirements-dev.txt ./foundation/requirements.txt ./main/requirements-dev.txt ./main/requirements.txt ./payments/requirements-dev.txt ./payments/requirements.txt ./processes/requirements-dev.txt ./processes/requirements.txt ./shipping/requirements-dev.txt ./shipping/requirements.txt ./shipping_infrastructure/requirements-dev.txt ./shipping_infrastructure/requirements.txt ./web_app/requirements-dev.txt ./web_app/requirements.txt ./web_app_models/requirements-dev.txt ./web_app_models/requirements.txt
 #
-atomicwrites==1.3.0       # via pytest
 attrs==19.1.0             # via pytest
 babel==2.7.0              # via flask-babelex
 bcrypt==3.1.7
@@ -13,6 +12,7 @@ certifi==2019.3.9         # via requests
 cffi==1.13.2              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.0                # via flask, rq
+factory-boy==2.12.0
 faker==2.0.3
 flask-babelex==0.9.3      # via flask-security
 flask-injector==0.12.0
@@ -24,7 +24,6 @@ flask-wtf==0.14.2         # via flask-security
 flask==1.1.1
 freezegun==0.3.12
 idna==2.8                 # via requests
-importlib-metadata==0.23  # via pluggy, pytest
 injector==0.17.0
 itsdangerous==1.1.0       # via flask, flask-security
 jinja2==2.10.3            # via flask, flask-babelex
@@ -47,16 +46,15 @@ pytz==2019.3
 redis==3.3.11
 requests==2.22.0
 rq==1.2.2
-six==1.13.0               # via bcrypt, faker, freezegun, packaging, pytest, python-dateutil, sqlalchemy-utils
+six==1.13.0               # via bcrypt, faker, freezegun, packaging, python-dateutil, sqlalchemy-utils
 speaklater==1.3           # via flask-babelex
 sqlalchemy-utils==0.35.0  # via pytest-sqlalchemy
 sqlalchemy==1.3.13
 stripe==2.42.0
 text-unidecode==1.3       # via faker
 typing-extensions==3.7.4.1
-typing==3.7.4.1             # via flask-injector
+typing==3.7.4.1           # via flask-injector
 urllib3==1.25.6           # via requests
 wcwidth==0.1.7            # via pytest
-werkzeug==0.16.0
+werkzeug==0.16.0          # via flask
 wtforms==2.2.1            # via flask-wtf
-zipp==0.6.0               # via importlib-metadata
