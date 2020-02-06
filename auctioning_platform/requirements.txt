@@ -52,7 +52,7 @@ speaklater==1.3           # via flask-babelex
 sqlalchemy-utils==0.35.0  # via pytest-sqlalchemy
 sqlalchemy==1.3.13
 stripe==2.37.2
-text-unidecode==1.2       # via faker
+text-unidecode==1.3       # via faker
 typing-extensions==3.7.4.1
 typing==3.7.4.1             # via flask-injector
 urllib3==1.25.6           # via requests
