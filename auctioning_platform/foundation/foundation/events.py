@@ -21,6 +21,9 @@ class EventMixin:
     def domain_events(self) -> List[Event]:
         return self._pending_domain_events[:]
 
+    def clean_events(self) -> None:
+        self._pending_domain_events.clear()
+
 
 class Handler(Generic[T]):
     """Simple generic used to associate handlers with events using DI.

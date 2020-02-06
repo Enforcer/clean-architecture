@@ -24,18 +24,18 @@ class Auction(EventMixin):
         self._withdrawn_bids_ids: List[BidId] = []
 
     def place_bid(self, bidder_id: BidderId, amount: Money) -> None:
-        if self.should_end:
+        if self._should_end:
             raise BidOnEndedAuction
 
         old_winner = self.winners[0] if self.bids else None
         if amount > self.current_price:
             self.bids.append(Bid(id=None, bidder_id=bidder_id, amount=amount))
             self._record_event(WinningBidPlaced(self.id, bidder_id, amount, self.title))
-            if old_winner:
+            if old_winner and old_winner != bidder_id:
                 self._record_event(BidderHasBeenOverbid(self.id, old_winner, amount, self.title))
 
     @property
-    def should_end(self) -> bool:
+    def _should_end(self) -> bool:
         return datetime.now(tz=self.ends_at.tzinfo) > self.ends_at
 
     @property
@@ -64,7 +64,7 @@ class Auction(EventMixin):
         return self._withdrawn_bids_ids[:]
 
     def end_auction(self) -> None:
-        if not self.should_end:
+        if not self._should_end:
             raise AuctionHasNotEnded
         if self.ended:
             raise AuctionAlreadyEnded
