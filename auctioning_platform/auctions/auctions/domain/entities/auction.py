@@ -5,7 +5,7 @@ from foundation.events import EventMixin
 from foundation.value_objects import Money
 
 from auctions.domain.entities.bid import Bid
-from auctions.domain.events import AuctionEnded, BidderHasBeenOverbid, WinningBidPlaced
+from auctions.domain.events import AuctionBegan, AuctionEnded, BidderHasBeenOverbid, WinningBidPlaced
 from auctions.domain.exceptions import AuctionAlreadyEnded, AuctionHasNotEnded, BidOnEndedAuction
 from auctions.domain.types import AuctionId, BidderId, BidId
 
@@ -20,7 +20,7 @@ class Auction(EventMixin):
         self.starting_price = starting_price
         self.bids = sorted(bids, key=lambda bid: bid.amount)
         self.ends_at = ends_at
-        self.ended = ended
+        self._ended = ended
         self._withdrawn_bids_ids: List[BidId] = []
 
     def place_bid(self, bidder_id: BidderId, amount: Money) -> None:
@@ -66,15 +66,21 @@ class Auction(EventMixin):
     def end_auction(self) -> None:
         if not self._should_end:
             raise AuctionHasNotEnded
-        if self.ended:
+        if self._ended:
             raise AuctionAlreadyEnded
 
         winner_id: Optional[BidderId] = None
         if self.bids:
             winner_id = self._highest_bid.bidder_id
 
-        self.ended = True
+        self._ended = True
         self._record_event(AuctionEnded(self.id, winner_id, self.current_price, self.title))
+
+    @classmethod
+    def create(cls, id: AuctionId, title: str, starting_price: Money, ends_at: datetime) -> "Auction":
+        auction = Auction(id, title, starting_price, [], ends_at, False)
+        auction._record_event(AuctionBegan(id, starting_price, title))
+        return auction
 
     def __str__(self) -> str:
         return f'<Auction #{self.id} title="{self.title}" current_price={self.current_price}>'

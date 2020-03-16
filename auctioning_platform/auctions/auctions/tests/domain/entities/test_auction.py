@@ -152,9 +152,17 @@ def test_should_raise_if_auction_has_not_been_ended() -> None:
         auction.end_auction()
 
 
-def test_should_not_let_to_end_auction_multiple_times(yesterday: datetime) -> None:
+def test_EndedAuction_PlacingBid_RaisesException(yesterday: datetime) -> None:
     auction = AuctionFactory(ends_at=yesterday)
-
     auction.end_auction()
+
+    with pytest.raises(BidOnEndedAuction):
+        auction.place_bid(bidder_id=1, amount=get_dollars("19.99"))
+
+
+def test_EndedAuction_Ending_RaisesException(yesterday: datetime) -> None:
+    auction = AuctionFactory(ends_at=yesterday)
+    auction.end_auction()
+
     with pytest.raises(AuctionAlreadyEnded):
         auction.end_auction()

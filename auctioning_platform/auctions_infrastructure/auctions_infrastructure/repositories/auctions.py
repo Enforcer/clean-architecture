@@ -43,7 +43,7 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
             "starting_price": auction.starting_price.amount,
             "current_price": auction.current_price.amount,
             "ends_at": auction.ends_at,
-            "ended": auction.ended,
+            "ended": auction._ended,
         }
         update_result = self._conn.execute(auctions.update(values=raw_auction, whereclause=auctions.c.id == auction.id))
         assert update_result.rowcount == 1  # no support for creating
@@ -61,3 +61,5 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
 
         for event in auction.domain_events:
             self._event_bus.post(event)
+
+        auction.clean_events()

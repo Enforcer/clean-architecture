@@ -2,6 +2,7 @@ from typing import Type
 
 from flask import Blueprint, Response, abort, jsonify, make_response, request
 from flask_login import current_user
+import flask_injector
 import injector
 from marshmallow import Schema, exceptions as marshmallow_exceptions, fields, post_load
 
@@ -11,12 +12,13 @@ from auctions.application import queries as auction_queries
 from auctions.application.use_cases import placing_bid
 from auctions.domain.types import AuctionId
 
-46
+
 auctions_blueprint = Blueprint("auctions_blueprint", __name__)
 
 
 class AuctionsWeb(injector.Module):
     @injector.provider
+    @flask_injector.request
     def placing_bid_output_boundary(self) -> placing_bid.PlacingBidOutputBoundary:
         return PlacingBidPresenter()
 
@@ -71,11 +73,13 @@ def single_auction(auction_id: int, query: auction_queries.GetSingleAuction) -> 
 
 
 @auctions_blueprint.route("/<int:auction_id>/bids", methods=["POST"])
-def place_bid(auction_id: AuctionId, placing_bid_uc: placing_bid.PlacingBid) -> Response:
+def place_bid(
+    auction_id: AuctionId, placing_bid_uc: placing_bid.PlacingBid, presenter: placing_bid.PlacingBidOutputBoundary
+) -> Response:
     if not current_user.is_authenticated:
         abort(403)
 
     placing_bid_uc.execute(
         get_input_dto(PlacingBidSchema, context={"auction_id": auction_id, "bidder_id": current_user.id})
     )
-    return placing_bid_uc.output_boundary.response  # type: ignore
+    return presenter.response  # type: ignore

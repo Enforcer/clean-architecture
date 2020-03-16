@@ -29,3 +29,10 @@ class AuctionEnded(Event):
     winner_id: Optional[BidderId]
     winning_bid: Money
     auction_title: str
+
+
+@dataclass(frozen=True)
+class AuctionBegan(Event):
+    auction_id: AuctionId
+    starting_price: Money
+    auction_title: str

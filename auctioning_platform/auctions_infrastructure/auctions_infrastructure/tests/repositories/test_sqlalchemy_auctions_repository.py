@@ -150,7 +150,7 @@ def test_removes_withdrawn_bids(
 
 
 @pytest.mark.usefixtures("transaction")
-def test_posts_pending_domain_events(
+def test_AuctionsRepo_UponSavingAuction_PostsPendingEventsViaEventBus(
     connection: Connection, another_bidder_id: int, auction_model_with_a_bid: RowProxy, event_bus_mock: Mock
 ) -> None:
     repo = SqlAlchemyAuctionsRepo(connection, event_bus_mock)
@@ -160,3 +160,45 @@ def test_posts_pending_domain_events(
     repo.save(auction)
 
     event_bus_mock.post.assert_called()
+
+
+from foundation.events import EventBus, Event
+
+
+class EventBusStub(EventBus):
+    def __init__(self) -> None:
+        self.events = []
+
+    def post(self, event: Event) -> None:
+        self.events.append(event)
+
+
+@pytest.fixture()
+def event_bus_stub() -> EventBusStub:
+    return EventBusStub()
+
+
+@pytest.mark.usefixtures("transaction")
+def test_AuctionsRepo_UponSavingAuction_ClearsPendingEvents(
+    connection: Connection, another_bidder_id: int, auction_model_with_a_bid: RowProxy, event_bus_mock: Mock
+) -> None:
+    repo = SqlAlchemyAuctionsRepo(connection, event_bus_mock)
+    auction = repo.get(auction_model_with_a_bid.id)
+    auction.place_bid(another_bidder_id, auction.current_price + get_dollars("1.00"))
+
+    repo.save(auction)
+
+    assert len(auction.domain_events) == 0
+
+
+# @pytest.mark.usefixtures("transaction")
+# def test_AuctionsRepo_UponSavingAuction_PostsPendingEventsViaEventBus(
+#     connection: Connection, another_bidder_id: int, auction_model_with_a_bid: RowProxy, event_bus_stub: EventBusStub
+# ) -> None:
+#     repo = SqlAlchemyAuctionsRepo(connection, event_bus_stub)
+#     auction = repo.get(auction_model_with_a_bid.id)
+#     auction.place_bid(another_bidder_id, auction.current_price + get_dollars("1.00"))
+#
+#     repo.save(auction)
+#
+#     event_bus_stub.events

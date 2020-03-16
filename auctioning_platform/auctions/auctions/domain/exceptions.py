@@ -8,3 +8,7 @@ class AuctionHasNotEnded(Exception):
 
 class AuctionAlreadyEnded(Exception):
     pass
+
+
+class AuctionEndingInThePast(Exception):
+    pass
