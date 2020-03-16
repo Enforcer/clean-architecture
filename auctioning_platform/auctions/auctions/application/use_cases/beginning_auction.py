@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from auctions.domain.exceptions import AuctionEndingInThePast
 from foundation.value_objects import Money
 
 from auctions.application.repositories import AuctionsRepository
 from auctions.domain.entities import Auction
+from auctions.domain.exceptions import AuctionEndingInThePast
 from auctions.domain.types import AuctionId
 
 

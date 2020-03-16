@@ -6,6 +6,7 @@ import pytest
 from sqlalchemy import func, select
 from sqlalchemy.engine import Connection, Engine, RowProxy
 
+from foundation.events import Event, EventBus
 from foundation.value_objects.factories import get_dollars
 
 from auctions.domain.entities import Auction, Bid
@@ -160,9 +161,6 @@ def test_AuctionsRepo_UponSavingAuction_PostsPendingEventsViaEventBus(
     repo.save(auction)
 
     event_bus_mock.post.assert_called()
-
-
-from foundation.events import EventBus, Event
 
 
 class EventBusStub(EventBus):

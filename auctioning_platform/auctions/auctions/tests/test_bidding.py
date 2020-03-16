@@ -2,19 +2,19 @@ from datetime import datetime, timedelta
 from typing import Optional
 from unittest.mock import Mock, call
 
+from freezegun import freeze_time
 import pytest
 import pytz
-from freezegun import freeze_time
 
-from auctions.domain.exceptions import BidOnEndedAuction
 from foundation.events import EventBus
 from foundation.value_objects.factories import get_dollars
 
 from auctions import BeginningAuction, BidderHasBeenOverbid, PlacingBid, WinningBidPlaced
+from auctions.application.repositories import AuctionsRepository
 from auctions.application.use_cases.beginning_auction import BeginningAuctionInputDto
 from auctions.application.use_cases.placing_bid import PlacingBidInputDto, PlacingBidOutputBoundary, PlacingBidOutputDto
 from auctions.domain.entities import Auction
-from auctions.application.repositories import AuctionsRepository
+from auctions.domain.exceptions import BidOnEndedAuction
 from auctions.domain.types import AuctionId
 from auctions.tests.factories import AuctionFactory
 from auctions.tests.in_memory_repo import InMemoryAuctionsRepo
@@ -62,7 +62,7 @@ def auctions_repo(event_bus: Mock) -> AuctionsRepository:
 def place_bid_uc(
     output_boundary: PlacingBidOutputBoundaryFake, auction: Auction, auctions_repo: AuctionsRepository
 ) -> PlacingBid:
-    auctions_repo._data[auction.id] = auction
+    auctions_repo.save(auction)
     return PlacingBid(output_boundary, auctions_repo)
 
 

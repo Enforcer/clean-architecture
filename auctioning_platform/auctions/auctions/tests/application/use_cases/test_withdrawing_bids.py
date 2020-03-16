@@ -3,10 +3,12 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from foundation.value_objects import Money
+
 from auctions.application.use_cases import WithdrawingBids
 from auctions.application.use_cases.withdrawing_bids import WithdrawingBidsInputDto
 from auctions.domain.entities import Auction
-from foundation.value_objects import Money
+from auctions.domain.types import AuctionId
 
 
 @pytest.fixture()
@@ -19,32 +21,35 @@ def input_dto(auction: Auction, exemplary_bids_ids: List[int]) -> WithdrawingBid
     return WithdrawingBidsInputDto(auction.id, exemplary_bids_ids)
 
 
-# class EndingAuctionInputDto:
-#     def __init__(self, auction_id) -> None:
-#          self.auction_id = auction_id
-#
-# class EndingAuction:
-#     def execute(self, dto: EndingAuctionInputDto) -> None:
-#         pass
-#
-# class PaymentProvider:
-#     def begin_payment(self, amount: Money) -> None:
-#         pass
-#
-# class PaymentProviderStub(PaymentProvider):
-#     def __init__(self) -> None:
-#         self.payments: List[Money] = []
-#
-#     def begin_payment(self, amount: Money) -> bool:
-#         self.payments.append(amount)
-#         return True
-#
-# def test_EndingAuction_EndedAuctionWithWinner_BeginsPaymentWithAuctionCurrentPrice(
-#         ending_auction_uc: EndingAuction, auction: Auction, payment_provider: PaymentProviderStub
-# ) -> None:
-#     ending_auction_uc.execute(EndingAuctionInputDto(auction.id))
-#
-#     assert payment_provider.payments == [auction.current_price]
+class EndingAuctionInputDto:
+    def __init__(self, auction_id: AuctionId) -> None:
+        self.auction_id = auction_id
+
+
+class EndingAuction:
+    def execute(self, dto: EndingAuctionInputDto) -> None:
+        pass
+
+
+class PaymentProvider:
+    def begin_payment(self, amount: Money) -> None:
+        pass
+
+
+class PaymentProviderStub(PaymentProvider):
+    def __init__(self) -> None:
+        self.payments: List[Money] = []
+
+    def begin_payment(self, amount: Money) -> None:
+        self.payments.append(amount)
+
+
+def test_EndingAuction_EndedAuctionWithWinner_BeginsPaymentWithAuctionCurrentPrice(
+    ending_auction_uc: EndingAuction, auction: Auction, payment_provider: PaymentProviderStub
+) -> None:
+    ending_auction_uc.execute(EndingAuctionInputDto(auction.id))
+
+    assert payment_provider.payments == [auction.current_price]
 
 
 def test_loads_auction_using_id(
