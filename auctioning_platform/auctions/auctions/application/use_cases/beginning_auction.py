@@ -6,7 +6,7 @@ from foundation.value_objects import Money
 from auctions.application.repositories import AuctionsRepository
 from auctions.domain.entities import Auction
 from auctions.domain.exceptions import AuctionEndingInThePast
-from auctions.domain.types import AuctionId
+from auctions.domain.value_objects import AuctionId
 
 
 @dataclass

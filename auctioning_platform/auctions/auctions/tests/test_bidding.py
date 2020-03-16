@@ -15,7 +15,7 @@ from auctions.application.use_cases.beginning_auction import BeginningAuctionInp
 from auctions.application.use_cases.placing_bid import PlacingBidInputDto, PlacingBidOutputBoundary, PlacingBidOutputDto
 from auctions.domain.entities import Auction
 from auctions.domain.exceptions import BidOnEndedAuction
-from auctions.domain.types import AuctionId
+from auctions.domain.value_objects import AuctionId
 from auctions.tests.factories import AuctionFactory
 from auctions.tests.in_memory_repo import InMemoryAuctionsRepo
 

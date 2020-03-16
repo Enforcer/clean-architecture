@@ -7,7 +7,7 @@ from foundation.value_objects import Money
 from auctions.domain.entities.bid import Bid
 from auctions.domain.events import AuctionBegan, AuctionEnded, BidderHasBeenOverbid, WinningBidPlaced
 from auctions.domain.exceptions import AuctionAlreadyEnded, AuctionHasNotEnded, BidOnEndedAuction
-from auctions.domain.types import AuctionId, BidderId, BidId
+from auctions.domain.value_objects import AuctionId, BidderId, BidId
 
 
 class Auction(EventMixin):

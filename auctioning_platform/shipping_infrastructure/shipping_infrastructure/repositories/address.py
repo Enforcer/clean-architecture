@@ -4,7 +4,7 @@ import faker
 
 from shipping import AddressRepository
 from shipping.domain.entities import Address
-from shipping.domain.types import ConsigneeId
+from shipping.domain.value_objects import ConsigneeId
 
 
 class FakeAddressRepository(AddressRepository):

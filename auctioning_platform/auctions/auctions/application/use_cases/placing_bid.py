@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from foundation.value_objects import Money
 
 from auctions.application.repositories import AuctionsRepository
-from auctions.domain.types import AuctionId, BidderId
+from auctions.domain.value_objects import AuctionId, BidderId
 
 
 @dataclass

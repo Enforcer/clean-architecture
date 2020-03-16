@@ -4,7 +4,7 @@ from foundation.events import EventBus
 
 from auctions.application.repositories import AuctionsRepository
 from auctions.domain.entities import Auction
-from auctions.domain.types import AuctionId
+from auctions.domain.value_objects import AuctionId
 
 
 class InMemoryAuctionsRepo(AuctionsRepository):

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from auctions.application.repositories import AuctionsRepository
-from auctions.domain.types import AuctionId
+from auctions.domain.value_objects import AuctionId
 
 
 @dataclass

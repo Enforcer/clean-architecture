@@ -10,7 +10,7 @@ from foundation.value_objects.factories import get_dollars
 
 from auctions.application import queries as auction_queries
 from auctions.application.use_cases import placing_bid
-from auctions.domain.types import AuctionId
+from auctions.domain.value_objects import AuctionId
 
 auctions_blueprint = Blueprint("auctions_blueprint", __name__)
 
