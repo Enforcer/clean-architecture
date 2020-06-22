@@ -8,7 +8,7 @@ attrs==19.1.0             # via pytest
 babel==2.7.0              # via flask-babelex
 bcrypt==3.1.7
 blinker==1.4              # via flask-mail, flask-principal
-certifi==2019.3.9         # via requests
+certifi==2020.6.20         # via requests
 cffi==1.14.0              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.0                # via flask, rq
