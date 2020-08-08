@@ -62,4 +62,4 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
         for event in auction.domain_events:
             self._event_bus.post(event)
 
-        auction.clean_events()
+        auction.clear_events()

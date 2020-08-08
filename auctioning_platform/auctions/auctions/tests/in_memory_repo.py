@@ -18,5 +18,5 @@ class InMemoryAuctionsRepo(AuctionsRepository):
     def save(self, auction: Auction) -> None:
         for event in auction.domain_events:
             self._event_bus.post(event)
-        auction.clean_events()
+        auction.clear_events()
         self._data[auction.id] = auction

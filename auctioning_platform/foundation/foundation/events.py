@@ -21,7 +21,7 @@ class EventMixin:
     def domain_events(self) -> List[Event]:
         return self._pending_domain_events[:]
 
-    def clean_events(self) -> None:
+    def clear_events(self) -> None:
         self._pending_domain_events.clear()
 
 
