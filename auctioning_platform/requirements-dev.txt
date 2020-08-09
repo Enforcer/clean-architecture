@@ -4,4 +4,5 @@ isort==4.3.21
 flake8==3.7.9
 mypy==0.761
 pylint==2.5.3
+pylint-forbidden-imports==1.0.0
 
