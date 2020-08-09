@@ -17,6 +17,7 @@ services:
       EMAIL_FROM_NAME: Auctions
       EMAIL_FROM_ADDRESS: auctions@cleanarchitecture.io
       DB_DSN: postgresql+psycopg2://postgres:cleanarchitecture@database/cleanarchitecture
+      REDIS_HOST: redis
     depends_on:
       - database
   database:
