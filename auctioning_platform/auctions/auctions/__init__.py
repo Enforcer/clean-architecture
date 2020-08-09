@@ -1,6 +1,6 @@
 import injector
 
-from auctions.application.queries import GetActiveAuctions, GetSingleAuction
+from auctions.application.queries import AuctionDto, GetActiveAuctions, GetSingleAuction
 from auctions.application.repositories import AuctionsRepository
 from auctions.application.use_cases import (
     BeginningAuction,
@@ -10,14 +10,18 @@ from auctions.application.use_cases import (
     PlacingBid,
     PlacingBidInputDto,
     PlacingBidOutputBoundary,
+    PlacingBidOutputDto,
     WithdrawingBids,
     WithdrawingBidsInputDto,
 )
 from auctions.domain.events import AuctionBegan, AuctionEnded, BidderHasBeenOverbid, WinningBidPlaced
+from auctions.domain.value_objects import AuctionId
 
 __all__ = [
     # module
     "Auctions",
+    # value objects
+    "AuctionId",
     # events
     "AuctionBegan",
     "AuctionEnded",
@@ -34,9 +38,13 @@ __all__ = [
     "EndingAuctionInputDto",
     "PlacingBidInputDto",
     "WithdrawingBidsInputDto",
+    # output dtos
+    "PlacingBidOutputDto",
     # queries
     "GetActiveAuctions",
     "GetSingleAuction",
+    # queries dtos
+    "AuctionDto",
 ]
 
 

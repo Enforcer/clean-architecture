@@ -7,6 +7,7 @@ from auctions import BidderHasBeenOverbid, WinningBidPlaced
 
 from customer_relationship.config import CustomerRelationshipConfig
 from customer_relationship.facade import CustomerRelationshipFacade
+from customer_relationship.models import customers
 
 __all__ = [
     # module
@@ -14,6 +15,8 @@ __all__ = [
     "CustomerRelationshipConfig",
     # facade
     "CustomerRelationshipFacade",
+    # models
+    "customers",
 ]
 
 

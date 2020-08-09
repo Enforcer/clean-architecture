@@ -7,7 +7,7 @@ from main import bootstrap_app
 from foundation.method_dispatch import method_dispatch
 from foundation.value_objects import Money
 
-from auctions.application import queries as auction_queries
+from auctions import AuctionDto
 from web_app.blueprints.auctions import AuctionsWeb, auctions_blueprint
 from web_app.blueprints.shipping import shipping_blueprint
 from web_app.security import setup as security_setup
@@ -18,8 +18,8 @@ class JSONEncoder(json.JSONEncoder):
     def default(self, obj: object) -> object:
         raise TypeError(f"Cannot serialize {type(obj)}")
 
-    @default.register(auction_queries.AuctionDto)  # noqa: F811
-    def serialize_auction_dto(self, obj: auction_queries.AuctionDto) -> object:
+    @default.register(AuctionDto)  # noqa: F811
+    def serialize_auction_dto(self, obj: AuctionDto) -> object:
         return {
             "id": obj.id,
             "title": obj.title,
@@ -69,6 +69,12 @@ def create_app() -> Flask:
         finally:
             app_context.connection_provider.close_if_present()
 
+        return response
+
+    @app.after_request
+    def add_cors_headers(response: Response) -> Response:
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "*"
         return response
 
     # has to be after DB-hooks, because it relies on DB

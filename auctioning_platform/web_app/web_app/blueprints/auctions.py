@@ -8,9 +8,15 @@ from marshmallow import Schema, exceptions as marshmallow_exceptions, fields, po
 
 from foundation.value_objects.factories import get_dollars
 
-from auctions.application import queries as auction_queries
-from auctions.application.use_cases import placing_bid
-from auctions.domain.value_objects import AuctionId
+from auctions import (
+    AuctionId,
+    GetActiveAuctions,
+    GetSingleAuction,
+    PlacingBid,
+    PlacingBidInputDto,
+    PlacingBidOutputBoundary,
+    PlacingBidOutputDto,
+)
 
 auctions_blueprint = Blueprint("auctions_blueprint", __name__)
 
@@ -18,7 +24,7 @@ auctions_blueprint = Blueprint("auctions_blueprint", __name__)
 class AuctionsWeb(injector.Module):
     @injector.provider
     @flask_injector.request
-    def placing_bid_output_boundary(self) -> placing_bid.PlacingBidOutputBoundary:
+    def placing_bid_output_boundary(self) -> PlacingBidOutputBoundary:
         return PlacingBidPresenter()
 
 
@@ -33,7 +39,7 @@ class Dollars(fields.Field):
             raise marshmallow_exceptions.ValidationError(str(exc))
 
 
-def get_input_dto(schema_cls: Type[Schema], context: dict) -> placing_bid.PlacingBidInputDto:
+def get_input_dto(schema_cls: Type[Schema], context: dict) -> PlacingBidInputDto:
     schema = schema_cls(context=context)
     try:
         return schema.load(request.json)
@@ -45,14 +51,14 @@ class PlacingBidSchema(Schema):
     amount = Dollars()
 
     @post_load
-    def make_dto(self, data: dict, **_kwargs: dict) -> placing_bid.PlacingBidInputDto:
-        return placing_bid.PlacingBidInputDto(**self.context, **data)
+    def make_dto(self, data: dict, **_kwargs: dict) -> PlacingBidInputDto:
+        return PlacingBidInputDto(**self.context, **data)
 
 
-class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
+class PlacingBidPresenter(PlacingBidOutputBoundary):
     response: Response
 
-    def present(self, output_dto: placing_bid.PlacingBidOutputDto) -> None:
+    def present(self, output_dto: PlacingBidOutputDto) -> None:
         message = (
             f"Hooray! You are a winner"
             if output_dto.is_winner
@@ -62,19 +68,17 @@ class PlacingBidPresenter(placing_bid.PlacingBidOutputBoundary):
 
 
 @auctions_blueprint.route("/")
-def auctions_list(query: auction_queries.GetActiveAuctions) -> Response:
+def auctions_list(query: GetActiveAuctions) -> Response:
     return make_response(jsonify(query.query()))  # type: ignore
 
 
 @auctions_blueprint.route("/<int:auction_id>")
-def single_auction(auction_id: int, query: auction_queries.GetSingleAuction) -> Response:
+def single_auction(auction_id: int, query: GetSingleAuction) -> Response:
     return make_response(jsonify(query.query(auction_id)))  # type: ignore
 
 
 @auctions_blueprint.route("/<int:auction_id>/bids", methods=["POST"])
-def place_bid(
-    auction_id: AuctionId, placing_bid_uc: placing_bid.PlacingBid, presenter: placing_bid.PlacingBidOutputBoundary
-) -> Response:
+def place_bid(auction_id: AuctionId, placing_bid_uc: PlacingBid, presenter: PlacingBidOutputBoundary) -> Response:
     if not current_user.is_authenticated:
         abort(403)
 
