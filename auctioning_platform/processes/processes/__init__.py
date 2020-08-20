@@ -9,8 +9,8 @@ from foundation.events import AsyncEventHandlerProvider, AsyncHandler, Event
 from customer_relationship import CustomerRelationshipFacade
 from payments import PaymentsFacade
 
-from processes.paying_for_won_item import PayingForWonItemSaga, PayingForWonItemSagaHandler
-from processes.repository import SagaDataRepo
+from processes.paying_for_won_item import PayingForWonItem, PayingForWonItemHandler
+from processes.repository import ProcessManagerDataRepo
 
 __all__ = [
     # module
@@ -25,28 +25,28 @@ class Handler(Protocol):
         ...
 
 
-class Saga(Protocol):
+class ProcessManager(Protocol):
     handle: Handler
 
 
 class Processes(injector.Module):
-    SAGAS_HANDLERS: List[Tuple[Type[Saga], Type[Handler]]] = [
-        (PayingForWonItemSaga, PayingForWonItemSagaHandler)  # type: ignore
+    PM_HANDLERS: List[Tuple[Type[ProcessManager], Type[Handler]]] = [
+        (PayingForWonItem, PayingForWonItemHandler)  # type: ignore
     ]
 
     @injector.provider
-    def get_paying_for_won_item_saga(
+    def get_paying_for_won_item(
         self, payments: PaymentsFacade, customer_relationship: CustomerRelationshipFacade
-    ) -> PayingForWonItemSaga:
-        return PayingForWonItemSaga(payments, customer_relationship)
+    ) -> PayingForWonItem:
+        return PayingForWonItem(payments, customer_relationship)
 
     @injector.provider
-    def get_saga_data_repo(self, connection: Connection) -> SagaDataRepo:
-        return SagaDataRepo(connection)
+    def get_data_repo(self, connection: Connection) -> ProcessManagerDataRepo:
+        return ProcessManagerDataRepo(connection)
 
     def configure(self, binder: injector.Binder) -> None:
-        for saga, handler_cls in self.SAGAS_HANDLERS:
-            handled_events = [event for event in saga.handle.registry.keys() if issubclass(event, Event)]
+        for pm, handler_cls in self.PM_HANDLERS:
+            handled_events = [event for event in pm.handle.registry.keys() if issubclass(event, Event)]
             for event in handled_events:
                 binder.multibind(AsyncHandler[event], to=AsyncEventHandlerProvider(handler_cls))
 

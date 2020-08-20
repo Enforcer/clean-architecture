@@ -12,16 +12,16 @@ from customer_relationship import CustomerRelationshipFacade
 from payments import PaymentCaptured, PaymentsFacade
 
 
-class SagaState(Enum):
+class State(Enum):
     PAYMENT_STARTED = "PAYMENT_STARTED"
     TIMED_OUT = "TIMED_OUT"
     FINISHED = "FINISHED"
 
 
 @dataclass
-class PayingForWonItemSagaData:
-    saga_uuid: uuid.UUID
-    state: Optional[SagaState] = None
+class PayingForWonItemData:
+    process_uuid: uuid.UUID
+    state: Optional[State] = None
     timeout_at: Optional[datetime] = None
     winning_bid: Optional[Money] = None
     auction_title: Optional[str] = None
@@ -29,28 +29,28 @@ class PayingForWonItemSagaData:
     winner_id: Optional[int] = None
 
 
-class PayingForWonItemSaga:
+class PayingForWonItem:
     def __init__(self, payments: PaymentsFacade, customer_relationship: CustomerRelationshipFacade) -> None:
         self._payments = payments
         self._customer_relationship = customer_relationship
 
-    def timeout(self, data: PayingForWonItemSagaData) -> None:
+    def timeout(self, data: PayingForWonItemData) -> None:
         assert data.timeout_at is not None and datetime.now() >= data.timeout_at
-        assert data.state == SagaState.PAYMENT_STARTED
-        data.state = SagaState.TIMED_OUT
+        assert data.state == State.PAYMENT_STARTED
+        data.state = State.TIMED_OUT
 
     @method_dispatch
-    def handle(self, event: Any, data: PayingForWonItemSagaData) -> None:
+    def handle(self, event: Any, data: PayingForWonItemData) -> None:
         raise Exception(f"Unhandled event {event}")
 
     @handle.register(AuctionEnded)
-    def handle_auction_ended(self, event: AuctionEnded, data: PayingForWonItemSagaData) -> None:
+    def handle_auction_ended(self, event: AuctionEnded, data: PayingForWonItemData) -> None:
         assert data.state is None
         payment_uuid = uuid.uuid4()
         self._payments.start_new_payment(payment_uuid, event.winner_id, event.winning_bid, event.auction_title)
         self._customer_relationship.send_email_about_winning(event.winner_id, event.winning_bid, event.auction_title)
 
-        data.state = SagaState.PAYMENT_STARTED
+        data.state = State.PAYMENT_STARTED
         data.auction_title = event.auction_title
         data.winning_bid = event.winning_bid
         data.timeout_at = datetime.now() + timedelta(days=3)
@@ -58,11 +58,11 @@ class PayingForWonItemSaga:
         data.winner_id = event.winner_id
 
     @handle.register(PaymentCaptured)
-    def handle_payment_captured(self, event: PaymentCaptured, data: PayingForWonItemSagaData) -> None:
-        assert data.state == SagaState.PAYMENT_STARTED
+    def handle_payment_captured(self, event: PaymentCaptured, data: PayingForWonItemData) -> None:
+        assert data.state == State.PAYMENT_STARTED
         self._customer_relationship.send_email_after_successful_payment(
             event.customer_id, data.winning_bid, data.auction_title
         )
 
-        data.state = SagaState.FINISHED
+        data.state = State.FINISHED
         data.timeout_at = None

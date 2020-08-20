@@ -9,9 +9,9 @@ from foundation.value_objects.factories import get_dollars
 
 from db_infrastructure import Base
 
-from processes.paying_for_won_item import PayingForWonItemSagaData
-from processes.paying_for_won_item.saga import SagaState
-from processes.repository import SagaDataRepo, saga_data_table
+from processes.paying_for_won_item import PayingForWonItemData
+from processes.paying_for_won_item.saga import State
+from processes.repository import ProcessManagerDataRepo, process_manager_data_table
 
 EXAMPLE_DATETIME = datetime(2019, 5, 24, 15, 20, 0, 12)
 
@@ -27,17 +27,17 @@ def setup_teardown_tables(engine: Engine) -> None:
 
 
 @pytest.fixture()
-def repo(connection: Connection) -> SagaDataRepo:
-    return SagaDataRepo(connection)
+def repo(connection: Connection) -> ProcessManagerDataRepo:
+    return ProcessManagerDataRepo(connection)
 
 
 @pytest.mark.parametrize(
     "data, json_repr",
     [
         (
-            PayingForWonItemSagaData(UUID("331831f1-3d7c-48c2-9433-955c1cf8deb6")),
+            PayingForWonItemData(UUID("331831f1-3d7c-48c2-9433-955c1cf8deb6")),
             {
-                "saga_uuid": "331831f1-3d7c-48c2-9433-955c1cf8deb6",
+                "process_uuid": "331831f1-3d7c-48c2-9433-955c1cf8deb6",
                 "state": None,
                 "timeout_at": None,
                 "winning_bid": None,
@@ -47,9 +47,9 @@ def repo(connection: Connection) -> SagaDataRepo:
             },
         ),
         (
-            PayingForWonItemSagaData(
+            PayingForWonItemData(
                 UUID("d1526bb4-cee4-4b63-9029-802abc0f7593"),
-                SagaState.PAYMENT_STARTED,
+                State.PAYMENT_STARTED,
                 EXAMPLE_DATETIME,
                 get_dollars("15.99"),
                 "Irrelevant",
@@ -57,8 +57,8 @@ def repo(connection: Connection) -> SagaDataRepo:
                 2,
             ),
             {
-                "saga_uuid": "d1526bb4-cee4-4b63-9029-802abc0f7593",
-                "state": SagaState.PAYMENT_STARTED.value,
+                "process_uuid": "d1526bb4-cee4-4b63-9029-802abc0f7593",
+                "state": State.PAYMENT_STARTED.value,
                 "timeout_at": EXAMPLE_DATETIME.isoformat(),
                 "winning_bid": {"amount": "15.99", "currency": "USD"},
                 "auction_title": "Irrelevant",
@@ -69,17 +69,19 @@ def repo(connection: Connection) -> SagaDataRepo:
     ],
 )
 def test_saving_and_reading(
-    repo: SagaDataRepo, connection: Connection, data: PayingForWonItemSagaData, json_repr: dict
+    repo: ProcessManagerDataRepo, connection: Connection, data: PayingForWonItemData, json_repr: dict
 ) -> None:
-    saga_uuid = uuid4()
+    process_uuid = uuid4()
 
-    connection.execute(saga_data_table.insert(values={"uuid": saga_uuid, "json": json.dumps(json_repr)}))
+    connection.execute(process_manager_data_table.insert(values={"uuid": process_uuid, "json": json.dumps(json_repr)}))
 
-    assert repo.get(saga_uuid, type(data)) == data
+    assert repo.get(process_uuid, type(data)) == data
 
-    connection.execute(saga_data_table.delete().where(saga_data_table.c.uuid == saga_uuid))
+    connection.execute(process_manager_data_table.delete().where(process_manager_data_table.c.uuid == process_uuid))
 
-    repo.save(saga_uuid, data)
+    repo.save(process_uuid, data)
 
-    row = connection.execute(saga_data_table.select(saga_data_table.c.uuid == saga_uuid)).first()
+    row = connection.execute(
+        process_manager_data_table.select(process_manager_data_table.c.uuid == process_uuid)
+    ).first()
     assert json.loads(row.json) == json_repr
