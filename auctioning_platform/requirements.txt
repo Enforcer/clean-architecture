@@ -56,5 +56,5 @@ typing-extensions==3.7.4.1
 typing==3.7.4.1           # via flask-injector
 urllib3==1.25.10          # via requests
 wcwidth==0.1.7            # via pytest
-werkzeug==0.16.0          # via flask
+werkzeug==1.0.1          # via flask
 wtforms==2.2.1            # via flask-wtf
