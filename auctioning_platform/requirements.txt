@@ -20,7 +20,7 @@ flask-login==0.4.1
 flask-mail==0.9.1         # via flask-security
 flask-principal==0.4.0    # via flask-security
 flask-security==3.0.0
-flask-wtf==0.14.2         # via flask-security
+flask-wtf==0.14.3         # via flask-security
 flask==1.1.1
 freezegun==0.3.15
 idna==2.8                 # via requests
