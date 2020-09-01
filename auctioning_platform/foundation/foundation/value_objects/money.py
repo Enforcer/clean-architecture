@@ -18,7 +18,7 @@ class Money:
         else:
             decimal_tuple = decimal_amount.as_tuple()
             if decimal_tuple.sign:
-                raise ValueError(f"amount must not be negative!")
+                raise ValueError("amount must not be negative!")
             elif -decimal_tuple.exponent > currency.decimal_precision:
                 raise ValueError(
                     f"given amount has invalid precision! It should have "

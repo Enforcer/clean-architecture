@@ -60,7 +60,7 @@ class PlacingBidPresenter(PlacingBidOutputBoundary):
 
     def present(self, output_dto: PlacingBidOutputDto) -> None:
         message = (
-            f"Hooray! You are a winner"
+            "Hooray! You are a winner"
             if output_dto.is_winner
             else f"Your bid is too low. Current price is {output_dto.current_price}"
         )
