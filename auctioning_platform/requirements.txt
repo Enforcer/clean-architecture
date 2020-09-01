@@ -11,7 +11,7 @@ blinker==1.4              # via flask-mail, flask-principal
 certifi==2020.6.20         # via requests
 cffi==1.14.0              # via bcrypt
 chardet==3.0.4            # via requests
-click==7.0                # via flask, rq
+click==7.1.2                # via flask, rq
 factory-boy==2.12.0
 faker==2.0.3
 flask-babelex==0.9.4      # via flask-security
