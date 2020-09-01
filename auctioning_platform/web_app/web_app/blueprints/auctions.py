@@ -69,12 +69,12 @@ class PlacingBidPresenter(PlacingBidOutputBoundary):
 
 @auctions_blueprint.route("/")
 def auctions_list(query: GetActiveAuctions) -> Response:
-    return make_response(jsonify(query.query()))  # type: ignore
+    return make_response(jsonify(query.query()))
 
 
 @auctions_blueprint.route("/<int:auction_id>")
 def single_auction(auction_id: int, query: GetSingleAuction) -> Response:
-    return make_response(jsonify(query.query(auction_id)))  # type: ignore
+    return make_response(jsonify(query.query(auction_id)))
 
 
 @auctions_blueprint.route("/<int:auction_id>/bids", methods=["POST"])

@@ -37,7 +37,7 @@ class SaUserDatastore(UserDatastore):
 
     @property
     def session(self) -> Session:
-        return request.session
+        return request.session  # type: ignore
 
 
 def setup(app: Flask) -> None:
