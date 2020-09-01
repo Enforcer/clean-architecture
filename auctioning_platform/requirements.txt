@@ -13,7 +13,7 @@ cffi==1.14.0              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.1.2                # via flask, rq
 factory-boy==2.12.0
-faker==2.0.3
+faker==4.1.2
 flask-babelex==0.9.4      # via flask-security
 flask-injector==0.12.0
 flask-login==0.4.1
