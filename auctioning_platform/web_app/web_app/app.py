@@ -58,14 +58,14 @@ def create_app() -> Flask:
 
     @app.before_request
     def transaction_start() -> None:
-        request.tx = app_context.connection_provider.open().begin()
-        request.session = app_context.connection_provider.provide_session()
+        request.tx = app_context.connection_provider.open().begin()  # type: ignore
+        request.session = app_context.connection_provider.provide_session()  # type: ignore
 
     @app.after_request
     def transaction_commit(response: Response) -> Response:
         try:
             if hasattr(request, "tx") and response.status_code < 400:
-                request.tx.commit()
+                request.tx.commit()  # type: ignore
         finally:
             app_context.connection_provider.close_if_present()
 
