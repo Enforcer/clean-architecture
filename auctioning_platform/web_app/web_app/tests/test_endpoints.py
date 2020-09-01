@@ -4,8 +4,10 @@ from typing import Generator
 
 from _pytest.tmpdir import TempPathFactory
 from flask import Flask, testing
+from flask_login import FlaskLoginClient
 import pytest
 from sqlalchemy.engine import Connection, create_engine
+from sqlalchemy.orm import Session
 
 from auctions_infrastructure import auctions, bids
 from customer_relationship.models import customers
@@ -96,10 +98,12 @@ def another_user(connection: Connection) -> Generator[str, None, None]:
 
 
 @pytest.fixture()
-def logged_in_user(create_remove_user: str, client: testing.FlaskClient) -> None:
-    with client.session_transaction() as session:  # type: ignore
-        session["user_id"] = create_remove_user
-        session["_fresh"] = True
+def logged_client(create_remove_user: str, app: Flask, connection: Connection) -> FlaskLoginClient:
+    app.test_client_class = FlaskLoginClient
+    session = Session(bind=connection)
+    user = session.query(User).get(create_remove_user)
+    with app.test_client(user=user) as client:
+        yield client
 
 
 @pytest.mark.usefixtures("remove_user")
@@ -164,9 +168,8 @@ def test_returns_list_of_auctions(client: testing.FlaskClient) -> None:
     assert type(response.json) == list
 
 
-@pytest.mark.usefixtures("logged_in_user")
-def test_places_bid(client: testing.FlaskClient, example_auction: int) -> None:
-    response = client.post(
+def test_places_bid(logged_client: testing.FlaskClient, example_auction: int) -> None:
+    response = logged_client.post(
         f"/auctions/{example_auction}/bids", headers={"Content-type": "application/json"}, json={"amount": "15.99"}
     )
 
