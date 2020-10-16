@@ -4,7 +4,11 @@ orbs:
   python: circleci/python@0.2.1
 
 jobs:
-  build-and-test:
+  build:
+    docker:
+      - image: redis:5
+
+  install-and-test:
     working_directory: ~/clean-architecture/auctioning_platform
     executor: python/default
     steps:
@@ -25,4 +29,5 @@ jobs:
 workflows:
   main:
     jobs:
-      - build-and-test
+      - build
+      - install-and-test
