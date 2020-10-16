@@ -15,12 +15,17 @@ jobs:
           path: ~/clean-architecture
       - restore_cache:
           keys:
-          - pip-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
+          - pip-cache-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
       - run: make dev
       - save_cache:
-          key: pip-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
+          key: pip-cache-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
           paths:
           - /home/circleci/.local/lib/
+      - run: python -m flake8 ./
+      - run: python -m black ./ -l 120 --check
+      - run: python -m isort --check-only ./
+      - run: ./run_mypy.sh
+      - run: ./run_pylint.sh
       - run:
           command: python -m pytest
           name: Test

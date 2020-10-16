@@ -6,4 +6,4 @@ for dirname in $(ls); do
     fi
 done
 
-exec pylint $MODULES_PATHS
+exec python -m pylint $MODULES_PATHS

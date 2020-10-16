@@ -1,7 +1,6 @@
 import injector
 
 from shipping import AddressRepository  # GetNextPackage
-# from shipping_infrastructure.queries import SqlGetNextPackage
 from shipping_infrastructure.models import packages
 from shipping_infrastructure.repositories import FakeAddressRepository
 
