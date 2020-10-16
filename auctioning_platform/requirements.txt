@@ -22,7 +22,7 @@ flask-principal==0.4.0    # via flask-security
 flask-security==3.0.0
 flask-wtf==0.14.3         # via flask-security
 flask==1.1.1
-freezegun==0.3.15
+freezegun==1.0.0
 idna==2.8                 # via requests
 injector==0.17.0
 itsdangerous==1.1.0       # via flask, flask-security
