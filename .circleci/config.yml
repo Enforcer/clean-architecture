@@ -10,9 +10,14 @@ jobs:
     steps:
       - checkout:
           path: ~/clean-architecture
-      - python/load-cache
+      - restore_cache:
+          keys:
+          - pip-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
       - python/install-deps
-      - python/save-cache
+      - save_cache:
+          key: pip-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
+          paths:
+          - /home/circleci/.local/lib/
       - run:
           command: pytest
           name: Test
