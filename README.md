@@ -1,6 +1,8 @@
 # Implementing the Clean Architecture - Auctions
 Example app.
 
+[![CircleCI](https://circleci.com/gh/Enforcer/clean-architecture.svg?style=svg)](https://app.circleci.com/pipelines/github/Enforcer/clean-architecture?branch=master)
+
 # Work with the repo
 Pycharm - mark each package as Sources Root.
 ![Marking directories as source root in PyCharm](docs/marking_as_sources_root.png)
