@@ -8,10 +8,10 @@ endef
 
 .PHONY: dev
 dev:
-	pip install -r requirements.txt -r requirements-dev.txt
+	pip install --use-feature=2020-resolver -r requirements.txt -r requirements-dev.txt
 	$(foreach lib,$(libs),$(call install_dev,$(lib)))
 
 .PHONY: freeze-deps
 freeze-deps:
 	pip install pip-tools==5.3.1
-	pip-compile --output-file=requirements.txt $(foreach lib,$(libs), ./$(lib)/requirements.txt ./$(lib)/requirements-dev.txt)
+	pip-compile --upgrade --output-file=requirements.txt $(foreach lib,$(libs), ./$(lib)/requirements.txt ./$(lib)/requirements-dev.txt)
