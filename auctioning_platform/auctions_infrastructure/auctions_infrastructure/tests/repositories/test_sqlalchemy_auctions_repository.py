@@ -10,10 +10,9 @@ from foundation.events import Event, EventBus
 from foundation.value_objects.factories import get_dollars
 
 from auctions.domain.entities import Auction, Bid
-from db_infrastructure import Base
-
 from auctions_infrastructure import auctions, bids
 from auctions_infrastructure.repositories import SqlAlchemyAuctionsRepo
+from db_infrastructure import Base
 
 
 @pytest.fixture(scope="session")

@@ -9,11 +9,10 @@ from foundation.events import EventBus, InjectorEventBus, RunAsyncHandler
 from foundation.locks import Lock, LockFactory
 
 from customer_relationship import CustomerRelationshipConfig
-from payments import PaymentsConfig
-
 from main.async_handler_task import async_handler_generic_task
 from main.db import ThreadlocalConnectionProvider
 from main.redis import RedisLock
+from payments import PaymentsConfig
 
 
 class Db(injector.Module):

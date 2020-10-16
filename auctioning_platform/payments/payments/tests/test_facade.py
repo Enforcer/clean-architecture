@@ -10,7 +10,6 @@ from foundation.events import EventBus
 from foundation.value_objects.factories import get_dollars
 
 from db_infrastructure import Base
-
 from payments.api import ApiConsumer
 from payments.api.exceptions import PaymentFailedError
 from payments.config import PaymentsConfig

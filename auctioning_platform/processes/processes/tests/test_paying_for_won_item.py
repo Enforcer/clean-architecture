@@ -11,7 +11,6 @@ from foundation.value_objects.factories import get_dollars
 from auctions import AuctionEnded
 from customer_relationship import CustomerRelationshipFacade
 from payments import PaymentCaptured, PaymentsFacade
-
 from processes.paying_for_won_item import PayingForWonItem
 from processes.paying_for_won_item.saga import PayingForWonItemData, State
 

@@ -16,7 +16,7 @@ install:
 script:
   - flake8 ./
   - black ./ -l 120 --check
-  - isort --apply --recursive --check-only
+  - isort --check-only
   - ./run_mypy.sh
   - ./run_pylint.sh
   - pytest

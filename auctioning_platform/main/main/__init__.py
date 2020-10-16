@@ -10,14 +10,13 @@ from auctions import Auctions
 from auctions_infrastructure import AuctionsInfrastructure
 from customer_relationship import CustomerRelationship, CustomerRelationshipFacade
 from db_infrastructure import metadata
+from main.db import ThreadlocalConnectionProvider
+from main.modules import Configs, Db, EventBusMod, RedisMod, Rq
 from payments import Payments
 from processes import Processes
 from shipping import Shipping
 from shipping_infrastructure import ShippingInfrastructure
 from web_app_models import User
-
-from main.db import ThreadlocalConnectionProvider
-from main.modules import Configs, Db, EventBusMod, RedisMod, Rq
 
 __all__ = ["bootstrap_app"]
 

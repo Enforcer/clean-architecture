@@ -8,7 +8,6 @@ from sqlalchemy.engine import Connection, Engine
 from foundation.value_objects.factories import get_dollars
 
 from db_infrastructure import Base
-
 from processes.paying_for_won_item import PayingForWonItemData
 from processes.paying_for_won_item.saga import State
 from processes.repository import ProcessManagerDataRepo, process_manager_data_table

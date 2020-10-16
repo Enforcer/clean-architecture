@@ -2,12 +2,12 @@ from datetime import datetime
 
 from flask import Flask, Response, json, request
 from flask_injector import FlaskInjector
-from main import bootstrap_app
 
 from foundation.method_dispatch import method_dispatch
 from foundation.value_objects import Money
 
 from auctions import AuctionDto
+from main import bootstrap_app
 from web_app.blueprints.auctions import AuctionsWeb, auctions_blueprint
 from web_app.blueprints.shipping import shipping_blueprint
 from web_app.security import setup as security_setup
