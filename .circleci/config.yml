@@ -6,6 +6,7 @@ orbs:
 jobs:
   build-and-test:
     docker:
+      - image: python:3.9
       - image: redis:5
     working_directory: ~/clean-architecture/auctioning_platform
     executor: python/default
