@@ -13,5 +13,5 @@ dev:
 
 .PHONY: freeze-deps
 freeze-deps:
-	pip install pip-tools==4.4.1
+	pip install pip-tools==5.3.1
 	pip-compile --output-file=requirements.txt $(foreach lib,$(libs), ./$(lib)/requirements.txt ./$(lib)/requirements-dev.txt)
