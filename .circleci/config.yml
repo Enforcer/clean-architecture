@@ -13,7 +13,7 @@ jobs:
       - restore_cache:
           keys:
           - pip-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
-      - python/install-deps
+      - run: make dev
       - save_cache:
           key: pip-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
           paths:
