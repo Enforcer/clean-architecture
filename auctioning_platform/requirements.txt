@@ -35,7 +35,7 @@ passlib==1.7.1            # via flask-security
 pluggy==0.13.1            # via pytest
 psycopg2-binary==2.8.4
 py==1.8.0                 # via pytest
-pycparser==2.19           # via cffi
+pycparser==2.20           # via cffi
 pyparsing==2.4.7          # via packaging
 pytest-freezegun==0.3.0.post1
 pytest-sqlalchemy==0.2.1
