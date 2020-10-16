@@ -18,9 +18,8 @@ jobs:
           key: pip-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
           paths:
           - /home/circleci/.local/lib/
-      - run: echo "export PATH=~/.local/bin:$PATH" >> $BASH_ENV
       - run:
-          command: pytest
+          command: python -m pytest
           name: Test
 
 workflows:
