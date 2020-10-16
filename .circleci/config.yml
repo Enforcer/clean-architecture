@@ -1,0 +1,23 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
+jobs:
+  build-and-test:
+    working_directory: ~/clean-architecture/auctioning_platform
+    executor: python/default
+    steps:
+      - checkout:
+          path: ~/clean-architecture
+      - python/load-cache
+      - python/install-deps
+      - python/save-cache
+      - run:
+          command: pytest
+          name: Test
+
+workflows:
+  main:
+    jobs:
+      - build-and-test
