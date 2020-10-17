@@ -1,4 +1,4 @@
-rq==1.2.2
+rq==1.5.2
 redis==3.5.3
 injector==0.17.0
 python-dotenv>=0.10.3

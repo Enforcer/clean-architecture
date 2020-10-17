@@ -1,3 +1,4 @@
 pytest
-factory-boy==2.12.0
-freezegun==1.0.0
+factory-boy
+freezegun
+pytest-faker
