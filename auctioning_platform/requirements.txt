@@ -23,7 +23,7 @@ flask-mail==0.9.1         # via flask-security
 flask-principal==0.4.0    # via flask-security
 flask-security==3.0.0     # via -r ./web_app/requirements.txt, -r ./web_app_models/requirements.txt
 flask-wtf==0.14.3         # via flask-security
-flask==1.1.1              # via -r ./web_app/requirements.txt, flask-babelex, flask-injector, flask-login, flask-mail, flask-principal, flask-security, flask-wtf
+flask==1.1.2              # via -r ./web_app/requirements.txt, flask-babelex, flask-injector, flask-login, flask-mail, flask-principal, flask-security, flask-wtf
 freezegun==1.0.0          # via -r ./auctions/requirements-dev.txt, -r ./processes/requirements-dev.txt, pytest-freezegun
 idna==2.8                 # via email-validator, requests
 iniconfig==1.1.1          # via pytest
