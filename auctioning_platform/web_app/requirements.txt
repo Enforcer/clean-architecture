@@ -1,7 +1,7 @@
 email-validator==1.1.1
 Flask-Security==3.0.0
 Flask-Injector==0.12.0
-Flask==1.1.1
+Flask==1.1.2
 bcrypt==3.1.7
 marshmallow==3.5.1
 Flask-Login==0.5.0
