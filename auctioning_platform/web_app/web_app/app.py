@@ -2,12 +2,15 @@ from datetime import datetime
 
 from flask import Flask, Response, json, request
 from flask_injector import FlaskInjector
+from sqlalchemy.engine import Connection
+from sqlalchemy.orm import Session
 
 from foundation.method_dispatch import method_dispatch
 from foundation.value_objects import Money
 
 from auctions import AuctionDto
 from main import bootstrap_app
+from main.modules import RequestScope
 from web_app.blueprints.auctions import AuctionsWeb, auctions_blueprint
 from web_app.blueprints.shipping import shipping_blueprint
 from web_app.security import setup as security_setup
@@ -58,16 +61,20 @@ def create_app() -> Flask:
 
     @app.before_request
     def transaction_start() -> None:
-        request.tx = app_context.connection_provider.open().begin()  # type: ignore
-        request.session = app_context.connection_provider.provide_session()  # type: ignore
+        app_context.injector.get(RequestScope).enter()
+
+        request.connection = app_context.injector.get(Connection)  # type: ignore
+        request.tx = request.connection.begin()  # type: ignore
+        request.session = app_context.injector.get(Session)  # type: ignore
 
     @app.after_request
     def transaction_commit(response: Response) -> Response:
+        scope = app_context.injector.get(RequestScope)
         try:
             if hasattr(request, "tx") and response.status_code < 400:
                 request.tx.commit()  # type: ignore
         finally:
-            app_context.connection_provider.close_if_present()
+            scope.exit()
 
         return response
 
@@ -77,7 +84,7 @@ def create_app() -> Flask:
         response.headers["Access-Control-Allow-Headers"] = "*"
         return response
 
-    # has to be after DB-hooks, because it relies on DB
+    # has to be done after DB-hooks, because it relies on DB
     security_setup(app)
 
     return app

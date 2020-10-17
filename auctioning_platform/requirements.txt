@@ -27,7 +27,7 @@ flask==1.1.2              # via -r ./web_app/requirements.txt, flask-babelex, fl
 freezegun==1.0.0          # via -r ./auctions/requirements-dev.txt, -r ./processes/requirements-dev.txt, pytest-freezegun
 idna==2.8                 # via email-validator, requests
 iniconfig==1.1.1          # via pytest
-injector==0.17.0          # via -r ./auctions/requirements.txt, -r ./auctions_infrastructure/requirements.txt, -r ./customer_relationship/requirements.txt, -r ./foundation/requirements.txt, -r ./main/requirements.txt, -r ./payments/requirements.txt, -r ./processes/requirements.txt, -r ./shipping/requirements.txt, -r ./shipping_infrastructure/requirements.txt, flask-injector
+injector==0.18.4          # via -r ./auctions/requirements.txt, -r ./auctions_infrastructure/requirements.txt, -r ./customer_relationship/requirements.txt, -r ./foundation/requirements.txt, -r ./main/requirements.txt, -r ./payments/requirements.txt, -r ./processes/requirements.txt, -r ./shipping/requirements.txt, -r ./shipping_infrastructure/requirements.txt, flask-injector
 itsdangerous==1.1.0       # via flask, flask-security, flask-wtf
 jinja2==2.11.2            # via flask, flask-babelex
 markupsafe==1.1.1         # via jinja2, wtforms
@@ -39,8 +39,8 @@ psycopg2-binary==2.8.4    # via -r ./db_infrastructure/requirements.txt
 py==1.9.0                 # via pytest
 pycparser==2.20           # via cffi
 pyparsing==2.4.7          # via packaging
-pytest-freezegun==0.4.2  # via -r ./processes/requirements-dev.txt
 pytest-faker==2.0.0       # via -r ./auctions/requirements-dev.txt
+pytest-freezegun==0.4.2   # via -r ./processes/requirements-dev.txt
 pytest-sqlalchemy==0.2.1  # via -r ./db_infrastructure/requirements.txt
 pytest==6.1.1             # via -r ./auctions/requirements-dev.txt, -r ./auctions_infrastructure/requirements-dev.txt, -r ./customer_relationship/requirements-dev.txt, -r ./foundation/requirements-dev.txt, -r ./payments/requirements-dev.txt, -r ./processes/requirements-dev.txt, -r ./shipping/requirements-dev.txt, -r ./shipping_infrastructure/requirements-dev.txt, -r ./web_app/requirements-dev.txt, pytest-freezegun, pytest-sqlalchemy
 python-dateutil==2.8.1    # via faker, freezegun
@@ -56,7 +56,7 @@ sqlalchemy==1.3.19        # via -r ./auctions_infrastructure/requirements.txt, -
 stripe==2.54.0            # via -r ./payments/requirements.txt
 text-unidecode==1.3       # via faker
 toml==0.10.1              # via pytest
-typing-extensions==3.7.4.1  # via -r ./foundation/requirements.txt, -r ./processes/requirements.txt
+typing-extensions==3.7.4.1  # via -r ./foundation/requirements.txt, -r ./processes/requirements.txt, injector
 typing==3.7.4.3           # via flask-injector
 urllib3==1.25.10          # via requests
 werkzeug==1.0.1           # via flask

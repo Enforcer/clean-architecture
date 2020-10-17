@@ -10,7 +10,6 @@ from auctions import Auctions
 from auctions_infrastructure import AuctionsInfrastructure
 from customer_relationship import CustomerRelationship, CustomerRelationshipFacade
 from db_infrastructure import metadata
-from main.db import ThreadlocalConnectionProvider
 from main.modules import Configs, Db, EventBusMod, RedisMod, Rq
 from payments import Payments
 from processes import Processes
@@ -23,7 +22,6 @@ __all__ = ["bootstrap_app"]
 
 @dataclass
 class App:
-    connection_provider: ThreadlocalConnectionProvider
     injector: injector.Injector
 
 
@@ -48,21 +46,18 @@ def bootstrap_app() -> App:
     }
 
     engine = create_engine(os.environ["DB_DSN"])
-    connection_provider = ThreadlocalConnectionProvider(engine)
-    dependency_injector = _setup_dependency_injection(settings, connection_provider)
+    dependency_injector = _setup_dependency_injection(settings, engine)
     _setup_orm_events(dependency_injector)
 
     _create_db_schema(engine)  # TEMPORARY
 
-    return App(connection_provider, dependency_injector)
+    return App(dependency_injector)
 
 
-def _setup_dependency_injection(
-    settings: dict, connection_provider: ThreadlocalConnectionProvider
-) -> injector.Injector:
-    return injector.Injector(  # type: ignore
+def _setup_dependency_injection(settings: dict, engine: Engine) -> injector.Injector:
+    return injector.Injector(
         [
-            Db(connection_provider),
+            Db(engine),
             RedisMod(settings["redis.host"]),
             Rq(),
             EventBusMod(),
