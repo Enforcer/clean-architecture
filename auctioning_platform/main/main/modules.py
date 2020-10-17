@@ -41,7 +41,10 @@ class RequestScope(injector.Scope):
         except AttributeError:
             provider = injector.InstanceProvider(provider.get(self.injector))
             setattr(self._locals, repr(key), provider)
-            registry = getattr(self._locals, self.REGISTRY_KEY)
+            try:
+                registry = getattr(self._locals, self.REGISTRY_KEY)
+            except AttributeError:
+                raise Exception(f"{key} is request scoped, but no RequestScope entered!")
             registry[key] = provider
             return provider
 
