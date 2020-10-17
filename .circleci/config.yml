@@ -15,10 +15,10 @@ jobs:
           path: ~/clean-architecture
       - restore_cache:
           keys:
-          - pip-cache-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
+          - pip-{{ checksum "requirements.txt" }}
       - run: make dev
       - save_cache:
-          key: pip-cache-{{ checksum "requirements.txt"  }}-{{ checksum "requirements-dev.txt" }}
+          key: pip-{{ checksum "requirements.txt" }}
           paths:
           - /home/circleci/.local/lib/
       - run: python -m flake8 ./
