@@ -34,7 +34,13 @@ def config_path(tmp_path_factory: TempPathFactory) -> str:
 @pytest.fixture(scope="session")
 def app(config_path: str) -> Flask:
     os.environ["CONFIG_PATH"] = config_path
-    return create_app()
+    # Disable password hashing in tests to get speed-up
+    settings_to_override = {
+        "SECURITY_PASSWORD_HASH": "plaintext",
+        "SECURITY_HASHING_SCHEMES": ["hex_md5"],
+        "SECURITY_DEPRECATED_HASHING_SCHEMES": [],
+    }
+    return create_app(settings_to_override)
 
 
 @pytest.fixture()

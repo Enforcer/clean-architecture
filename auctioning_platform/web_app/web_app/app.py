@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from flask import Flask, Response, json, request
 from flask_injector import FlaskInjector
@@ -40,7 +41,10 @@ class JSONEncoder(json.JSONEncoder):
         return obj.isoformat()
 
 
-def create_app() -> Flask:
+def create_app(settings_override: Optional[dict] = None) -> Flask:
+    if settings_override is None:
+        settings_override = {}
+
     app = Flask(__name__)
 
     app.json_encoder = JSONEncoder
@@ -55,6 +59,8 @@ def create_app() -> Flask:
     app.config["SECURITY_REGISTERABLE"] = True
     app.config["SECURITY_PASSWORD_SALT"] = "99f885320c0f867cde17876a7849904c41a2b8120a9a9e76d1789e458e543af9"
     app.config["WTF_CSRF_ENABLED"] = False
+    for key, value in settings_override.items():
+        app.config[key] = value
 
     app_context = bootstrap_app()
     FlaskInjector(app, modules=[AuctionsWeb()], injector=app_context.injector)
