@@ -21,11 +21,11 @@ __all__ = ["bootstrap_app"]
 
 
 @dataclass
-class App:
+class AppContext:
     injector: injector.Injector
 
 
-def bootstrap_app() -> App:
+def bootstrap_app() -> AppContext:
     """This is bootstrap function independent from the context.
 
     This should be used for Web, CLI, or worker context."""
@@ -51,7 +51,7 @@ def bootstrap_app() -> App:
 
     _create_db_schema(engine)  # TEMPORARY
 
-    return App(dependency_injector)
+    return AppContext(dependency_injector)
 
 
 def _setup_dependency_injection(settings: dict, engine: Engine) -> injector.Injector:
