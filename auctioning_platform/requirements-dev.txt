@@ -1,7 +1,7 @@
 pip-tools==5.3.1
 isort==5.6.3
 black==20.8b1
-flake8==3.8.3
+flake8==3.8.4
 mypy==0.782
 pylint==2.6.0
 pylint-forbidden-imports==1.0.0
