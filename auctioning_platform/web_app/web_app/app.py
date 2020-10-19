@@ -1,44 +1,16 @@
-from datetime import datetime
 from typing import Optional
 
-from flask import Flask, Response, json, request
+from flask import Flask, Response, request
 from flask_injector import FlaskInjector
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Session
 
-from foundation.method_dispatch import method_dispatch
-from foundation.value_objects import Money
-
-from auctions import AuctionDto
 from main import bootstrap_app
 from main.modules import RequestScope
 from web_app.blueprints.auctions import AuctionsWeb, auctions_blueprint
 from web_app.blueprints.shipping import shipping_blueprint
+from web_app.json_encoder import JSONEncoder
 from web_app.security import setup as security_setup
-
-
-class JSONEncoder(json.JSONEncoder):
-    @method_dispatch
-    def default(self, obj: object) -> object:
-        raise TypeError(f"Cannot serialize {type(obj)}")
-
-    @default.register(AuctionDto)  # noqa: F811
-    def serialize_auction_dto(self, obj: AuctionDto) -> object:
-        return {
-            "id": obj.id,
-            "title": obj.title,
-            "current_price": obj.current_price,
-            "starting_price": obj.starting_price,
-            "ends_at": obj.ends_at,
-        }
-
-    @default.register(Money)  # noqa: F811
-    def serialize_money(self, obj: Money) -> object:
-        return {"amount": str(obj.amount), "currency": obj.currency.iso_code}
-
-    @default.register(datetime)  # noqa: F811
-    def serialize_datetime(self, obj: datetime) -> str:
-        return obj.isoformat()
 
 
 def create_app(settings_override: Optional[dict] = None) -> Flask:
