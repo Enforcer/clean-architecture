@@ -1,5 +1,5 @@
 pip-tools==5.3.1
-isort==5.6.3
+isort==5.6.4
 black==20.8b1
 flake8==3.8.4
 mypy==0.790
