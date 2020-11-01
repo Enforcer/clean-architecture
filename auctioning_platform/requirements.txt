@@ -58,6 +58,6 @@ text-unidecode==1.3       # via faker
 toml==0.10.1              # via pytest
 typing-extensions==3.7.4.3  # via -r ./foundation/requirements.txt, -r ./processes/requirements.txt, injector
 typing==3.7.4.3           # via flask-injector
-urllib3==1.25.10          # via requests
+urllib3==1.25.11          # via requests
 werkzeug==1.0.1           # via flask
 wtforms==2.3.3            # via flask-wtf
