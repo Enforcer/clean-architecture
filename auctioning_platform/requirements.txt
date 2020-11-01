@@ -31,7 +31,7 @@ injector==0.18.4          # via -r ./auctions/requirements.txt, -r ./auctions_in
 itsdangerous==1.1.0       # via flask, flask-security, flask-wtf
 jinja2==2.11.2            # via flask, flask-babelex
 markupsafe==1.1.1         # via jinja2, wtforms
-marshmallow==3.5.1        # via -r ./web_app/requirements.txt
+marshmallow==3.8.0        # via -r ./web_app/requirements.txt
 packaging==20.4           # via pytest
 passlib==1.7.4            # via flask-security
 pluggy==0.13.1            # via pytest
