@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 import factory
 from flask.testing import FlaskClient
 import injector
@@ -26,14 +24,10 @@ def example_auction(container: injector.Injector) -> int:
     """It should rather use a sequence of other API calls, maybe auctions'
     module use cases specific for creating an auction, not adding directly to the DB.
     """
-    scope = container.get(RequestScope)
-    scope.enter()
-    try:
+    with container.get(RequestScope):
         uc = container.get(BeginningAuction)
         dto = BeginningAuctionInputDtoFactory.build()
         uc.execute(dto)
-    finally:
-        scope.exit()
 
     return int(dto.auction_id)
 

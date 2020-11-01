@@ -35,6 +35,12 @@ class RequestScope(injector.Scope):
 
         delattr(self._locals, self.REGISTRY_KEY)
 
+    def __enter__(self) -> None:
+        self.enter()
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:  # type: ignore
+        self.exit()
+
     def get(self, key: Type[T], provider: Provider[T]) -> Provider[T]:
         try:
             return getattr(self._locals, repr(key))  # type: ignore
