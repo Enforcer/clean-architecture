@@ -2,7 +2,6 @@ from flask import Blueprint, Response, abort, jsonify, make_response, request
 import flask_injector
 from flask_login import current_user
 import injector
-from marshmallow import Schema, post_load
 
 from auctions import (
     AuctionId,
@@ -13,8 +12,7 @@ from auctions import (
     PlacingBidOutputBoundary,
     PlacingBidOutputDto,
 )
-from web_app.serialization.dto import get_input_dto
-from web_app.serialization.fields import Dollars
+from web_app.serialization.dto import get_dto
 
 auctions_blueprint = Blueprint("auctions_blueprint", __name__)
 
@@ -41,18 +39,10 @@ def place_bid(auction_id: AuctionId, placing_bid_uc: PlacingBid, presenter: Plac
     if not current_user.is_authenticated:
         abort(403)
 
-    dto = get_input_dto(request, PlacingBidSchema, context={"auction_id": auction_id, "bidder_id": current_user.id})
+    dto = get_dto(request, PlacingBidInputDto, context={"auction_id": auction_id, "bidder_id": current_user.id})
 
     placing_bid_uc.execute(dto)
     return presenter.response  # type: ignore
-
-
-class PlacingBidSchema(Schema):
-    amount = Dollars()
-
-    @post_load
-    def make_dto(self, data: dict, **_kwargs: dict) -> PlacingBidInputDto:
-        return PlacingBidInputDto(**self.context, **data)
 
 
 class PlacingBidPresenter(PlacingBidOutputBoundary):
