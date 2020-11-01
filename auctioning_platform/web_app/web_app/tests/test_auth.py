@@ -18,7 +18,10 @@ def test_register_returns_details_with_auth_token(client: testing.FlaskClient) -
 
 
 def test_register_creates_customer(client: testing.FlaskClient, connection: Connection) -> None:
-    client.post("/register", json={"email": "test+register@cleanarchitecture.io", "password": "Dummy123!"})
+    response = client.post(
+        "/register", json={"email": "test+register+123@cleanarchitecture.io", "password": "Dummy123!"}
+    )
+    assert response.status_code == 200
 
     assert_customer_with_given_email_exists(connection, "test+register@cleanarchitecture.io")
 
