@@ -49,7 +49,7 @@ class RequestScope(injector.Scope):
             return provider
 
 
-request = injector.ScopeDecorator(RequestScope)
+request = injector.ScopeDecorator(RequestScope)  # type: ignore
 
 
 class Db(injector.Module):
@@ -72,7 +72,7 @@ class RedisMod(injector.Module):
         self._redis_host = redis_host
 
     def configure(self, binder: injector.Binder) -> None:
-        binder.bind(Redis, Redis(host=self._redis_host))
+        binder.bind(Redis, Redis(host=self._redis_host))  # type: ignore
 
     @injector.provider
     def lock(self, redis: Redis) -> LockFactory:

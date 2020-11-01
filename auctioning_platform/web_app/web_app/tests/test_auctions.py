@@ -15,12 +15,7 @@ def example_auction(connection: Connection) -> int:
     ends_at = datetime.now() + timedelta(days=3)
     result_proxy = connection.execute(
         auctions.insert(
-            {
-                "title": "Super aukcja",
-                "starting_price": "0.99",
-                "current_price": "1.00",
-                "ends_at": ends_at,
-            }
+            {"title": "Super aukcja", "starting_price": "0.99", "current_price": "1.00", "ends_at": ends_at}
         )
     )
     auction_id = result_proxy.lastrowid

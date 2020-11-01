@@ -1,14 +1,14 @@
 from datetime import datetime
+from functools import singledispatchmethod
 import json
 
-from foundation.method_dispatch import method_dispatch
 from foundation.value_objects import Money
 
 from auctions import AuctionDto
 
 
 class JSONEncoder(json.JSONEncoder):
-    @method_dispatch
+    @singledispatchmethod
     def default(self, obj: object) -> object:
         raise TypeError(f"Cannot serialize {type(obj)}")
 

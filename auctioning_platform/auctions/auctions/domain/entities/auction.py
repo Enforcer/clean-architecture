@@ -18,7 +18,7 @@ class Auction(EventMixin):
         self.id = id
         self.title = title
         self.starting_price = starting_price
-        self.bids = sorted(bids, key=lambda bid: bid.amount)
+        self.bids = sorted(bids, key=lambda bid: bid.amount)  # type: ignore
         self.ends_at = ends_at
         self._ended = ended
         self._withdrawn_bids_ids: List[BidId] = []

@@ -7,17 +7,19 @@ from sqlalchemy.engine import Connection
 from customer_relationship import customers
 
 
-def test_register(client: testing.FlaskClient, connection: Connection) -> None:
-    response = client.post(
-        "/register",
-        json={"email": "test+register@cleanarchitecture.io", "password": "Dummy123!"},
-    )
+def test_register_returns_details_with_auth_token(client: testing.FlaskClient) -> None:
+    response = client.post("/register", json={"email": "test+register@cleanarchitecture.io", "password": "Dummy123!"})
 
     assert response.status_code == 200
     json_response_body = response.json.copy()
     assert isinstance(json_response_body["response"]["user"].pop("authentication_token"), str)
     assert isinstance(json_response_body["response"]["user"].pop("id"), str)
     assert json_response_body == {"meta": {"code": 200}, "response": {"user": {}}}
+
+
+def test_register_creates_customer(client: testing.FlaskClient, connection: Connection) -> None:
+    client.post("/register", json={"email": "test+register@cleanarchitecture.io", "password": "Dummy123!"})
+
     assert_customer_with_given_email_exists(connection, "test+register@cleanarchitecture.io")
 
 
@@ -42,10 +44,7 @@ def registered_user(client: testing.FlaskClient) -> RegisteredUser:
 
 
 def test_login(client: testing.FlaskClient, registered_user: RegisteredUser) -> None:
-    response = client.post(
-        "/login",
-        json={"email": registered_user.email, "password": registered_user.password},
-    )
+    response = client.post("/login", json={"email": registered_user.email, "password": registered_user.password})
 
     assert response.status_code == 200
     json_response_body = response.json.copy()
