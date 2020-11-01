@@ -1,2 +1,2 @@
 injector
-typing-extensions==3.7.4.1
+typing-extensions==3.7.4.3
