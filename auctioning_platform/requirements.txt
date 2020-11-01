@@ -35,7 +35,7 @@ marshmallow==3.8.0        # via -r ./web_app/requirements.txt
 packaging==20.4           # via pytest
 passlib==1.7.4            # via flask-security
 pluggy==0.13.1            # via pytest
-psycopg2-binary==2.8.4    # via -r ./db_infrastructure/requirements.txt
+psycopg2-binary==2.8.6    # via -r ./db_infrastructure/requirements.txt
 py==1.9.0                 # via pytest
 pycparser==2.20           # via cffi
 pyparsing==2.4.7          # via packaging

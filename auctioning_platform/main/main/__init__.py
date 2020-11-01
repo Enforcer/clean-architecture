@@ -55,7 +55,7 @@ def bootstrap_app() -> AppContext:
 
 
 def _setup_dependency_injection(settings: dict, engine: Engine) -> injector.Injector:
-    return injector.Injector(  # type: ignore
+    return injector.Injector(
         [
             Db(engine),
             RedisMod(settings["redis.host"]),
