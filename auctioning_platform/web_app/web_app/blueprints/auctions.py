@@ -1,12 +1,8 @@
-from typing import Type
-
 from flask import Blueprint, Response, abort, jsonify, make_response, request
 import flask_injector
 from flask_login import current_user
 import injector
-from marshmallow import Schema, exceptions as marshmallow_exceptions, fields, post_load
-
-from foundation.value_objects.factories import get_dollars
+from marshmallow import Schema, post_load
 
 from auctions import (
     AuctionId,
@@ -17,6 +13,8 @@ from auctions import (
     PlacingBidOutputBoundary,
     PlacingBidOutputDto,
 )
+from web_app.serialization.dto import get_input_dto
+from web_app.serialization.fields import Dollars
 
 auctions_blueprint = Blueprint("auctions_blueprint", __name__)
 
@@ -28,23 +26,25 @@ class AuctionsWeb(injector.Module):
         return PlacingBidPresenter()
 
 
-class Dollars(fields.Field):
-    def _serialize(self, value, attr, obj, **kwargs):  # type: ignore
-        return str(value)
-
-    def _deserialize(self, value, attr, data, **kwargs):  # type: ignore
-        try:
-            return get_dollars(value)
-        except ValueError as exc:
-            raise marshmallow_exceptions.ValidationError(str(exc))
+@auctions_blueprint.route("/")
+def auctions_list(query: GetActiveAuctions) -> Response:
+    return make_response(jsonify(query.query()))
 
 
-def get_input_dto(schema_cls: Type[Schema], context: dict) -> PlacingBidInputDto:
-    schema = schema_cls(context=context)
-    try:
-        return schema.load(request.json)
-    except marshmallow_exceptions.ValidationError as exc:
-        abort(make_response(jsonify(exc.messages), 400))
+@auctions_blueprint.route("/<int:auction_id>")
+def single_auction(auction_id: int, query: GetSingleAuction) -> Response:
+    return make_response(jsonify(query.query(auction_id)))
+
+
+@auctions_blueprint.route("/<int:auction_id>/bids", methods=["POST"])
+def place_bid(auction_id: AuctionId, placing_bid_uc: PlacingBid, presenter: PlacingBidOutputBoundary) -> Response:
+    if not current_user.is_authenticated:
+        abort(403)
+
+    dto = get_input_dto(request, PlacingBidSchema, context={"auction_id": auction_id, "bidder_id": current_user.id})
+
+    placing_bid_uc.execute(dto)
+    return presenter.response  # type: ignore
 
 
 class PlacingBidSchema(Schema):
@@ -65,24 +65,3 @@ class PlacingBidPresenter(PlacingBidOutputBoundary):
             else f"Your bid is too low. Current price is {output_dto.current_price}"
         )
         self.response = make_response(jsonify({"message": message}))
-
-
-@auctions_blueprint.route("/")
-def auctions_list(query: GetActiveAuctions) -> Response:
-    return make_response(jsonify(query.query()))
-
-
-@auctions_blueprint.route("/<int:auction_id>")
-def single_auction(auction_id: int, query: GetSingleAuction) -> Response:
-    return make_response(jsonify(query.query(auction_id)))
-
-
-@auctions_blueprint.route("/<int:auction_id>/bids", methods=["POST"])
-def place_bid(auction_id: AuctionId, placing_bid_uc: PlacingBid, presenter: PlacingBidOutputBoundary) -> Response:
-    if not current_user.is_authenticated:
-        abort(403)
-
-    placing_bid_uc.execute(
-        get_input_dto(PlacingBidSchema, context={"auction_id": auction_id, "bidder_id": current_user.id})
-    )
-    return presenter.response  # type: ignore
