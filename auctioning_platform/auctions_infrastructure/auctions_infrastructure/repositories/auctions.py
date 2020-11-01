@@ -45,7 +45,8 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
             "ended": auction._ended,
         }
         update_result = self._conn.execute(auctions.update(values=raw_auction, whereclause=auctions.c.id == auction.id))
-        assert update_result.rowcount == 1  # no support for creating
+        if update_result.rowcount != 1:
+            self._conn.execute(auctions.insert(values=dict(raw_auction, id=auction.id)))
 
         for bid in auction.bids:
             if bid.id:

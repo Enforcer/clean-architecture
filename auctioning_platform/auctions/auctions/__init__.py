@@ -30,6 +30,7 @@ __all__ = [
     # repositories
     "AuctionsRepository",
     # use cases
+    "BeginningAuction",
     "PlacingBid",
     "PlacingBidOutputBoundary",
     "WithdrawingBids",

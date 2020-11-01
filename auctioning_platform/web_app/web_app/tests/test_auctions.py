@@ -1,25 +1,41 @@
 from datetime import datetime, timedelta
 
+import factory
 from flask.testing import FlaskClient
+import injector
 import pytest
-from sqlalchemy.engine import Connection
 
-from auctions_infrastructure import auctions
+from foundation.value_objects.factories import get_dollars
+
+from auctions import BeginningAuction, BeginningAuctionInputDto
+from main.modules import RequestScope
+
+
+class BeginningAuctionInputDtoFactory(factory.Factory):
+    class Meta:
+        model = BeginningAuctionInputDto
+
+    auction_id = factory.Sequence(lambda n: n)
+    title = factory.Faker("name")
+    starting_price = get_dollars("0.99")
+    ends_at = factory.Faker("future_datetime", end_date="+7d")
 
 
 @pytest.fixture()
-def example_auction(connection: Connection) -> int:
+def example_auction(container: injector.Injector) -> int:
     """It should rather use a sequence of other API calls, maybe auctions'
     module use cases specific for creating an auction, not adding directly to the DB.
     """
-    ends_at = datetime.now() + timedelta(days=3)
-    result_proxy = connection.execute(
-        auctions.insert(
-            {"title": "Super aukcja", "starting_price": "0.99", "current_price": "1.00", "ends_at": ends_at}
-        )
-    )
-    auction_id = result_proxy.lastrowid
-    return int(auction_id)
+    scope = container.get(RequestScope)
+    scope.enter()
+    try:
+        uc = container.get(BeginningAuction)
+        dto = BeginningAuctionInputDtoFactory.build()
+        uc.execute(dto)
+    finally:
+        scope.exit()
+
+    return int(dto.auction_id)
 
 
 def test_return_single_auction(client: FlaskClient, example_auction: int) -> None:

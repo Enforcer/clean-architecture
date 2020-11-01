@@ -2,6 +2,7 @@ import os
 
 from _pytest.tmpdir import TempPathFactory
 from flask import Flask, testing
+import injector
 import pytest
 from sqlalchemy.engine import Connection, create_engine
 
@@ -41,6 +42,11 @@ def app(config_path: str) -> Flask:
         "SECURITY_DEPRECATED_HASHING_SCHEMES": [],
     }
     return create_app(settings_to_override)
+
+
+@pytest.fixture()
+def container(app: Flask) -> injector.Injector:
+    return app.injector  # type: ignore
 
 
 @pytest.fixture()

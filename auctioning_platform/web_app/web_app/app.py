@@ -36,6 +36,7 @@ def create_app(settings_override: Optional[dict] = None) -> Flask:
 
     app_context = bootstrap_app()
     FlaskInjector(app, modules=[AuctionsWeb()], injector=app_context.injector)
+    app.injector = app_context.injector
 
     @app.before_request
     def transaction_start() -> None:
