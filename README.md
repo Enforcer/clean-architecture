@@ -1,14 +1,16 @@
-# Implementing the Clean Architecture - Auctions
-Example app.
+# Implementing the Clean Architecture
+Example project used in the book
+[![Implementing the Clean Architecture cover](docs/cover.png)](https://leanpub.com/implementing-the-clean-architecture)
 
+## Auctions
 [![CircleCI](https://circleci.com/gh/Enforcer/clean-architecture.svg?style=svg)](https://app.circleci.com/pipelines/github/Enforcer/clean-architecture?branch=master)
 
-# Work with the repo
+## Working with the repo
 Pycharm - mark each package as Sources Root.
 ![Marking directories as source root in PyCharm](docs/marking_as_sources_root.png)
 Console - `make dev` to install each subpackage in editable mode.
 
-# Work with docker containers
+## Working with docker containers
 ```bash
 # Start everything
 docker-compose up --build
