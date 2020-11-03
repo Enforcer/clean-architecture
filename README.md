@@ -1,5 +1,6 @@
 # Implementing the Clean Architecture
 Example project used in the book
+
 [![Implementing the Clean Architecture cover](docs/cover.png)](https://leanpub.com/implementing-the-clean-architecture)
 
 ## Auctions
