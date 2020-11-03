@@ -1,10 +1,10 @@
-# Implementing the Clean Architecture
-Example project used in the book
+# Implementing the Clean Architecture - Auctions
+Example project used in the book [Implementing the Clean Architecture](https://leanpub.com/implementing-the-clean-architecture)
 
 [![Implementing the Clean Architecture cover](docs/cover.png)](https://leanpub.com/implementing-the-clean-architecture)
 
-## Auctions
-[![CircleCI](https://circleci.com/gh/Enforcer/clean-architecture.svg?style=svg)](https://app.circleci.com/pipelines/github/Enforcer/clean-architecture?branch=master)
+## Build status
+[![CircleCI](https://circleci.com/gh/Enforcer/clean-architecture.svg?style=svg)](https://app.circleci.com/pipelines/github/Enforcer/clean-architecture?branch=master) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Working with the repo
 Pycharm - mark each package as Sources Root.
