@@ -19,9 +19,23 @@ class BeginningAuctionInputDto:
 
 class BeginningAuction:
     def __init__(self, auctions_repo: AuctionsRepository) -> None:
+        """
+        Initialize a new repo.
+
+        Args:
+            self: (todo): write your description
+            auctions_repo: (todo): write your description
+        """
         self.auctions_repo = auctions_repo
 
     def execute(self, input_dto: BeginningAuctionInputDto) -> None:
+        """
+        A method to executection
+
+        Args:
+            self: (todo): write your description
+            input_dto: (todo): write your description
+        """
         if input_dto.ends_at < datetime.now(tz=input_dto.ends_at.tzinfo):
             raise AuctionEndingInThePast
 

@@ -22,12 +22,27 @@ class GUID(TypeDecorator):
     impl = CHAR
 
     def load_dialect_impl(self, dialect: Any) -> Any:
+        """
+        Loads the sqlal dialect descriptor.
+
+        Args:
+            self: (todo): write your description
+            dialect: (todo): write your description
+        """
         if dialect.name == "postgresql":
             return dialect.type_descriptor(UUID())
         else:
             return dialect.type_descriptor(CHAR(32))
 
     def process_bind_param(self, value: Any, dialect: Any) -> Optional[str]:
+        """
+        Processes the value for the query string.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+            dialect: (todo): write your description
+        """
         if value is None:
             return value
         elif dialect.name == "postgresql":
@@ -40,6 +55,14 @@ class GUID(TypeDecorator):
                 return "%.32x" % value.int
 
     def process_result_value(self, value: Any, dialect: Any) -> Optional[uuid.UUID]:
+        """
+        Process the result value.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+            dialect: (todo): write your description
+        """
         if value is None:
             return value
         else:

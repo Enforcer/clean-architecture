@@ -12,6 +12,12 @@ from payments.api.requests import Request
 
 @pytest.fixture(scope="session")
 def api_key(request: SubRequest) -> str:
+    """
+    Get the api key.
+
+    Args:
+        request: (todo): write your description
+    """
     try:
         return str(request.config.getoption("--stripe-secret-key"))
     except ValueError:
@@ -20,11 +26,23 @@ def api_key(request: SubRequest) -> str:
 
 @pytest.fixture()
 def api_consumer(api_key: str) -> ApiConsumer:
+    """
+    Create a consumer consumer.
+
+    Args:
+        api_key: (str): write your description
+    """
     return ApiConsumer(api_key, "")
 
 
 @pytest.fixture(scope="session")
 def source(api_key: str) -> str:
+    """
+    Create a dictionary of data for a given api key.
+
+    Args:
+        api_key: (str): write your description
+    """
     response = requests.post(
         f"{Request.url}/v1/tokens",
         auth=(api_key, ""),
@@ -41,6 +59,14 @@ def source(api_key: str) -> str:
 
 @pytest.mark.stripe
 def test_charge_then_capture(api_consumer: ApiConsumer, source: str, api_key: str) -> None:
+    """
+    Test the charge of the charge charge.
+
+    Args:
+        api_consumer: (todo): write your description
+        source: (str): write your description
+        api_key: (str): write your description
+    """
     charge_id = api_consumer.charge(get_dollars("15.00"), source)
     api_consumer.capture(charge_id)
 

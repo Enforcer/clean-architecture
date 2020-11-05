@@ -7,6 +7,12 @@ class Request:
     method = "GET"
 
     def to_params(self) -> dict:
+        """
+        Return a dict to a dict.
+
+        Args:
+            self: (todo): write your description
+        """
         return {field.name: getattr(self, field.name) for field in fields(self) if not field.name.startswith("_")}
 
 
@@ -27,4 +33,10 @@ class CaptureRequest(Request):
 
     @property
     def url(self) -> str:  # type: ignore
+        """
+        Returns the url for the url.
+
+        Args:
+            self: (todo): write your description
+        """
         return f"{Request.url}/v1/charges/{self._capture_id}/capture"

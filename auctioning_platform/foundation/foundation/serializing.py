@@ -20,6 +20,12 @@ class Dataclass(Protocol):
 
 
 def _extract_type_if_optional(type_hint: Type) -> Tuple[Type, bool]:
+    """
+    Extracts the type of the - type_hint.
+
+    Args:
+        type_hint: (str): write your description
+    """
     if hasattr(type_hint, "__args__") and type(None) in type_hint.__args__:
         return type_hint.__args__[0], True
     elif type_hint in serializers and type_hint in deserializers:
@@ -29,6 +35,12 @@ def _extract_type_if_optional(type_hint: Type) -> Tuple[Type, bool]:
 
 
 def _deserialize_dt(raw_dt: str) -> datetime:
+    """
+    Deserialize datetime. datetime.
+
+    Args:
+        raw_dt: (todo): write your description
+    """
     try:
         return datetime.strptime(raw_dt, "%Y-%m-%dT%H:%M:%S.%f%z")  # with tz info
     except ValueError:
@@ -54,6 +66,13 @@ serializers = {
 
 
 def from_json(json_repr: dict, dataclass: Type[T]) -> T:
+    """
+    Deserialize a json string from a dictionary.
+
+    Args:
+        json_repr: (int): write your description
+        dataclass: (todo): write your description
+    """
     data = {}
     for field in dataclasses.fields(dataclass):
         field_type, _ = _extract_type_if_optional(field.type)
@@ -72,6 +91,12 @@ def from_json(json_repr: dict, dataclass: Type[T]) -> T:
 
 
 def to_json(dataclass_instance: Dataclass) -> str:
+    """
+    Convert a dataclass to a dictionary.
+
+    Args:
+        dataclass_instance: (bool): write your description
+    """
     data = {}
     for field in dataclasses.fields(type(dataclass_instance)):
         field_type, _ = _extract_type_if_optional(field.type)

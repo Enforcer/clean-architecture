@@ -12,4 +12,10 @@ class CustomerRelationshipConfig:
 
     @property
     def formatted_from(self) -> str:
+        """
+        Returns the formatted formatted string.
+
+        Args:
+            self: (todo): write your description
+        """
         return f"{self.email_from[0]} <{self.email_from[1]}>"

@@ -21,26 +21,56 @@ from payments.models import payments
 
 @pytest.fixture(scope="session")
 def sqlalchemy_connect_url() -> str:
+    """
+    Return the sqlalchemy sqlalchemy url.
+
+    Args:
+    """
     return "sqlite:///:memory:"
 
 
 @pytest.fixture()
 def event_bus() -> Mock:
+    """
+    Return a : class : ~.
+
+    Args:
+    """
     return Mock(spec_set=EventBus)
 
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_teardown_tables(engine: Engine) -> None:
+    """
+    Setup all tables.
+
+    Args:
+        engine: (todo): write your description
+    """
     Base.metadata.create_all(engine)
 
 
 @pytest.fixture()
 def facade(connection: Connection, event_bus: Mock) -> PaymentsFacade:
+    """
+    Return a new connection.
+
+    Args:
+        connection: (todo): write your description
+        event_bus: (todo): write your description
+    """
     return PaymentsFacade(PaymentsConfig("", ""), connection, event_bus)
 
 
 @pytest.fixture()
 def inserted_payment(request: SubRequest, connection: Connection) -> dict:
+    """
+    Inserts payment.
+
+    Args:
+        request: (todo): write your description
+        connection: (todo): write your description
+    """
     status = getattr(request, "param", None) or PaymentStatus.NEW.value
     charge_id = None if status not in (PaymentStatus.CHARGED.value, PaymentStatus.CAPTURED.value) else "token"
     data: Dict[str, Any] = {
@@ -57,6 +87,13 @@ def inserted_payment(request: SubRequest, connection: Connection) -> dict:
 
 
 def get_payment(connection: Connection, payment_uuid: str) -> RowProxy:
+    """
+    Return the payment instance.
+
+    Args:
+        connection: (todo): write your description
+        payment_uuid: (str): write your description
+    """
     row = connection.execute(payments.select(payments.c.uuid == payment_uuid)).first()
     return row
 
@@ -65,6 +102,14 @@ def get_payment(connection: Connection, payment_uuid: str) -> RowProxy:
 def test_adding_new_payment_is_reflected_on_pending_payments_list(
     facade: PaymentsFacade, connection: Connection, event_bus: Mock
 ) -> None:
+    """
+    Test for new payment for new payment.
+
+    Args:
+        facade: (todo): write your description
+        connection: (todo): write your description
+        event_bus: (todo): write your description
+    """
     customer_id = 1
     assert facade.get_pending_payments(customer_id) == []
 
@@ -100,6 +145,14 @@ def test_adding_new_payment_is_reflected_on_pending_payments_list(
 def test_pending_payments_returns_only_new_payments(
     facade: PaymentsFacade, inserted_payment: dict, connection: Connection
 ) -> None:
+    """
+    Return the pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending pending
+
+    Args:
+        facade: (todo): write your description
+        inserted_payment: (todo): write your description
+        connection: (todo): write your description
+    """
     assert facade.get_pending_payments(inserted_payment["customer_id"]) == []
 
 
@@ -107,6 +160,15 @@ def test_pending_payments_returns_only_new_payments(
 def test_successful_charge_updates_status(
     facade: PaymentsFacade, inserted_payment: dict, connection: Connection, event_bus: Mock
 ) -> None:
+    """
+    Displays the status of the status of an invoice.
+
+    Args:
+        facade: (todo): write your description
+        inserted_payment: (todo): write your description
+        connection: (todo): write your description
+        event_bus: (todo): write your description
+    """
     payment_uuid = uuid.UUID(inserted_payment["uuid"])
     charge_id = "SOME_CHARGE_ID"
 
@@ -124,6 +186,15 @@ def test_successful_charge_updates_status(
 def test_unsuccessful_charge(
     facade: PaymentsFacade, inserted_payment: dict, connection: Connection, event_bus: Mock
 ) -> None:
+    """
+    Unsuccessfulment a payment.
+
+    Args:
+        facade: (todo): write your description
+        inserted_payment: (todo): write your description
+        connection: (todo): write your description
+        event_bus: (todo): write your description
+    """
     payment_uuid = uuid.UUID(inserted_payment["uuid"])
 
     with patch.object(ApiConsumer, "charge", side_effect=PaymentFailedError) as charge_mock:
@@ -137,6 +208,15 @@ def test_unsuccessful_charge(
 @pytest.mark.parametrize("inserted_payment", [PaymentStatus.CHARGED.value], indirect=["inserted_payment"])
 @pytest.mark.usefixtures("transaction")
 def test_capture(facade: PaymentsFacade, inserted_payment: dict, connection: Connection, event_bus: Mock) -> None:
+    """
+    Captures the payment.
+
+    Args:
+        facade: (todo): write your description
+        inserted_payment: (todo): write your description
+        connection: (todo): write your description
+        event_bus: (todo): write your description
+    """
     payment_uuid = uuid.UUID(inserted_payment["uuid"])
     with patch.object(ApiConsumer, "capture") as capture_mock:
         facade.capture(payment_uuid, inserted_payment["customer_id"])

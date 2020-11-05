@@ -22,4 +22,10 @@ class ShippingInfrastructure(injector.Module):
 
     @injector.provider
     def address_repo(self) -> AddressRepository:
+        """
+        Returns the repository.
+
+        Args:
+            self: (todo): write your description
+        """
         return FakeAddressRepository()

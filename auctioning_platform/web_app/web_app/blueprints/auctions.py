@@ -21,21 +21,48 @@ class AuctionsWeb(injector.Module):
     @injector.provider
     @flask_injector.request
     def placing_bid_output_boundary(self) -> PlacingBidOutputBoundary:
+        """
+        Returns the output of the convolutionalid.
+
+        Args:
+            self: (todo): write your description
+        """
         return PlacingBidPresenter()
 
 
 @auctions_blueprint.route("/")
 def auctions_list(query: GetActiveAuctions) -> Response:
+    """
+    Gets a list of all active response.
+
+    Args:
+        query: (str): write your description
+    """
     return make_response(jsonify(query.query()))
 
 
 @auctions_blueprint.route("/<int:auction_id>")
 def single_auction(auction_id: int, query: GetSingleAuction) -> Response:
+    """
+    Makes a response.
+
+    Args:
+        auction_id: (str): write your description
+        query: (str): write your description
+    """
     return make_response(jsonify(query.query(auction_id)))
 
 
 @auctions_blueprint.route("/<int:auction_id>/bids", methods=["POST"])
 def place_bid(auction_id: AuctionId, placing_bid_uc: PlacingBid, presenter: PlacingBidOutputBoundary) -> Response:
+    """
+    Place a flight_authenticated.
+
+    Args:
+        auction_id: (str): write your description
+        placing_bid_uc: (todo): write your description
+        presenter: (todo): write your description
+    """
     if not current_user.is_authenticated:
         abort(403)
 
@@ -49,6 +76,13 @@ class PlacingBidPresenter(PlacingBidOutputBoundary):
     response: Response
 
     def present(self, output_dto: PlacingBidOutputDto) -> None:
+        """
+        Ensure that the output is present response.
+
+        Args:
+            self: (todo): write your description
+            output_dto: (array): write your description
+        """
         message = (
             "Hooray! You are a winner"
             if output_dto.is_winner

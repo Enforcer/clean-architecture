@@ -17,6 +17,11 @@ from processes.paying_for_won_item.saga import PayingForWonItemData, State
 
 @pytest.fixture()
 def mocked_uuid4() -> Generator[uuid.UUID, None, None]:
+    """
+    Yield a unique uuid.
+
+    Args:
+    """
     fixed_uuid = uuid.UUID("441fdf64-6d89-4664-9fce-7b026cf24f99")
     with patch.object(uuid, "uuid4", return_value=fixed_uuid):
         yield fixed_uuid
@@ -24,21 +29,44 @@ def mocked_uuid4() -> Generator[uuid.UUID, None, None]:
 
 @pytest.fixture()
 def payments_facade_mock() -> Mock:
+    """
+    Return a : class : py : class : mock. mockFacmockmockFac. mockFac.
+
+    Args:
+    """
     return Mock(spec_set=PaymentsFacade)
 
 
 @pytest.fixture()
 def customer_relationship_mock() -> Mock:
+    """
+    Return a set of custom relations.
+
+    Args:
+    """
     return Mock(spec_set=CustomerRelationshipFacade)
 
 
 @pytest.fixture()
 def pm_data(mocked_uuid4) -> PayingForWonItemData:
+    """
+    Return a biopython. pmx.
+
+    Args:
+        mocked_uuid4: (str): write your description
+    """
     return PayingForWonItemData(mocked_uuid4)
 
 
 @pytest.fixture()
 def process_manager(payments_facade_mock: Mock, customer_relationship_mock: Mock) -> PayingForWonItem:
+    """
+    Process a manager manager.
+
+    Args:
+        payments_facade_mock: (str): write your description
+        customer_relationship_mock: (todo): write your description
+    """
     return PayingForWonItem(payments_facade_mock, customer_relationship_mock)
 
 
@@ -50,6 +78,18 @@ def test_should_start_new_payment_upon_auction_ended(
     mocked_uuid4: uuid.UUID,
     pm_data: PayingForWonItemData,
 ) -> None:
+    """
+    This is a new new payment and sends a new_paymentction.
+
+    Args:
+        process_manager: (todo): write your description
+        payments_facade_mock: (todo): write your description
+        customer_relationship_mock: (todo): write your description
+        mocked_uuid4: (todo): write your description
+        uuid: (todo): write your description
+        UUID: (todo): write your description
+        pm_data: (todo): write your description
+    """
     event = AuctionEnded(auction_id=1, winner_id=2, winning_bid=get_dollars("99.99"), auction_title="irrelevant")
     process_manager.handle(event, pm_data)
 
@@ -69,6 +109,14 @@ def test_should_start_new_payment_upon_auction_ended(
 
 @pytest.fixture()
 def pm_data_waiting_for_payment(mocked_uuid4: uuid.UUID) -> PayingForWonItemData:
+    """
+    Return a uuid for a given asset for the uuid.
+
+    Args:
+        mocked_uuid4: (todo): write your description
+        uuid: (int): write your description
+        UUID: (int): write your description
+    """
     return PayingForWonItemData(
         mocked_uuid4, State.PAYMENT_STARTED, datetime.now() + timedelta(days=3), get_dollars("15.99"), "Irrelevant"
     )
@@ -80,6 +128,17 @@ def test_should_send_success_email_after_payment(
     customer_relationship_mock: Mock,
     pm_data_waiting_for_payment: PayingForWonItemData,
 ) -> None:
+    """
+    This method sends a send_should_should_after_send_send_payment.
+
+    Args:
+        mocked_uuid4: (str): write your description
+        uuid: (todo): write your description
+        UUID: (todo): write your description
+        process_manager: (todo): write your description
+        customer_relationship_mock: (todo): write your description
+        pm_data_waiting_for_payment: (todo): write your description
+    """
     event = PaymentCaptured(mocked_uuid4, 2)
     process_manager.handle(event, pm_data_waiting_for_payment)
 
@@ -96,6 +155,17 @@ def test_should_timeout(
     customer_relationship_mock: Mock,
     pm_data_waiting_for_payment: PayingForWonItemData,
 ) -> None:
+    """
+    This function is_uuid4_waits has been received.
+
+    Args:
+        mocked_uuid4: (todo): write your description
+        uuid: (str): write your description
+        UUID: (str): write your description
+        process_manager: (todo): write your description
+        customer_relationship_mock: (todo): write your description
+        pm_data_waiting_for_payment: (todo): write your description
+    """
     with freezegun.freeze_time(datetime.now() + timedelta(days=4)):
         process_manager.timeout(pm_data_waiting_for_payment)
 

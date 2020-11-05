@@ -11,17 +11,42 @@ class RedisLock(Lock):
     LOCK_VALUE = "LOCKED"
 
     def __init__(self, redis: StrictRedis, name: str, timeout: int = 30) -> None:
+        """
+        Initialize a redis instance.
+
+        Args:
+            self: (todo): write your description
+            redis: (todo): write your description
+            name: (str): write your description
+            timeout: (int): write your description
+        """
         self._redis = redis
         self._lock_name = name
         self._timeout = timeout
 
     def __enter__(self) -> None:
+        """
+        Enter the lock.
+
+        Args:
+            self: (todo): write your description
+        """
         if not self._redis.set(self._lock_name, self.LOCK_VALUE, nx=True, ex=self._timeout):
             raise AlreadyLocked
 
     def __exit__(
         self, exc_type: Optional[Type[BaseException]], exc_val: Optional[BaseException], exc_tb: Optional[TracebackType]
     ) -> Literal[False]:
+        """
+        Exit the given exception.
+
+        Args:
+            self: (todo): write your description
+            exc_type: (todo): write your description
+            Type: (todo): write your description
+            exc_val: (todo): write your description
+            exc_tb: (todo): write your description
+        """
         if exc_type != AlreadyLocked:
             self._redis.delete(self._lock_name)
         return False

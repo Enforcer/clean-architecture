@@ -12,16 +12,31 @@ from auctions.tests.factories import AuctionFactory
 
 @pytest.fixture()
 def yesterday() -> datetime:
+    """
+    Return a datetime.
+
+    Args:
+    """
     return datetime.now() - timedelta(days=1)
 
 
 def test_should_use_starting_price_as_current_price_for_empty_bids_list() -> None:
+    """
+    Checks if the current price of the current price.
+
+    Args:
+    """
     auction = AuctionFactory()
 
     assert auction.current_price == auction.starting_price
 
 
 def test_should_return_highest_bid_for_current_price() -> None:
+    """
+    Given a list of the price for the given price.
+
+    Args:
+    """
     auction = AuctionFactory(
         bids=[Bid(id=1, bidder_id=1, amount=get_dollars("20")), Bid(id=2, bidder_id=2, amount=get_dollars("15"))]
     )
@@ -30,12 +45,22 @@ def test_should_return_highest_bid_for_current_price() -> None:
 
 
 def test_should_return_no_winners_for_empty_bids_list() -> None:
+    """
+    Return true if all of the test is in a high level.
+
+    Args:
+    """
     auction = AuctionFactory()
 
     assert auction.winners == []
 
 
 def test_should_return_highest_bids_user_id_for_winners_list() -> None:
+    """
+    Return true if the user can be fetched.
+
+    Args:
+    """
     auction = AuctionFactory(
         bids=[
             Bid(id=1, bidder_id=1, amount=get_dollars("101")),
@@ -48,6 +73,11 @@ def test_should_return_highest_bids_user_id_for_winners_list() -> None:
 
 
 def test_should_win_auction_if_is_the_only_bidder_above_starting_price() -> None:
+    """
+    Checks if the user canderction.
+
+    Args:
+    """
     auction = AuctionFactory()
 
     auction.place_bid(bidder_id=1, amount=get_dollars("11"))
@@ -56,6 +86,11 @@ def test_should_win_auction_if_is_the_only_bidder_above_starting_price() -> None
 
 
 def test_should_not_be_winning_auction_if_bids_below_starting_price() -> None:
+    """
+    Determine if a user touction for a given period.
+
+    Args:
+    """
     auction = AuctionFactory()
 
     auction.place_bid(bidder_id=1, amount=get_dollars("5"))
@@ -64,6 +99,11 @@ def test_should_not_be_winning_auction_if_bids_below_starting_price() -> None:
 
 
 def test_should_withdraw_the_only_bid() -> None:
+    """
+    Checks if a given price hasdraw
+
+    Args:
+    """
     auction = AuctionFactory(bids=[Bid(id=1, bidder_id=1, amount=get_dollars("50"))])
 
     auction.withdraw_bids([1])
@@ -73,6 +113,11 @@ def test_should_withdraw_the_only_bid() -> None:
 
 
 def test_should_add_withdrawn_bids_ids_to_separate_list() -> None:
+    """
+    : parametermine if a list of a list of ids.
+
+    Args:
+    """
     auction = AuctionFactory(bids=[Bid(id=1, bidder_id=1, amount=get_dollars("50"))])
 
     auction.withdraw_bids([1])
@@ -81,6 +126,11 @@ def test_should_add_withdrawn_bids_ids_to_separate_list() -> None:
 
 
 def test_should_not_be_winning_if_bid_lower_than_current_price() -> None:
+    """
+    Determine if there is not allowed
+
+    Args:
+    """
     auction = AuctionFactory(bids=[Bid(id=1, bidder_id=1, amount=get_dollars("10.00"))])
 
     lower_bid_bidder_id = 2
@@ -90,6 +140,12 @@ def test_should_not_be_winning_if_bid_lower_than_current_price() -> None:
 
 
 def test_should_not_allow_placing_bids_for_ended_auction(yesterday: datetime) -> None:
+    """
+    Determine if there is not allowed period.
+
+    Args:
+        yesterday: (todo): write your description
+    """
     auction = AuctionFactory(ends_at=yesterday)
 
     with pytest.raises(BidOnEndedAuction):
@@ -97,6 +153,11 @@ def test_should_not_allow_placing_bids_for_ended_auction(yesterday: datetime) ->
 
 
 def test_should_emit_event_upon_overbid() -> None:
+    """
+    Determine if the event has changed.
+
+    Args:
+    """
     bid_that_will_lose = Bid(id=1, bidder_id=1, amount=get_dollars("15.00"))
     auction = AuctionFactory(bids=[bid_that_will_lose])
 
@@ -108,6 +169,11 @@ def test_should_emit_event_upon_overbid() -> None:
 
 
 def test_should_emit_winning_event_if_the_first_offer() -> None:
+    """
+    This function to show event handler.
+
+    Args:
+    """
     auction = AuctionFactory()
     winning_amount = auction.current_price + get_dollars("1.00")
 
@@ -117,6 +183,11 @@ def test_should_emit_winning_event_if_the_first_offer() -> None:
 
 
 def test_should_emit_winning_if_overbids() -> None:
+    """
+    Determine if the event was detected in - memory event.
+
+    Args:
+    """
     auction = AuctionFactory(bids=[Bid(id=1, bidder_id=1, amount=get_dollars("15.00"))])
     winning_amount = auction.current_price + get_dollars("1.00")
 
@@ -128,6 +199,12 @@ def test_should_emit_winning_if_overbids() -> None:
 
 
 def test_should_emit_auction_ended(yesterday: datetime) -> None:
+    """
+    Determine if the event has changed.
+
+    Args:
+        yesterday: (todo): write your description
+    """
     auction = AuctionFactory(bids=[Bid(id=1, bidder_id=1, amount=get_dollars("15.00"))], ends_at=yesterday)
 
     auction.end_auction()
@@ -137,6 +214,12 @@ def test_should_emit_auction_ended(yesterday: datetime) -> None:
 
 
 def test_should_emit_event_with_none_winner_if_no_winners(yesterday: datetime) -> None:
+    """
+    Determine whether the event has been blocked.
+
+    Args:
+        yesterday: (todo): write your description
+    """
     auction = AuctionFactory(ends_at=yesterday)
 
     auction.end_auction()
@@ -146,6 +229,11 @@ def test_should_emit_event_with_none_winner_if_no_winners(yesterday: datetime) -
 
 
 def test_should_raise_if_auction_has_not_been_ended() -> None:
+    """
+    Return true if the given test.
+
+    Args:
+    """
     auction = AuctionFactory()
 
     with pytest.raises(AuctionHasNotEnded):
@@ -153,6 +241,12 @@ def test_should_raise_if_auction_has_not_been_ended() -> None:
 
 
 def test_EndedAuction_PlacingBid_RaisesException(yesterday: datetime) -> None:
+    """
+    Test if the ended ended.
+
+    Args:
+        yesterday: (todo): write your description
+    """
     auction = AuctionFactory(ends_at=yesterday)
     auction.end_auction()
 
@@ -161,6 +255,12 @@ def test_EndedAuction_PlacingBid_RaisesException(yesterday: datetime) -> None:
 
 
 def test_EndedAuction_Ending_RaisesException(yesterday: datetime) -> None:
+    """
+    Test if the end of the end of the end of the end time.
+
+    Args:
+        yesterday: (todo): write your description
+    """
     auction = AuctionFactory(ends_at=yesterday)
     auction.end_auction()
 

@@ -16,6 +16,14 @@ class BaseSchema(Schema):
 
 
 def get_dto(request: Request, dto_cls: Type[TDto], context: dict) -> TDto:
+    """
+    Returns the given dto dto_cls.
+
+    Args:
+        request: (todo): write your description
+        dto_cls: (str): write your description
+        context: (dict): write your description
+    """
     schema_cls = class_schema(dto_cls, base_schema=BaseSchema)
     schema = schema_cls()
     try:

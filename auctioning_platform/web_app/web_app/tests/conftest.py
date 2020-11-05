@@ -11,6 +11,12 @@ from web_app.app import create_app
 
 @pytest.fixture(scope="session")
 def config_path(tmp_path_factory: TempPathFactory) -> str:
+    """
+    Create a temporary path.
+
+    Args:
+        tmp_path_factory: (str): write your description
+    """
     temp_dir = tmp_path_factory.mktemp("config")
     db_dir = tmp_path_factory.mktemp("test_db")
     conf_file_path = temp_dir / ".test_env_file"
@@ -34,6 +40,12 @@ def config_path(tmp_path_factory: TempPathFactory) -> str:
 
 @pytest.fixture(scope="session")
 def app(config_path: str) -> Flask:
+    """
+    Creates an application.
+
+    Args:
+        config_path: (str): write your description
+    """
     os.environ["CONFIG_PATH"] = config_path
     # Disable password hashing in tests to get speed-up
     settings_to_override = {
@@ -46,16 +58,33 @@ def app(config_path: str) -> Flask:
 
 @pytest.fixture()
 def container(app: Flask) -> injector.Injector:
+    """
+    Determine if a container.
+
+    Args:
+        app: (todo): write your description
+    """
     return app.injector  # type: ignore
 
 
 @pytest.fixture()
 def client(app: Flask) -> testing.FlaskClient:
+    """
+    Create a new : class.
+
+    Args:
+        app: (todo): write your description
+    """
     return app.test_client()
 
 
 @pytest.fixture()
 def connection() -> Connection:
+    """
+    Establish a connection.
+
+    Args:
+    """
     engine = create_engine(os.environ["DB_DSN"])
     yield engine.connect()
     engine.dispose()
