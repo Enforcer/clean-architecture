@@ -18,10 +18,23 @@ class AuctionDto:
 class GetSingleAuction(abc.ABC):
     @abc.abstractmethod
     def query(self, auction_id: int) -> AuctionDto:
+        """
+        Get a query.
+
+        Args:
+            self: (todo): write your description
+            auction_id: (str): write your description
+        """
         pass
 
 
 class GetActiveAuctions(abc.ABC):
     @abc.abstractmethod
     def query(self) -> List[AuctionDto]:
+        """
+        Return a query.
+
+        Args:
+            self: (todo): write your description
+        """
         pass

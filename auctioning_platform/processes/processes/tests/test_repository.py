@@ -17,16 +17,33 @@ EXAMPLE_DATETIME = datetime(2019, 5, 24, 15, 20, 0, 12)
 
 @pytest.fixture(scope="session")
 def sqlalchemy_connect_url() -> str:
+    """
+    Return the sqlalchemy sqlalchemy url.
+
+    Args:
+    """
     return "sqlite:///:memory:"
 
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_teardown_tables(engine: Engine) -> None:
+    """
+    Setup all tables.
+
+    Args:
+        engine: (todo): write your description
+    """
     Base.metadata.create_all(engine)
 
 
 @pytest.fixture()
 def repo(connection: Connection) -> ProcessManagerDataRepo:
+    """
+    Returns a repository object for the given connection.
+
+    Args:
+        connection: (todo): write your description
+    """
     return ProcessManagerDataRepo(connection)
 
 
@@ -70,6 +87,15 @@ def repo(connection: Connection) -> ProcessManagerDataRepo:
 def test_saving_and_reading(
     repo: ProcessManagerDataRepo, connection: Connection, data: PayingForWonItemData, json_repr: dict
 ) -> None:
+    """
+    : param repo : : return :
+
+    Args:
+        repo: (todo): write your description
+        connection: (todo): write your description
+        data: (todo): write your description
+        json_repr: (int): write your description
+    """
     process_uuid = uuid4()
 
     connection.execute(process_manager_data_table.insert(values={"uuid": process_uuid, "json": json.dumps(json_repr)}))

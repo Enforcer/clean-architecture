@@ -14,6 +14,12 @@ from web_app.security import setup as security_setup
 
 
 def create_app(settings_override: Optional[dict] = None) -> Flask:
+    """
+    Creates a flask application.
+
+    Args:
+        settings_override: (dict): write your description
+    """
     if settings_override is None:
         settings_override = {}
 
@@ -40,6 +46,11 @@ def create_app(settings_override: Optional[dict] = None) -> Flask:
 
     @app.before_request
     def transaction_start() -> None:
+        """
+        Start a transaction.
+
+        Args:
+        """
         app_context.injector.get(RequestScope).enter()
 
         request.connection = app_context.injector.get(Connection)  # type: ignore
@@ -48,6 +59,12 @@ def create_app(settings_override: Optional[dict] = None) -> Flask:
 
     @app.after_request
     def transaction_commit(response: Response) -> Response:
+        """
+        Commit the transaction.
+
+        Args:
+            response: (todo): write your description
+        """
         scope = app_context.injector.get(RequestScope)
         try:
             if hasattr(request, "tx") and response.status_code < 400:
@@ -59,6 +76,12 @@ def create_app(settings_override: Optional[dict] = None) -> Flask:
 
     @app.after_request
     def add_cors_headers(response: Response) -> Response:
+        """
+        Add cors headers.
+
+        Args:
+            response: (todo): write your description
+        """
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Headers"] = "*"
         return response

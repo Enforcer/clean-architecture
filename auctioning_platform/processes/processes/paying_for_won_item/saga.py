@@ -31,20 +31,51 @@ class PayingForWonItemData:
 
 class PayingForWonItem:
     def __init__(self, payments: PaymentsFacade, customer_relationship: CustomerRelationshipFacade) -> None:
+        """
+        Initialize the relationship.
+
+        Args:
+            self: (todo): write your description
+            payments: (array): write your description
+            customer_relationship: (todo): write your description
+        """
         self._payments = payments
         self._customer_relationship = customer_relationship
 
     def timeout(self, data: PayingForWonItemData) -> None:
+        """
+        Called when a timeout.
+
+        Args:
+            self: (todo): write your description
+            data: (array): write your description
+        """
         assert data.timeout_at is not None and datetime.now() >= data.timeout_at
         assert data.state == State.PAYMENT_STARTED
         data.state = State.TIMED_OUT
 
     @method_dispatch
     def handle(self, event: Any, data: PayingForWonItemData) -> None:
+        """
+        Handles the event.
+
+        Args:
+            self: (todo): write your description
+            event: (todo): write your description
+            data: (todo): write your description
+        """
         raise Exception(f"Unhandled event {event}")
 
     @handle.register(AuctionEnded)
     def handle_auction_ended(self, event: AuctionEnded, data: PayingForWonItemData) -> None:
+        """
+        Handles an event handler for an event.
+
+        Args:
+            self: (todo): write your description
+            event: (todo): write your description
+            data: (array): write your description
+        """
         assert data.state is None
         payment_uuid = uuid.uuid4()
         self._payments.start_new_payment(payment_uuid, event.winner_id, event.winning_bid, event.auction_title)
@@ -59,6 +90,14 @@ class PayingForWonItem:
 
     @handle.register(PaymentCaptured)
     def handle_payment_captured(self, event: PaymentCaptured, data: PayingForWonItemData) -> None:
+        """
+        Handles a customer event.
+
+        Args:
+            self: (todo): write your description
+            event: (todo): write your description
+            data: (array): write your description
+        """
         assert data.state == State.PAYMENT_STARTED
         self._customer_relationship.send_email_after_successful_payment(
             event.customer_id, data.winning_bid, data.auction_title

@@ -9,6 +9,13 @@ from shipping.domain.value_objects import ConsigneeId
 
 class FakeAddressRepository(AddressRepository):
     def get(self, consignee_id: ConsigneeId) -> Address:
+        """
+        Returns a unique address.
+
+        Args:
+            self: (todo): write your description
+            consignee_id: (str): write your description
+        """
         fake = faker.Faker()
         return Address(
             uuid=uuid.uuid4(),

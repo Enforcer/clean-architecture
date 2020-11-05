@@ -33,6 +33,13 @@ def example_auction(container: injector.Injector) -> int:
 
 
 def test_return_single_auction(client: FlaskClient, example_auction: int) -> None:
+    """
+    Returns a json - rpc client.
+
+    Args:
+        client: (todo): write your description
+        example_auction: (todo): write your description
+    """
     response = client.get(f"/auctions/{example_auction}", headers={"Content-type": "application/json"})
 
     assert response.status_code == 200
@@ -40,6 +47,12 @@ def test_return_single_auction(client: FlaskClient, example_auction: int) -> Non
 
 
 def test_returns_list_of_auctions(client: FlaskClient) -> None:
+    """
+    Return a list of all cross - cases
+
+    Args:
+        client: (todo): write your description
+    """
     response = client.get("/auctions/", headers={"Content-type": "application/json"})
 
     assert response.status_code == 200
@@ -48,6 +61,12 @@ def test_returns_list_of_auctions(client: FlaskClient) -> None:
 
 @pytest.fixture()
 def logged_in_client(client: FlaskClient) -> FlaskClient:
+    """
+    Authenticate with a client.
+
+    Args:
+        client: (todo): write your description
+    """
     email, password = "test+bid+1@cleanarchitecture.io", "Dumm123!"
     client.post(
         "/register",
@@ -57,6 +76,13 @@ def logged_in_client(client: FlaskClient) -> FlaskClient:
 
 
 def test_places_bid(example_auction: int, logged_in_client: FlaskClient) -> None:
+    """
+    Makes a single test for a given example.
+
+    Args:
+        example_auction: (todo): write your description
+        logged_in_client: (todo): write your description
+    """
     response = logged_in_client.post(f"/auctions/{example_auction}/bids", json={"amount": "15.99"})
 
     assert response.status_code == 200

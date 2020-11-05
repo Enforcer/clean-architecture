@@ -27,10 +27,27 @@ class PaymentDto:
 
     @classmethod
     def from_row(cls, row: Any) -> "PaymentDto":
+        """
+        Create a row from a row.
+
+        Args:
+            cls: (todo): write your description
+            row: (todo): write your description
+        """
         return PaymentDto(UUID(row.uuid), factories.get_dollars(row.amount / 100), row.description, row.status)
 
 
 def start_new_payment(payment_uuid: UUID, customer_id: int, amount: Money, description: str, conn: Connection) -> None:
+    """
+    Start a new payment.
+
+    Args:
+        payment_uuid: (str): write your description
+        customer_id: (str): write your description
+        amount: (int): write your description
+        description: (str): write your description
+        conn: (todo): write your description
+    """
     conn.execute(
         payments.insert(
             {
@@ -46,6 +63,13 @@ def start_new_payment(payment_uuid: UUID, customer_id: int, amount: Money, descr
 
 
 def get_pending_payments(customer_id: int, conn: Connection) -> List[PaymentDto]:
+    """
+    Get pending pendingicas.
+
+    Args:
+        customer_id: (str): write your description
+        conn: (todo): write your description
+    """
     rows = conn.execute(
         payments.select((payments.c.customer_id == customer_id) & (payments.c.status == PaymentStatus.NEW.value))
     ).fetchall()
@@ -53,6 +77,14 @@ def get_pending_payments(customer_id: int, conn: Connection) -> List[PaymentDto]
 
 
 def get_payment(payment_uuid: UUID, customer_id: int, conn: Connection) -> PaymentDto:
+    """
+    Return the payment.
+
+    Args:
+        payment_uuid: (str): write your description
+        customer_id: (str): write your description
+        conn: (todo): write your description
+    """
     row = conn.execute(
         payments.select((payments.c.customer_id == customer_id) & (payments.c.uuid == str(payment_uuid)))
     ).first()
@@ -60,6 +92,14 @@ def get_payment(payment_uuid: UUID, customer_id: int, conn: Connection) -> Payme
 
 
 def get_payment_charge_id(payment_uuid: UUID, customer_id: int, conn: Connection) -> Optional[str]:
+    """
+    Get the charge id for a payment.
+
+    Args:
+        payment_uuid: (str): write your description
+        customer_id: (str): write your description
+        conn: (todo): write your description
+    """
     row = conn.execute(
         payments.select((payments.c.customer_id == customer_id) & (payments.c.uuid == str(payment_uuid)))
     ).first()
@@ -67,6 +107,15 @@ def get_payment_charge_id(payment_uuid: UUID, customer_id: int, conn: Connection
 
 
 def update_payment(payment_uuid: UUID, customer_id: int, values: dict, conn: Connection) -> None:
+    """
+    Update the payment.
+
+    Args:
+        payment_uuid: (todo): write your description
+        customer_id: (str): write your description
+        values: (todo): write your description
+        conn: (todo): write your description
+    """
     conn.execute(
         payments.update()
         .where((payments.c.uuid == str(payment_uuid)) & (payments.c.customer_id == customer_id))

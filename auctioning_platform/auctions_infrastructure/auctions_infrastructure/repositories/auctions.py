@@ -14,10 +14,25 @@ from auctions_infrastructure import auctions, bids
 
 class SqlAlchemyAuctionsRepo(AuctionsRepository):
     def __init__(self, connection: Connection, event_bus: EventBus) -> None:
+        """
+        Initialize a connection.
+
+        Args:
+            self: (todo): write your description
+            connection: (todo): write your description
+            event_bus: (str): write your description
+        """
         self._conn = connection
         self._event_bus = event_bus
 
     def get(self, auction_id: AuctionId) -> Auction:
+        """
+        Gets the entity by id.
+
+        Args:
+            self: (todo): write your description
+            auction_id: (str): write your description
+        """
         row = self._conn.execute(auctions.select().where(auctions.c.id == auction_id)).first()
         if not row:
             raise Exception("Not found")
@@ -26,6 +41,14 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
         return self._row_to_entity(row, bid_rows)
 
     def _row_to_entity(self, auction_proxy: RowProxy, bids_proxies: List[RowProxy]) -> Auction:
+        """
+        Builds a row to an apction.
+
+        Args:
+            self: (todo): write your description
+            auction_proxy: (todo): write your description
+            bids_proxies: (todo): write your description
+        """
         auction_bids = [Bid(bid.id, bid.bidder_id, get_dollars(bid.amount)) for bid in bids_proxies]
         return Auction(
             auction_proxy.id,
@@ -37,6 +60,13 @@ class SqlAlchemyAuctionsRepo(AuctionsRepository):
         )
 
     def save(self, auction: Auction) -> None:
+        """
+        Save or insert of the record
+
+        Args:
+            self: (todo): write your description
+            auction: (todo): write your description
+        """
         raw_auction = {
             "title": auction.title,
             "starting_price": auction.starting_price.amount,

@@ -15,6 +15,12 @@ shipping_blueprint = Blueprint("shipping_blueprint", __name__)
 
 @shipping_blueprint.route("/package")
 def get_next_package(query: GetNextPackage) -> Response:
+    """
+    Returns the next package.
+
+    Args:
+        query: (str): write your description
+    """
     result = query.query()
     if not result:
         abort(404)
@@ -23,6 +29,13 @@ def get_next_package(query: GetNextPackage) -> Response:
 
 @shipping_blueprint.route("/package/<package_uuid>/ship", methods=["POST"])
 def ship_package(package_uuid: str, shipping_package_uc: ShippingPackage) -> Response:
+    """
+    Returns a deferred package.
+
+    Args:
+        package_uuid: (str): write your description
+        shipping_package_uc: (str): write your description
+    """
     if not current_user.is_authenticated:
         abort(403)
     # try:

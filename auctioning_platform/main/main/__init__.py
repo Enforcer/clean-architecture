@@ -55,6 +55,13 @@ def bootstrap_app() -> AppContext:
 
 
 def _setup_dependency_injection(settings: dict, engine: Engine) -> injector.Injector:
+    """
+    Called when the engine is ready to be executed.
+
+    Args:
+        settings: (dict): write your description
+        engine: (todo): write your description
+    """
     return injector.Injector(
         [
             Db(engine),
@@ -75,16 +82,46 @@ def _setup_dependency_injection(settings: dict, engine: Engine) -> injector.Inje
 
 
 def _setup_orm_events(dependency_injector: injector.Injector) -> None:
+    """
+    Setup events for the given customer.
+
+    Args:
+        dependency_injector: (dict): write your description
+        injector: (todo): write your description
+        Injector: (todo): write your description
+    """
     @sa_event.listens_for(User, "after_insert")
     def insert_cb(_mapper, _connection: Connection, user: User) -> None:  # type: ignore
+        """
+        Inserts a user.
+
+        Args:
+            _mapper: (todo): write your description
+            _connection: (todo): write your description
+            user: (todo): write your description
+        """
         dependency_injector.get(CustomerRelationshipFacade).create_customer(user.id, user.email)
 
     @sa_event.listens_for(User, "after_update")
     def update_cb(_mapper, _connection: Connection, user: User) -> None:  # type: ignore
+        """
+        Called when a user changes.
+
+        Args:
+            _mapper: (todo): write your description
+            _connection: (todo): write your description
+            user: (todo): write your description
+        """
         dependency_injector.get(CustomerRelationshipFacade).update_customer(user.id, user.email)
 
 
 def _create_db_schema(engine: Engine) -> None:
+    """
+    Create database schema.
+
+    Args:
+        engine: (todo): write your description
+    """
     # Models has to be imported for metadata.create_all to discover them
     from auctions_infrastructure import auctions, bids  # noqa
     from customer_relationship.models import customers  # noqa

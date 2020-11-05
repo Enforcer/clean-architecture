@@ -12,16 +12,41 @@ class Event:
 
 class EventMixin:
     def __init__(self) -> None:
+        """
+        Initialize domain events.
+
+        Args:
+            self: (todo): write your description
+        """
         self._pending_domain_events: List[Event] = []
 
     def _record_event(self, event: Event) -> None:
+        """
+        Record the event.
+
+        Args:
+            self: (todo): write your description
+            event: (todo): write your description
+        """
         self._pending_domain_events.append(event)
 
     @property
     def domain_events(self) -> List[Event]:
+        """
+        The list of the event handler.
+
+        Args:
+            self: (todo): write your description
+        """
         return self._pending_domain_events[:]
 
     def clear_events(self) -> None:
+        """
+        Clears all pending events.
+
+        Args:
+            self: (todo): write your description
+        """
         self._pending_domain_events.clear()
 
 
@@ -48,9 +73,23 @@ class EventHandlerProvider(Provider):
     """
 
     def __init__(self, cls: Type[T]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            self: (todo): write your description
+            cls: (todo): write your description
+        """
         self._cls = cls
 
     def get(self, injector: Injector) -> List[T]:
+        """
+        Return a injector.
+
+        Args:
+            self: (todo): write your description
+            injector: (todo): write your description
+        """
         return [injector.create_object(self._cls)]
 
 
@@ -62,15 +101,36 @@ class AsyncEventHandlerProvider(Provider):
     """
 
     def __init__(self, cls: Type[T]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            self: (todo): write your description
+            cls: (todo): write your description
+        """
         self._cls = cls
 
     def get(self, _injector: Injector) -> List[Type[T]]:
+        """
+        Get a list of injector instances.
+
+        Args:
+            self: (todo): write your description
+            _injector: (int): write your description
+        """
         return [self._cls]
 
 
 class EventBus(abc.ABC):
     @abc.abstractmethod
     def post(self, event: Event) -> None:
+        """
+        Create an event.
+
+        Args:
+            self: (todo): write your description
+            event: (todo): write your description
+        """
         raise NotImplementedError
 
 
@@ -86,10 +146,25 @@ class InjectorEventBus(EventBus):
     """
 
     def __init__(self, injector: Injector, run_async_handler: RunAsyncHandler) -> None:
+        """
+        Initialize the handler.
+
+        Args:
+            self: (todo): write your description
+            injector: (todo): write your description
+            run_async_handler: (todo): write your description
+        """
         self._injector = injector
         self._run_async_handler = run_async_handler
 
     def post(self, event: Event) -> None:
+        """
+        Calls the event.
+
+        Args:
+            self: (todo): write your description
+            event: (todo): write your description
+        """
         try:
             handlers = self._injector.get(Handler[type(event)])  # type: ignore
         except UnsatisfiedRequirement:
