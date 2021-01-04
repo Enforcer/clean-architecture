@@ -25,7 +25,7 @@ flask-security==3.0.0     # via -r ./web_app/requirements.txt, -r ./web_app_mode
 flask-wtf==0.14.3         # via flask-security
 flask==1.1.2              # via -r ./web_app/requirements.txt, flask-babelex, flask-injector, flask-login, flask-mail, flask-principal, flask-security, flask-wtf
 freezegun==1.0.0          # via -r ./auctions/requirements-dev.txt, -r ./processes/requirements-dev.txt, pytest-freezegun
-idna==2.8                 # via email-validator, requests
+idna==3.0                 # via email-validator, requests
 iniconfig==1.1.1          # via pytest
 injector==0.18.4          # via -r ./auctions/requirements.txt, -r ./auctions_infrastructure/requirements.txt, -r ./customer_relationship/requirements.txt, -r ./foundation/requirements.txt, -r ./main/requirements.txt, -r ./payments/requirements.txt, -r ./processes/requirements.txt, -r ./shipping/requirements.txt, -r ./shipping_infrastructure/requirements.txt, flask-injector
 itsdangerous==1.1.0       # via flask, flask-security, flask-wtf
