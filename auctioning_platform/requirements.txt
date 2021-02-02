@@ -47,7 +47,7 @@ pytest-sqlalchemy==0.2.1  # via -r ./db_infrastructure/requirements.txt
 pytest==6.1.2             # via -r ./auctions/requirements-dev.txt, -r ./auctions_infrastructure/requirements-dev.txt, -r ./customer_relationship/requirements-dev.txt, -r ./foundation/requirements-dev.txt, -r ./payments/requirements-dev.txt, -r ./processes/requirements-dev.txt, -r ./shipping/requirements-dev.txt, -r ./shipping_infrastructure/requirements-dev.txt, -r ./web_app/requirements-dev.txt, pytest-freezegun, pytest-sqlalchemy
 python-dateutil==2.8.1    # via faker, freezegun
 python-dotenv==0.15.0     # via -r ./main/requirements.txt
-pytz==2019.3              # via -r ./auctions_infrastructure/requirements.txt, babel
+pytz==2021.1              # via -r ./auctions_infrastructure/requirements.txt, babel
 redis==3.5.3              # via -r ./main/requirements.txt, rq
 requests==2.22.0          # via -r ./payments/requirements.txt, stripe
 rq==1.5.2                 # via -r ./main/requirements.txt
