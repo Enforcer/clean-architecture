@@ -29,7 +29,7 @@ idna==2.8                 # via email-validator, requests
 iniconfig==1.1.1          # via pytest
 injector==0.18.4          # via -r ./auctions/requirements.txt, -r ./auctions_infrastructure/requirements.txt, -r ./customer_relationship/requirements.txt, -r ./foundation/requirements.txt, -r ./main/requirements.txt, -r ./payments/requirements.txt, -r ./processes/requirements.txt, -r ./shipping/requirements.txt, -r ./shipping_infrastructure/requirements.txt, flask-injector
 itsdangerous==1.1.0       # via flask, flask-security, flask-wtf
-jinja2==2.11.2            # via flask, flask-babelex
+jinja2==2.11.3            # via flask, flask-babelex
 markupsafe==1.1.1         # via jinja2, wtforms
 marshmallow-dataclass==8.1.0  # via -r ./web_app/requirements.txt
 marshmallow==3.10.0        # via -r ./web_app/requirements.txt, marshmallow-dataclass
