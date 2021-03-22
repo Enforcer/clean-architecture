@@ -1,3 +1,3 @@
 injector
 SQLAlchemy==1.3.19
-Faker==4.14.0
+Faker==6.6.2
