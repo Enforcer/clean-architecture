@@ -13,7 +13,7 @@ cffi==1.14.3              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.1.2              # via flask, rq
 dnspython==2.0.0          # via email-validator
-email-validator==1.1.1    # via -r ./web_app/requirements.txt
+email-validator==1.1.2    # via -r ./web_app/requirements.txt
 factory-boy==3.1.0        # via -r ./auctions/requirements-dev.txt, -r ./web_app/requirements-dev.txt, -r ./web_app/requirements.txt
 faker==6.6.2             # via -r ./shipping_infrastructure/requirements.txt, factory-boy, pytest-faker
 flask-babelex==0.9.4      # via flask-security

@@ -1,4 +1,4 @@
-email-validator==1.1.1
+email-validator==1.1.2
 factory-boy==3.1.0
 Flask-Security==3.0.0
 Flask-Injector==0.12.0
