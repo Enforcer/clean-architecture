@@ -49,7 +49,7 @@ python-dateutil==2.8.1    # via faker, freezegun
 python-dotenv==0.15.0     # via -r ./main/requirements.txt
 pytz==2021.1              # via -r ./auctions_infrastructure/requirements.txt, babel
 redis==3.5.3              # via -r ./main/requirements.txt, rq
-requests==2.22.0          # via -r ./payments/requirements.txt, stripe
+requests==2.25.1          # via -r ./payments/requirements.txt, stripe
 rq==1.5.2                 # via -r ./main/requirements.txt
 six==1.15.0               # via bcrypt, packaging, python-dateutil, sqlalchemy-utils
 speaklater==1.3           # via flask-babelex
