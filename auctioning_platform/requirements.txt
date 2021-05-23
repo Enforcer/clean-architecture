@@ -34,7 +34,7 @@ markupsafe==1.1.1         # via jinja2, wtforms
 marshmallow-dataclass==8.1.0  # via -r ./web_app/requirements.txt
 marshmallow==3.10.0        # via -r ./web_app/requirements.txt, marshmallow-dataclass
 mypy-extensions==0.4.3    # via typing-inspect
-packaging==20.4           # via pytest
+packaging==20.9           # via pytest
 passlib==1.7.4            # via flask-security
 pluggy==0.13.1            # via pytest
 psycopg2-binary==2.8.6    # via -r ./db_infrastructure/requirements.txt
