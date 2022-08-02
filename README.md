@@ -3,6 +3,8 @@ Example project used in the book [Implementing the Clean Architecture](https://l
 
 [![Implementing the Clean Architecture cover](docs/cover.png)](https://leanpub.com/implementing-the-clean-architecture)
 
+[![Join our Discord server!](https://invidget.switchblade.xyz/cDyDKv2VsY)](http://discord.gg/cDyDKv2VsY)
+
 ## Build status
 [![CircleCI](https://circleci.com/gh/Enforcer/clean-architecture.svg?style=svg)](https://app.circleci.com/pipelines/github/Enforcer/clean-architecture?branch=master) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
