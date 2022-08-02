@@ -3,6 +3,8 @@ Example project used in the book [Implementing the Clean Architecture](https://l
 
 [![Implementing the Clean Architecture cover](docs/cover.png)](https://leanpub.com/implementing-the-clean-architecture)
 
+## Discord server
+
 [![Join our Discord server!](https://invidget.switchblade.xyz/cDyDKv2VsY)](http://discord.gg/cDyDKv2VsY)
 
 ## Build status
