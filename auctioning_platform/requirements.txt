@@ -6,7 +6,7 @@
 #
 attrs==20.2.0             # via pytest
 babel==2.8.0              # via flask-babelex
-bcrypt==3.1.7             # via -r ./web_app/requirements.txt
+bcrypt==3.2.0             # via -r ./web_app/requirements.txt
 blinker==1.4              # via flask-mail, flask-principal
 certifi==2020.6.20        # via requests
 cffi==1.14.3              # via bcrypt

@@ -3,7 +3,7 @@ factory-boy==3.1.0
 Flask-Security==3.0.0
 Flask-Injector==0.12.0
 Flask==1.1.2
-bcrypt==3.1.7
+bcrypt==3.2.0
 marshmallow==3.10.0
 marshmallow-dataclass==8.1.0
 Flask-Login==0.5.0
