@@ -62,5 +62,5 @@ typing-extensions==3.7.4.3  # via -r ./foundation/requirements.txt, -r ./process
 typing-inspect==0.6.0     # via marshmallow-dataclass
 typing==3.7.4.3           # via flask-injector
 urllib3==1.25.11          # via requests
-werkzeug==1.0.1           # via flask
+werkzeug==2.2.3           # via flask
 wtforms==2.3.3            # via flask-wtf
